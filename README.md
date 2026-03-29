@@ -222,8 +222,9 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 | Role | Provider / Model | When Used |
 |---|---|---|
 | Tool detection (pre-flight) | `groq/compound-mini` | Every request — determines if a tool call is needed |
-| Vision (image attachments) | `groq/llama-4-scout` | When the message includes an image |
-| Main inference — Groq | `groq/llama-4-scout`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
+| URL detection | `groq/compound` | When a message includes an URL |
+| Vision (image attachments) | `meta-llama/llama-4-scout-17b-16e-instruct` | When the message includes an image |
+| Main inference — Groq | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
 | Main inference — OpenAI | `openai/gpt-5.4`, `openai/gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
 | Main inference — Custom | Any OpenAI-compatible endpoint | Custom provider selected |
 | Emotion classification | `groq/llama-3.1-8b-instant` | Post-response, every message |
