@@ -1,11 +1,11 @@
 'use client'
 
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
-import { DEFAULT_GROQ_EMOTION_DETECTION_MODEL, EMOTION_KEYWORDS, DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, DEFAULT_GENDER } from '../constants'
+import { DEFAULT_OPENAI_TOOL_DETECTION_MODEL, EMOTION_KEYWORDS, DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, DEFAULT_GENDER } from '../constants'
 import { getDB } from '../db'
 import { getAPIKey } from '../utils'
 
-const CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const CHAT_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 /**
  * Valid emotion states derived from EMOTION_KEYWORDS — single source of truth
@@ -37,7 +37,7 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
 
 /**
  * Detect the dominant emotion in an AI response
- * Uses llama-3.1-8b-instant with JSON mode for fast, structured classification
+ * Uses gpt-5.4-nano with JSON mode for fast, structured classification
  * 
  * Only sends the AI response text - no conversation history needed
  * 
@@ -46,7 +46,7 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
  */
 export async function detectEmotion(aiResponse: string): Promise<EmotionDetectionResult> {
   try {
-    const apiKey = await getAPIKey('groq')
+    const apiKey = await getAPIKey('openai')
     const db = await getDB()
     const settings = await db.getSettings()
 
@@ -57,7 +57,7 @@ export async function detectEmotion(aiResponse: string): Promise<EmotionDetectio
     console.log('[Athena] Emotion detection - companion:', companion, 'personality:', personality)
 
     const reqBody = {
-      model: DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
+      model: DEFAULT_OPENAI_TOOL_DETECTION_MODEL,
       messages: [
         {
           role: 'system' as const,
