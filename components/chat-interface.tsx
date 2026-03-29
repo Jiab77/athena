@@ -40,6 +40,19 @@ import { EmojiPicker } from './emoji-picker'
 import { TokenUsagePopover, type TokenUsage } from './token-usage-popover'
 import { TTSPlayback } from './tts-playback'
 
+// Inline SVGs — avoids adding new lucide-react icon modules which can cause cache issues
+const CopyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+  </svg>
+)
+const CheckIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+)
+
 interface ChatInterfaceProps {
   isChatVisible: boolean
   setIsChatVisible: (visible: boolean) => void
@@ -86,6 +99,7 @@ export function ChatInterface({
   const [sttSupported, setSTTSupported] = useState(true)
   const [companionName, setCompanionName] = useState<string>('')
   const [companionImageUrl, setCompanionImageUrl] = useState<string>('')
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -757,18 +771,38 @@ export function ChatInterface({
               </div>
             ) : (
               <>
-                {displayMessages.slice(-MAX_DISPLAY_MESSAGES).map((message) => (
+                {displayMessages.slice(-MAX_DISPLAY_MESSAGES).map((message) => {
+                  const isUser = message.role === 'user'
+                  const isCopied = copiedMessageId === message.id
+
+                  const handleCopy = () => {
+                    navigator.clipboard.writeText(message.content)
+                    setCopiedMessageId(message.id)
+                    setTimeout(() => setCopiedMessageId(null), 2000)
+                  }
+
+                  return (
                   <div
                     key={message.id}
-                    className={`flex ${
-                      message.role === 'user'
-                        ? 'justify-end'
-                        : 'justify-start'
-                    }`}
+                    className={`flex group ${isUser ? 'justify-end' : 'justify-start'}`}
                   >
+                    {/* Copy button — left side for user messages */}
+                    {isUser && (
+                      <button
+                        onClick={handleCopy}
+                        className="self-start mt-1 mr-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
+                        aria-label="Copy message"
+                      >
+                        {isCopied
+                          ? <span className="text-green-500"><CheckIcon /></span>
+                          : <CopyIcon />
+                        }
+                      </button>
+                    )}
+
                     <div
                       className={`max-w-xs px-4 py-2 rounded-lg ${
-                        message.role === 'user'
+                        isUser
                           ? 'bg-primary text-primary-foreground rounded-br-none'
                           : 'bg-secondary text-secondary-foreground rounded-bl-none'
                       }`}
@@ -810,8 +844,23 @@ export function ChatInterface({
                         )}
                       </div>
                     </div>
+
+                    {/* Copy button — right side for companion messages */}
+                    {!isUser && (
+                      <button
+                        onClick={handleCopy}
+                        className="self-start mt-1 ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
+                        aria-label="Copy message"
+                      >
+                        {isCopied
+                          ? <span className="text-green-500"><CheckIcon /></span>
+                          : <CopyIcon />
+                        }
+                      </button>
+                    )}
                   </div>
-                ))}
+                  )
+                })}
                 {isLoading && <TypingIndicator message="Thinking..." />}
                 {isTranscribing && <TypingIndicator message="Transcribing..." />}
               <div ref={scrollRef} />
