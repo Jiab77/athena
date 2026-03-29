@@ -355,31 +355,35 @@ export function ChatInterface({
     try {
       const allMessages = updatedMessages
 
-      // Tool detection — Groq only, plain text only (skip if image, document or URL present)
+      // Tool detection — Groq and OpenAI providers, plain text only (skip if image or document present)
       const llmSettings = db ? await db.getSettings() : null
-      const isGroqProvider = (llmSettings?.selectedProvider || DEFAULT_MODEL_PROVIDER) === 'groq'
+      const selectedProvider = llmSettings?.selectedProvider || DEFAULT_MODEL_PROVIDER
+      const isGroqProvider = selectedProvider === 'groq'
+      const isOpenAIProvider = selectedProvider === 'openai'
       const isPlainText = !userMessage.imageBase64
         && !userMessage.documentContent
         && !/https?:\/\/\S+/.test(userMessage.content)
 
-      console.log('[Athena] Tool detection check — isGroqProvider:', isGroqProvider, 'isPlainText:', isPlainText)
+      console.log('[Athena] Tool detection check — provider:', selectedProvider, 'isPlainText:', isPlainText)
 
       let result: LLMResponse
 
-      if (isGroqProvider && isPlainText) {
-        console.log('[Athena] Running tool detection for message:', userMessage.content)
-        const toolResult = await detectTools(userMessage.content)
+      if ((isGroqProvider || isOpenAIProvider) && isPlainText) {
+        console.log('[Athena] Running tool detection for provider:', selectedProvider, 'message:', userMessage.content)
+        const toolResult = await detectTools(userMessage.content, selectedProvider)
 
-        if (toolResult.toolsUsed && toolResult.response) {
-          console.log('[Athena] Tools were used — skipping callLLM, using tool response directly')
+        if (isGroqProvider && toolResult.toolsUsed && toolResult.response) {
+          // Groq: tools already executed — response is ready, skip main callLLM
+          console.log('[Athena] Groq tools were used — skipping callLLM, using tool response directly')
           result = { response: toolResult.response, usage: null }
         } else {
-          console.log('[Athena] No tools needed — proceeding to callLLM')
-          result = await callLLM(allMessages)
+          // Groq: no tools fired, or OpenAI: toolsNeeded flag already set on last message by detectTools
+          console.log('[Athena] Tool detection complete — proceeding to callLLM, toolsNeeded:', toolResult.toolsNeeded)
+          result = await callLLM(allMessages, selectedProvider)
         }
       } else {
-        console.log('[Athena] Skipping tool detection (multimodal or non-Groq) — proceeding to callLLM')
-        result = await callLLM(allMessages)
+        console.log('[Athena] Skipping tool detection (multimodal or unsupported provider) — proceeding to callLLM')
+        result = await callLLM(allMessages, selectedProvider)
       }
       
       // Update token usage for display
