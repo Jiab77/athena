@@ -246,7 +246,7 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 | Key | Required For |
 |---|---|
 | `GROQ_API_KEY` | Groq LLM + STT (Whisper) + emotion detection |
-| `OPENAI_API_KEY` | OpenAI LLM + TTS |
+| `OPENAI_API_KEY` | OpenAI LLM + STT (Whisper) + TTS |
 | `RESEMBLEAI_API_KEY` | ResembleAI Chatterbox TTS |
 | `DECART_API_KEY` | Decart live avatar (WebRTC) |
 
@@ -289,7 +289,6 @@ Add your API keys in **Settings > Model** within the app — they are encrypted 
 
 ## Development Philosophy
 
-See `SOUL.md` for core principles:
 - Zero Trust (verify the system is not manipulating)
 - DRY and KISS (simplicity over cleverness)
 - Kerckhoffs's Principle (no hidden agendas in data)
