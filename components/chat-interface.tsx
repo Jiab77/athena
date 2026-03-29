@@ -396,7 +396,7 @@ export function ChatInterface({
       // Detect emotion from response async (fire-and-forget) — does not block message render or TTS
       console.log('[Athena] About to call detectEmotion with response:', result.response)
       console.log('[Athena] onExpressionChange available:', !!onExpressionChange)
-      detectEmotion(result.response).then(({ emotion }) => {
+      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
         console.log('[Athena] Detected emotion:', emotion)
         if (emotion) {
           if (onExpressionChange) {
