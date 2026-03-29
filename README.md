@@ -222,11 +222,17 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 | Role | Provider / Model | When Used |
 |---|---|---|
 | Tool detection (pre-flight) | `groq/compound-mini` | Every request — determines if a tool call is needed |
-| Vision (image attachments) | `groq/llama-4-scout` | When the message includes an image |
-| Main inference — Groq | `groq/llama-4-scout`, `groq/llama3-70b`, etc. | Groq provider selected |
-| Main inference — OpenAI | `openai/gpt-4o`, `openai/gpt-4o-mini`, etc. (Responses API) | OpenAI provider selected |
+| URL detection | `groq/compound` | When a message includes an URL |
+| Vision (image attachments) | `meta-llama/llama-4-scout-17b-16e-instruct` | When the message includes an image |
+| Main inference — Groq | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
+| Main inference — OpenAI | `openai/gpt-5.4`, `openai/gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
 | Main inference — Custom | Any OpenAI-compatible endpoint | Custom provider selected |
-| Emotion classification | `groq/llama-3.1-8b-instant` | Post-response, every message |
+| Emotion classification | `llama-3.1-8b-instant` | Post-response, every message |
+| STT (Speech To Text) — Groq | `whisper-large-v3-turbo` | To convert user speech in text |
+| STT (Speech To Text) — OpenAI | `whisper-1` | To convert user speech to text |
+| TTS (Text To Speech) — OpenAI | `gpt-4o-mini-tts` | To convert companion text to speech |
+| TTS (Text To Speech) — RessembleAI | `chatterbox` | To convert companion text to speech |
+| Live Avatar — Decart AI | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
 
 ### Supported Providers
 
