@@ -227,7 +227,7 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 | Main inference — Groq | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
 | Main inference — OpenAI | `openai/gpt-5.4`, `openai/gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
 | Main inference — Custom | Any OpenAI-compatible endpoint | Custom provider selected |
-| Emotion classification | `groq/llama-3.1-8b-instant` | Post-response, every message |
+| Emotion classification | `llama-3.1-8b-instant` | Post-response, every message |
 | STT (Speech To Text) — Groq | `whisper-large-v3-turbo` | To convert user speech in text |
 | STT (Speech To Text) — OpenAI | `whisper-1` | To convert user speech to text |
 | TTS (Text To Speech) — OpenAI | `gpt-4o-mini-tts` | To convert companion text to speech |
