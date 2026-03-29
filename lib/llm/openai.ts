@@ -148,7 +148,7 @@ export async function callOpenAIAPI(
       max_output_tokens: 2048,
       reasoning: { effort: 'low' },
       ...(toolsNeeded
-        ? { tools: [{ type: 'web_search' }], tool_choice: 'auto' }
+        ? { tools: [{ type: 'web_search' }, { type: 'computer' }], tool_choice: 'auto' }
         : { text: { format: { type: 'json_object' } } }
       ),
     }
