@@ -84,7 +84,7 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 | Format | Description |
 |---|---|
 | `static-2d` | Static JPEG/PNG image with CSS float animation |
-| `animated-2d` | PixiJS sprite sheet animation (`AnimatedCharacter`) |
+| `animated-2d` | R3F/Three.js canvas animation with CSS glow fallback (`AnimatedCharacter`) |
 | `animated-3d` | 2.5D React Three Fiber plane mesh with custom GLSL shaders — parallax head-tracking, per-emotion animations, tint overlays |
 | `live-avatar` | Decart WebRTC real-time lip-sync avatar — idle timeout (10s), connection timeout (5s), local audio fallback |
 
@@ -157,7 +157,7 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 │   ├── settings-panel.tsx             # Companion customization (7 sections)
 │   ├── floating-action-button.tsx     # FAB entry point
 │   ├── avatar-2-5d.tsx                # 2.5D R3F avatar (custom GLSL shader)
-│   ├── r3f-animated-character.tsx     # PixiJS animated-2d avatar
+│   ├── r3f-animated-character.tsx     # R3F Three.js animated-2d avatar
 │   ├── decart-avatar.tsx              # Decart WebRTC live avatar
 │   ├── character-render.tsx           # Visual format router (delegates to above)
 │   ├── cyberpunk-background.tsx       # Animated background
@@ -356,7 +356,7 @@ See `/docs/IMPLEMENTATION_NOTES.md` ("Athena Companion Design Philosophy") for t
 [OpenAI TTS](https://platform.openai.com/docs/guides/text-to-speech) | [ResembleAI Chatterbox](https://www.resemble.ai/) | [Groq Whisper](https://groq.com/)
 
 **Avatar:**
-[Decart AI](https://www.decart.ai/) | [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) | [Three.js](https://threejs.org/) | [PixiJS](https://pixijs.com/)
+[Decart AI](https://www.decart.ai/) | [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) | [Three.js](https://threejs.org/)
 
 **Encryption:**
 [TweetNaCl.js](https://tweetnacl.js.org/) | [Web Crypto API / SubtleCrypto](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto) | [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)
