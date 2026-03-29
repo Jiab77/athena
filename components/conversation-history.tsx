@@ -45,8 +45,16 @@ export function ConversationHistory({
               decryptData(conv.messagesEncrypted, 'athena-conversations'),
               decryptData(conv.metadataEncrypted, 'athena-conversations'),
             ])
+            if (!messagesJson || !metadataJson) {
+              console.warn('[Athena] Conversation history - skipping unreadable conversation:', conv.id, '— decryption returned null (likely old format)')
+              continue
+            }
             const messages = JSON.parse(messagesJson)
             const metadata = JSON.parse(metadataJson)
+            if (!Array.isArray(messages)) {
+              console.warn('[Athena] Conversation history - skipping conversation with invalid messages shape:', conv.id)
+              continue
+            }
             decrypted.push({
               id: conv.id,
               companionId: '',

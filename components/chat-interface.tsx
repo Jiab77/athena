@@ -121,10 +121,14 @@ export function ChatInterface({
         if (stored) {
           try {
             const messagesJson = await decryptData(stored.messagesEncrypted, 'athena-conversations')
-            const messages = JSON.parse(messagesJson)
-            if (messages.length > 0) {
-              setDisplayMessages(messages)
-              console.log('[Athena] Loaded conversation for companion:', companionId, '- Messages:', messages.length)
+            if (!messagesJson) {
+              console.warn('[Athena] Could not decrypt conversation for companion:', companionId, '— stored data may be from an older format')
+            } else {
+              const messages = JSON.parse(messagesJson)
+              if (Array.isArray(messages) && messages.length > 0) {
+                setDisplayMessages(messages)
+                console.log('[Athena] Loaded conversation for companion:', companionId, '- Messages:', messages.length)
+              }
             }
           } catch (decryptError) {
             console.error('[Athena] Failed to decrypt conversation:', decryptError)
