@@ -147,6 +147,7 @@ export async function callOpenAIAPI(
       tools: [
         { type: 'web_search' }
       ],
+      tool_choice: 'auto',
     }
 
     console.log('[v0] callOpenAIAPI: request body (no content)', {
