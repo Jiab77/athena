@@ -6,6 +6,7 @@ import { getDB } from '@/lib/db'
 import { callGroqAPI, transcribeAudio as transcribeGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
+import { detectTools } from './tools'
 
 /**
  * LLM/STT Provider Router
@@ -59,16 +60,45 @@ async function getCurrentProvider(): Promise<string> {
 
 /**
  * Call LLM API for chat completions
- * Automatically routes to correct provider based on settings
- * @param messages - Conversation history
+ * Automatically routes to correct provider based on settings.
+ * Runs a pre-flight tool detection step for Groq and OpenAI providers:
+ * - Groq: if tools fire in the pre-flight, returns early with that response.
+ * - OpenAI: if toolsNeeded is true, the main call uses web_search without JSON mode.
+ *
+ * @param messages         - Conversation history
+ * @param selectedProvider - Optional provider override (avoids redundant DB read)
  * @returns API response with content and token usage
  */
-export async function callLLM(messages: Message[]): Promise<LLMResponse> {
-  const providerID = await getCurrentProvider()
+export async function callLLM(messages: Message[], selectedProvider?: string): Promise<LLMResponse> {
+  const providerID = selectedProvider || await getCurrentProvider()
   const provider = providers[providerID]
   
   if (!provider) {
     throw new Error(`Provider '${providerID}' not found in registry`)
+  }
+
+  // Pre-flight tool detection for Groq and OpenAI
+  if (providerID === 'groq' || providerID === 'openai') {
+    const lastUserMessage = [...messages].reverse().find(m => m.role === 'user')?.content || ''
+    if (lastUserMessage) {
+      const detection = await detectTools(lastUserMessage, providerID)
+
+      // Groq: tools already executed — response is ready
+      if (providerID === 'groq' && detection.toolsUsed && detection.response) {
+        console.log('[Router] Groq tools fired — returning pre-flight response')
+        return { response: detection.response, usage: null }
+      }
+
+      // OpenAI: pass toolsNeeded flag through via the messages array metadata
+      // We signal it by passing a special property on the last user message object
+      if (providerID === 'openai' && detection.toolsNeeded !== undefined) {
+        const lastMsg = messages[messages.length - 1]
+        if (lastMsg) {
+          (lastMsg as any)._toolsNeeded = detection.toolsNeeded
+          console.log('[Router] OpenAI toolsNeeded:', detection.toolsNeeded)
+        }
+      }
+    }
   }
   
   return provider.callAPI(messages)

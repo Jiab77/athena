@@ -1,11 +1,19 @@
 'use client'
 
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
-import { DEFAULT_GROQ_EMOTION_DETECTION_MODEL, EMOTION_KEYWORDS, DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, DEFAULT_GENDER } from '../constants'
+import {
+  DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
+  DEFAULT_OPENAI_TOOL_DETECTION_MODEL,
+  EMOTION_KEYWORDS,
+  DEFAULT_COMPANION_NAME,
+  DEFAULT_PERSONALITY,
+  DEFAULT_GENDER,
+} from '../constants'
 import { getDB } from '../db'
 import { getAPIKey } from '../utils'
 
-const CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const GROQ_CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const OPENAI_CHAT_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 /**
  * Valid emotion states derived from EMOTION_KEYWORDS — single source of truth
@@ -37,16 +45,18 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
 
 /**
  * Detect the dominant emotion in an AI response
- * Uses llama-3.1-8b-instant with JSON mode for fast, structured classification
+ * Uses gpt-5.4-nano with JSON mode for fast, structured classification
  * 
  * Only sends the AI response text - no conversation history needed
  * 
  * @param aiResponse - The AI response text to analyze
+ * @param provider   - The selected LLM provider ('groq' | 'openai' | other). Defaults to 'groq'.
  * @returns EmotionDetectionResult with detected emotion or null
  */
-export async function detectEmotion(aiResponse: string): Promise<EmotionDetectionResult> {
+export async function detectEmotion(aiResponse: string, provider = 'groq'): Promise<EmotionDetectionResult> {
   try {
-    const apiKey = await getAPIKey('groq')
+    const isOpenAI = provider === 'openai'
+    const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
     const db = await getDB()
     const settings = await db.getSettings()
 
@@ -54,10 +64,10 @@ export async function detectEmotion(aiResponse: string): Promise<EmotionDetectio
     const personality = (settings?.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const emotionSystemPrompt = buildEmotionSystemPrompt(companion, personality)
 
-    console.log('[Athena] Emotion detection - companion:', companion, 'personality:', personality)
+    console.log('[Athena] Emotion detection - provider:', provider, 'companion:', companion, 'personality:', personality)
 
     const reqBody = {
-      model: DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
+      model: isOpenAI ? DEFAULT_OPENAI_TOOL_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
       messages: [
         {
           role: 'system' as const,
@@ -68,15 +78,19 @@ export async function detectEmotion(aiResponse: string): Promise<EmotionDetectio
           content: aiResponse,
         },
       ],
-      temperature: 0.3, // Low temperature for consistent classification
-      max_completion_tokens: 64, // Short response expected
+      temperature: 0.3,
+      // Groq uses max_tokens, OpenAI Chat Completions uses max_completion_tokens
+      ...(isOpenAI
+        ? { max_completion_tokens: 64 }
+        : { max_tokens: 64 }
+      ),
       response_format: { type: 'json_object' },
     }
 
     console.log('[Athena] Emotion detection - analyzing response:', aiResponse)
     console.log('[Athena] Emotion detection request:', JSON.stringify(reqBody, null, 2))
 
-    const response = await fetch(CHAT_API_URL, {
+    const response = await fetch(isOpenAI ? OPENAI_CHAT_API_URL : GROQ_CHAT_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,

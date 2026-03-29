@@ -122,36 +122,36 @@ export async function callOpenAIAPI(
       }
     })
 
+    // Read the toolsNeeded flag set by the router's pre-flight detection
+    const lastMsg = messages[messages.length - 1] as any
+    const toolsNeeded = lastMsg?._toolsNeeded === true
+    // Clean up the flag so it doesn't leak into the payload
+    if (lastMsg) delete lastMsg._toolsNeeded
+
+    console.log('[v0] callOpenAIAPI: toolsNeeded from pre-flight', toolsNeeded)
+
     // Build request body for OpenAI Responses API
-    // New format: instructions (system prompt) + input (messages) instead of messages array
-    // JSON mode enabled via text.format to ensure valid JSON output
-    // Note: JSON mode requires the word "json" in the input messages, so we prepend a system message
-    const inputWithJsonContext = [
-      {
-        role: 'system' as const,
-        content: 'Always respond with valid JSON format.',
-      },
-      ...userMessages,
-    ]
+    // - toolsNeeded: enable web_search, disable JSON mode (mutually exclusive on Responses API)
+    // - no tools needed: enable JSON mode, no tools
+    const inputBase = toolsNeeded
+      ? userMessages  // plain prose expected — no JSON wrapper needed
+      : [
+        { role: 'system' as const, content: 'Always respond with valid JSON format.' },
+        ...userMessages,
+      ]
 
     const reqBody: any = {
       model: model,
       instructions: systemPrompt,
-      input: inputWithJsonContext,
+      input: inputBase,
       temperature: 1,
       max_output_tokens: 2048,
       reasoning: { effort: 'low' },
-      text: {
-        format: { type: 'json_object' }
-      },
+      ...(toolsNeeded
+        ? { tools: [{ type: 'web_search' }], tool_choice: 'auto' }
+        : { text: { format: { type: 'json_object' } } }
+      ),
     }
-
-    {/* FIXME: callOpenAIAPI: caught error Error: Web Search cannot be used with JSON mode.
-      tools: [
-        { type: 'web_search' }
-      ],
-      tool_choice: 'auto',
-      */}
 
     console.log('[v0] callOpenAIAPI: request body (no content)', {
       model: reqBody.model,
@@ -159,7 +159,7 @@ export async function callOpenAIAPI(
       maxOutputTokens: reqBody.max_output_tokens,
       reasoning: reqBody.reasoning,
       textFormat: reqBody.text?.format,
-      tools: reqBody.tools
+      toolsNeeded,
     })
 
     const response = await fetch(CHAT_API_URL, {
@@ -236,9 +236,16 @@ export async function callOpenAIAPI(
         throw new Error('No text found in OpenAI response output')
       }
 
-      console.log('[v0] callOpenAIAPI: raw content before JSON parse', content.slice(0, 200))
-      parsedResponse = parseCompanionJSON(content)
-      console.log('[v0] callOpenAIAPI: parsedResponse keys', Object.keys(parsedResponse))
+      console.log('[v0] callOpenAIAPI: raw content before parse', content.slice(0, 200))
+      // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
+      // Only fall back to wrapping as plain prose if parsing fails.
+      try {
+        parsedResponse = parseCompanionJSON(content)
+        console.log('[v0] callOpenAIAPI: parsedResponse keys', Object.keys(parsedResponse))
+      } catch {
+        console.log('[v0] callOpenAIAPI: JSON parse failed — wrapping plain prose as response (toolsNeeded:', toolsNeeded, ')')
+        parsedResponse = { response: content }
+      }
     } catch (parseError) {
       console.log('[v0] callOpenAIAPI: parse error', parseError)
       throw new Error('Invalid response from OpenAI Responses API')

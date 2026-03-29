@@ -344,8 +344,10 @@ export function useBrain({
 
       const history = await loadConversation()
       const allMessages = [...history, userMessage]
-      const result = await callLLM(allMessages)
-      console.log('[Brain] LLM response received, reasoning:', result.reasoning ?? 'none')
+      const settings = await db?.getSettings()
+      const selectedProvider = settings?.selectedProvider || 'groq'
+      const result = await callLLM(allMessages, selectedProvider)
+      console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
       // Fire-and-forget emotion detection
       detectEmotion(result.response).then(({ emotion }) => {
