@@ -111,6 +111,8 @@ export interface ToolDetectionResult {
   toolsUsed: boolean
   response?: string
   executedTools?: string[]
+  // OpenAI provider: pre-flight decision on whether tools are needed
+  toolsNeeded?: boolean
 }
 
 /**
