@@ -77,7 +77,8 @@ export async function callOpenAIAPI(
         console.log('[v0] callOpenAIAPI: attaching document', { name: msg.documentName, contentLength: msg.documentContent.length })
 
         // Convert text content to base64
-        const base64Content = Buffer.from(msg.documentContent).toString('base64')
+        const bytes = new TextEncoder().encode(msg.documentContent)
+        const base64Content = btoa(String.fromCharCode(...bytes))
 
         // Determine MIME type from filename extension
         const ext = msg.documentName.split('.').pop()?.toLowerCase()
