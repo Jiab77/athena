@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink, Copy, Check } from 'lucide-react'
+import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -39,6 +39,19 @@ import { ConversationHistory } from './conversation-history'
 import { EmojiPicker } from './emoji-picker'
 import { TokenUsagePopover, type TokenUsage } from './token-usage-popover'
 import { TTSPlayback } from './tts-playback'
+
+// Inline SVGs — avoids adding new lucide-react icon modules which can cause cache issues
+const CopyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+  </svg>
+)
+const CheckIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+)
 
 interface ChatInterfaceProps {
   isChatVisible: boolean
@@ -781,8 +794,8 @@ export function ChatInterface({
                         aria-label="Copy message"
                       >
                         {isCopied
-                          ? <Check className="h-3.5 w-3.5 text-green-500" />
-                          : <Copy className="h-3.5 w-3.5" />
+                          ? <span className="text-green-500"><CheckIcon /></span>
+                          : <CopyIcon />
                         }
                       </button>
                     )}
@@ -840,8 +853,8 @@ export function ChatInterface({
                         aria-label="Copy message"
                       >
                         {isCopied
-                          ? <Check className="h-3.5 w-3.5 text-green-500" />
-                          : <Copy className="h-3.5 w-3.5" />
+                          ? <span className="text-green-500"><CheckIcon /></span>
+                          : <CopyIcon />
                         }
                       </button>
                     )}
