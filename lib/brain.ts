@@ -45,6 +45,7 @@ export interface BrainState {
   // Expression / emotion
   expressionState: ExpressionState
   lastDetectedEmotion: EmotionState | null
+  setLastDetectedEmotion: (emotion: EmotionState | null) => void
   // Voice input
   voiceState: VoiceState
   sttSupported: boolean
@@ -349,8 +350,8 @@ export function useBrain({
       const result = await callLLM(allMessages, selectedProvider)
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
-      // Fire-and-forget emotion detection
-      detectEmotion(result.response).then(({ emotion }) => {
+      // Fire-and-forget emotion detection — pass provider so correct API key is used
+      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
         console.log('[Brain] Detected emotion:', emotion)
         if (emotion) setLastDetectedEmotion(emotion)
       })
@@ -441,6 +442,7 @@ export function useBrain({
   return {
     expressionState,
     lastDetectedEmotion,
+    setLastDetectedEmotion,
     voiceState,
     sttSupported,
     decartStream,
