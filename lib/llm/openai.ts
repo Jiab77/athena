@@ -146,7 +146,7 @@ export async function callOpenAIAPI(
       },
     }
 
-    {/*
+    {/* FIXME: callOpenAIAPI: caught error Error: Web Search cannot be used with JSON mode.
       tools: [
         { type: 'web_search' }
       ],
