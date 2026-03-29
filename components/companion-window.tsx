@@ -1,0 +1,320 @@
+'use client'
+
+import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { AnimatedCharacter } from '@/components/animated-character'
+import { lazy, Suspense, useEffect, useRef } from 'react'
+
+// Module-level ref so it persists across renders
+let _companionPopupRef: Window | null = null
+
+function openCompanionPopup(url: string, name: string) {
+  if (_companionPopupRef && !_companionPopupRef.closed) {
+    _companionPopupRef.focus()
+    return
+  }
+  const w = 392, h = 535
+  const left = screen.availWidth - w
+  const top = Math.round((screen.availHeight - h) / 2)
+  _companionPopupRef = window.open(url, name, `width=${w},height=${h},left=${left},top=${top},resizable=no,scrollbars=no`)
+}
+
+export function getCompanionPopupRef() { return _companionPopupRef }
+export function setCompanionPopupRef(ref: Window | null) { _companionPopupRef = ref }
+
+const Avatar25D = lazy(() => import('@/components/avatar-2-5d').then(m => ({ default: m.Avatar25D })))
+import type { CompanionData, PersonalityType, VisualFormat, ExpressionState, EmotionState } from '@/lib/types'
+import { DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, PERSONALITY_TRAITS, DEFAULT_VISUAL_FORMAT } from '@/lib/constants'
+
+type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
+
+interface CompanionWindowProps {
+  isOpen: boolean
+  onClose: () => void
+  isChatVisible: boolean
+  setIsChatVisible: (visible: boolean) => void
+  isOnline: boolean
+  companion: CompanionData
+  expressionState?: ExpressionState
+  lastDetectedEmotion?: EmotionState | null
+  visualFormat?: VisualFormat
+  decartStream?: MediaStream | null
+  decartError?: string | null
+  // Voice interaction props
+  voiceState?: VoiceState
+  onMicClick?: () => void
+  voiceOutputEnabled?: boolean
+  onVoiceOutputToggle?: () => void
+  sttSupported?: boolean
+}
+
+export function CompanionWindow({
+  isOpen,
+  onClose,
+  isChatVisible,
+  setIsChatVisible,
+  isOnline,
+  companion,
+  expressionState = 'idle',
+  lastDetectedEmotion = null,
+  visualFormat = DEFAULT_VISUAL_FORMAT,
+  decartStream = null,
+  decartError = null,
+  voiceState = 'idle',
+  onMicClick,
+  voiceOutputEnabled = true,
+  onVoiceOutputToggle,
+  sttSupported = true,
+}: CompanionWindowProps) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  // Attach Decart WebRTC stream to video element when stream arrives
+  useEffect(() => {
+    if (videoRef.current && decartStream) {
+      videoRef.current.srcObject = decartStream
+    }
+  }, [decartStream])
+
+  if (!isOpen) return null
+
+  return (
+    <>
+      {/* Header with close button */}
+      <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 p-4 flex items-start justify-between flex-shrink-0">
+        <div className="flex-1">
+          <h2 className="text-lg font-bold text-foreground">{companion.name || DEFAULT_COMPANION_NAME}</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {PERSONALITY_TRAITS[companion.personality as PersonalityType] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 -mt-1 -mr-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 cursor-pointer"
+                  onClick={() => {
+                    const url = `/companion/${companion.id}?name=${encodeURIComponent(companion.name)}&image=${encodeURIComponent(companion.imageUrl || '')}&format=${visualFormat || 'static-2d'}`
+                    openCompanionPopup(url, `companion-${companion.id}`)
+                  }}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Pop out</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 cursor-pointer"
+            onClick={onClose}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <ScrollArea className="flex-1 overflow-hidden">
+        {/* Character Display - conditionally animated or static */}
+        <div className="px-4 pt-5 pb-10 bg-background border-t border-border flex items-center justify-center">
+          <div className="relative w-48 min-h-[264px]">
+            {/* Emotion emoji badge — top-left corner, always visible */}
+            {/* Uses lastDetectedEmotion (independent of animation state) so TTS/thinking never overrides it */}
+            <div className="absolute duration-300 flex h-7 items-center justify-center leading-none left-1 select-none text-xl top-1 transition-all w-8 z-20">
+              {lastDetectedEmotion === 'happy' && '😊'}
+              {lastDetectedEmotion === 'sad' && '😢'}
+              {lastDetectedEmotion === 'angry' && '😠'}
+              {lastDetectedEmotion === 'surprised' && '😲'}
+              {lastDetectedEmotion === 'thoughtful' && '🤔'}
+              {!lastDetectedEmotion && '😌'}
+            </div>
+
+            {visualFormat === 'live-avatar' ? (
+              <>
+                <div className="w-48 rounded-lg overflow-hidden border border-primary/30 shadow-lg shadow-primary/20" style={{ height: '264px' }}>
+                  {decartStream ? (
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted={false}
+                      className="w-full h-full object-cover"
+                      aria-label={`${companion.name} live avatar`}
+                    />
+                  ) : (
+                    // Fallback — static avatar while connecting or on error
+                    <img
+                      src={companion.imageUrl || "/placeholder.svg"}
+                      alt={companion.name}
+                      className={`w-full h-full object-cover ${decartError ? 'opacity-80' : 'opacity-60 animate-pulse'}`}
+                    />
+                  )}
+                </div>
+                <div className={`absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 px-3 py-1 rounded-full border shadow-md ${decartError ? 'border-destructive/40' : 'border-primary/30'}`}>
+                  <div className={`h-2 w-2 rounded-full flex-shrink-0 ${decartStream ? 'bg-green-500 animate-pulse' : decartError ? 'bg-destructive' : 'bg-amber-500 animate-pulse'}`} />
+                  <span className="text-xs font-medium text-foreground truncate max-w-[140px]">
+                    {decartStream ? 'Live' : decartError ? (decartError.toLowerCase().includes('credit') ? 'Insufficient credits' : 'Connection failed') : 'Connecting...'}
+                  </span>
+                </div>
+              </>
+            ) : visualFormat === 'animated-3d' ? (
+              <Suspense fallback={
+                <img
+                  src={companion.imageUrl || "/placeholder.svg"}
+                  alt={companion.name}
+                  className="w-full h-full object-cover opacity-60 animate-pulse rounded-lg"
+                />
+              }>
+                <Avatar25D
+                  imageUrl={companion.imageUrl || "/placeholder.svg"}
+                  name={companion.name}
+                  expressionState={expressionState}
+                  isOnline={isOnline}
+                />
+              </Suspense>
+            ) : visualFormat === 'animated-2d' ? (
+              <AnimatedCharacter
+                imageUrl={companion.imageUrl || "/placeholder.svg"}
+                name={companion.name}
+                expressionState={expressionState}
+                isOnline={isOnline}
+                usePixi={true}
+              />
+            ) : (
+              <>
+                <div className="w-48 h-66 rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
+                  <img
+                    src={companion.imageUrl || "/placeholder.svg"}
+                    alt={companion.name}
+                    className="w-full h-full object-cover animate-[float_6s_ease-in-out_infinite]"
+                  />
+                </div>
+                <div className="absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 px-3 py-1 rounded-full border border-primary/30 shadow-md">
+                  <div className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+                  <span className="text-xs font-medium text-foreground">{isOnline ? 'Online' : 'Offline'}</span>
+                </div>
+              </>
+            )}
+
+            {/* Speaker button - top right */}
+            {onVoiceOutputToggle && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`absolute top-1 right-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${
+                        voiceOutputEnabled 
+                          ? 'bg-primary/20 text-primary hover:bg-primary/30' 
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      }`}
+                      onClick={onVoiceOutputToggle}
+                    >
+                      {voiceOutputEnabled ? (
+                        <Volume2 className="h-4 w-4" />
+                      ) : (
+                        <VolumeX className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>{voiceOutputEnabled ? 'Disable voice' : 'Enable voice'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
+            {/* Mic button - bottom left */}
+            {sttSupported && onMicClick && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${
+                        voiceState === 'recording'
+                          ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
+                          : voiceState === 'transcribing' || voiceState === 'processing'
+                          ? 'bg-amber-500/20 text-amber-500'
+                          : 'bg-primary/20 text-primary hover:bg-primary/30'
+                      }`}
+                      onClick={onMicClick}
+                      disabled={voiceState === 'transcribing' || voiceState === 'processing'}
+                    >
+                      {voiceState === 'transcribing' || voiceState === 'processing' ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Mic className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>
+                      {voiceState === 'recording' 
+                        ? 'Tap to stop' 
+                        : voiceState === 'transcribing'
+                        ? 'Transcribing...'
+                        : voiceState === 'processing'
+                        ? 'Processing...'
+                        : 'Tap to speak'}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        </div>
+
+        {/* Info Section */}
+        <div className="p-4 bg-muted/30 border-t border-border">
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Personality</p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <p className="text-foreground truncate cursor-help">{PERSONALITY_TRAITS[companion.personality as PersonalityType] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]}</p>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs bg-slate-900 text-slate-50 border-slate-700">
+                    <p>{PERSONALITY_TRAITS[companion.personality as PersonalityType] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Created</p>
+              <p className="text-foreground text-xs">
+                {new Date(companion.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      </ScrollArea>
+
+      {/* Footer Action - Toggle Button */}
+      <div className="p-4 border-t border-border bg-background flex-shrink-0">
+        <Button 
+          onClick={() => setIsChatVisible(!isChatVisible)}
+          className="w-full cursor-pointer"
+          variant={isChatVisible ? "default" : "outline"}
+        >
+          {isChatVisible ? 'Hide chat' : 'Start chat'}
+        </Button>
+      </div>
+    </>
+  )
+}
