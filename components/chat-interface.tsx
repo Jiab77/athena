@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink } from 'lucide-react'
+import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink, Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -86,6 +86,7 @@ export function ChatInterface({
   const [sttSupported, setSTTSupported] = useState(true)
   const [companionName, setCompanionName] = useState<string>('')
   const [companionImageUrl, setCompanionImageUrl] = useState<string>('')
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -757,18 +758,38 @@ export function ChatInterface({
               </div>
             ) : (
               <>
-                {displayMessages.slice(-MAX_DISPLAY_MESSAGES).map((message) => (
+                {displayMessages.slice(-MAX_DISPLAY_MESSAGES).map((message) => {
+                  const isUser = message.role === 'user'
+                  const isCopied = copiedMessageId === message.id
+
+                  const handleCopy = () => {
+                    navigator.clipboard.writeText(message.content)
+                    setCopiedMessageId(message.id)
+                    setTimeout(() => setCopiedMessageId(null), 2000)
+                  }
+
+                  return (
                   <div
                     key={message.id}
-                    className={`flex ${
-                      message.role === 'user'
-                        ? 'justify-end'
-                        : 'justify-start'
-                    }`}
+                    className={`flex group ${isUser ? 'justify-end' : 'justify-start'}`}
                   >
+                    {/* Copy button — left side for user messages */}
+                    {isUser && (
+                      <button
+                        onClick={handleCopy}
+                        className="self-start mt-1 mr-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
+                        aria-label="Copy message"
+                      >
+                        {isCopied
+                          ? <Check className="h-3.5 w-3.5 text-green-500" />
+                          : <Copy className="h-3.5 w-3.5" />
+                        }
+                      </button>
+                    )}
+
                     <div
                       className={`max-w-xs px-4 py-2 rounded-lg ${
-                        message.role === 'user'
+                        isUser
                           ? 'bg-primary text-primary-foreground rounded-br-none'
                           : 'bg-secondary text-secondary-foreground rounded-bl-none'
                       }`}
@@ -810,8 +831,23 @@ export function ChatInterface({
                         )}
                       </div>
                     </div>
+
+                    {/* Copy button — right side for companion messages */}
+                    {!isUser && (
+                      <button
+                        onClick={handleCopy}
+                        className="self-start mt-1 ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
+                        aria-label="Copy message"
+                      >
+                        {isCopied
+                          ? <Check className="h-3.5 w-3.5 text-green-500" />
+                          : <Copy className="h-3.5 w-3.5" />
+                        }
+                      </button>
+                    )}
                   </div>
-                ))}
+                  )
+                })}
                 {isLoading && <TypingIndicator message="Thinking..." />}
                 {isTranscribing && <TypingIndicator message="Transcribing..." />}
               <div ref={scrollRef} />
