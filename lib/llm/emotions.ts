@@ -78,8 +78,12 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
           content: aiResponse,
         },
       ],
-      temperature: 0.3, // Low temperature for consistent classification
-      max_completion_tokens: 64, // Short response expected
+      temperature: 0.3,
+      // Groq uses max_tokens, OpenAI Chat Completions uses max_completion_tokens
+      ...(isOpenAI
+        ? { max_completion_tokens: 64 }
+        : { max_tokens: 64 }
+      ),
       response_format: { type: 'json_object' },
     }
 
