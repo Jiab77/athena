@@ -41,6 +41,7 @@ export function MergedCompanionChat({
   const {
     expressionState,
     lastDetectedEmotion,
+    setLastDetectedEmotion,
     voiceState,
     sttSupported,
     decartStream,
@@ -73,8 +74,7 @@ export function MergedCompanionChat({
                 onVoiceOutputToggle={onVoiceOutputToggle}
                 onExpressionChange={handleExpressionChange}
                 onEmotionDetected={(emotion) => {
-                  // Emotion reset is handled by TTS on-end callback in useBrain
-                  void emotion
+                  setLastDetectedEmotion(emotion)
                 }}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
               />
