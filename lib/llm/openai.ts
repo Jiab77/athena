@@ -28,13 +28,13 @@ export async function callOpenAIAPI(
     const apiKey = await getAPIKey('openai')
     const db = await getDB()
     const settings = await db.getSettings()
-    
+
     console.log('[v0] callOpenAIAPI: settings loaded', { hasSettings: !!settings })
 
     if (!settings) {
       throw new Error('No settings found in database')
     }
-    
+
     // Extract settings with defaults
     const model = settings.selectedModel || DEFAULT_MODEL_NAME
     const personality = (settings.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
@@ -44,7 +44,7 @@ export async function callOpenAIAPI(
     const customPersonalityTraits = settings.customPersonalityTraits
 
     console.log('[v0] callOpenAIAPI: resolved settings', { model, personality, companion, memoryWindowSize, avatarGender })
-    
+
     // Build system prompt with companion name, personality, gender from database
     const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
 
@@ -56,7 +56,7 @@ export async function callOpenAIAPI(
 
     // Detect if any message contains an actual image (base64 encoded)
     // Note: documentContent is for text files, not images
-    const hasImage = windowedMessages.some(msg => 
+    const hasImage = windowedMessages.some(msg =>
       msg.imageBase64 !== undefined && msg.imageBase64 !== null && msg.imageBase64.length > 0
     )
 
@@ -78,7 +78,7 @@ export async function callOpenAIAPI(
 
         // Convert text content to base64
         const base64Content = Buffer.from(msg.documentContent).toString('base64')
-        
+
         // Determine MIME type from filename extension
         const ext = msg.documentName.split('.').pop()?.toLowerCase()
         const mimeTypes: Record<string, string> = {
@@ -97,15 +97,15 @@ export async function callOpenAIAPI(
         const mimeType = mimeTypes[ext || ''] || 'application/octet-stream'
 
         console.log('[v0] callOpenAIAPI: document mime type resolved', { ext, mimeType })
-        
+
         content.push({
           type: 'input_file' as const,
           filename: msg.documentName,
           file_data: `data:${mimeType};base64,${base64Content}`,
         })
-        
+
       }
-      
+
       // If message has an image, add as input_image (Responses API format)
       if (msg.imageBase64 && msg.imageFormat) {
         console.log('[v0] callOpenAIAPI: attaching image', { format: msg.imageFormat, base64Length: msg.imageBase64.length })
@@ -132,14 +132,13 @@ export async function callOpenAIAPI(
       },
       ...userMessages,
     ]
-    
+
     const reqBody: any = {
       model: model,
       instructions: systemPrompt,
       input: inputWithJsonContext,
       temperature: 1,
       max_output_tokens: 2048,
-      top_p: 1,
       reasoning: { effort: 'low' },
       text: {
         format: { type: 'json_object' }
@@ -183,7 +182,7 @@ export async function callOpenAIAPI(
     })
 
     const usage = data.usage || null
-    
+
     // Parse JSON response from Responses API
     let parsedResponse: { response: string; reasoning?: string }
     try {
@@ -213,7 +212,7 @@ export async function callOpenAIAPI(
         contentType: messageOutput?.content?.[0]?.type,
         textLength: messageOutput?.content?.[0]?.text?.length,
       })
-      
+
       // Check for model refusal
       if (messageOutput?.content?.[0]?.type === 'refusal') {
         const refusalReason = messageOutput.content[0].refusal
@@ -266,7 +265,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     // Create FormData for multipart file upload
     const formData = new FormData()
     formData.append('file', audioBlob, DEFAULT_AUDIO_FILE)
-    
+
     // Get STT model from constants (OpenAI provider's first model)
     const providers = STT_PROVIDERS.find(p => p.id === 'openai')
     const sttModel = providers?.models[0]?.model || 'whisper-1'
