@@ -131,12 +131,6 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 
 ```
 /
-├── AGENTS.md                          # Collaboration framework (agent instructions)
-├── SOUL.md                            # Shared principles & philosophy
-├── MEMORY.md                          # Agent's cross-session project memory
-├── HUMAN.md                           # Notes about the human collaborator
-├── README.md                          # This file
-│
 ├── app/
 │   ├── page.tsx                       # Landing page (companion list + FAB)
 │   ├── layout.tsx                     # Root layout (fonts, PWA, analytics)
