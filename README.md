@@ -199,7 +199,7 @@ This is a single-developer project (with AI agent collaboration). Ideas welcomeâ
 
 ## License
 
-TBD (likely MIT or similar)
+MIT
 
 ## References
 
