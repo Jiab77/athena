@@ -237,13 +237,14 @@ export async function callOpenAIAPI(
       }
 
       console.log('[v0] callOpenAIAPI: raw content before parse', content.slice(0, 200))
-      // When tools are active JSON mode is off — treat the response as plain prose
-      if (toolsNeeded) {
-        parsedResponse = { response: content }
-        console.log('[v0] callOpenAIAPI: tools mode — wrapping plain prose as response')
-      } else {
+      // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
+      // Only fall back to wrapping as plain prose if parsing fails.
+      try {
         parsedResponse = parseCompanionJSON(content)
         console.log('[v0] callOpenAIAPI: parsedResponse keys', Object.keys(parsedResponse))
+      } catch {
+        console.log('[v0] callOpenAIAPI: JSON parse failed — wrapping plain prose as response (toolsNeeded:', toolsNeeded, ')')
+        parsedResponse = { response: content }
       }
     } catch (parseError) {
       console.log('[v0] callOpenAIAPI: parse error', parseError)
