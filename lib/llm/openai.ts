@@ -144,6 +144,9 @@ export async function callOpenAIAPI(
       text: {
         format: { type: 'json_object' }
       },
+      tools: [
+        { type: 'web_search' }
+      ],
     }
 
     console.log('[v0] callOpenAIAPI: request body (no content)', {
@@ -152,6 +155,7 @@ export async function callOpenAIAPI(
       maxOutputTokens: reqBody.max_output_tokens,
       reasoning: reqBody.reasoning,
       textFormat: reqBody.text?.format,
+      tools: reqBody.tools
     })
 
     const response = await fetch(CHAT_API_URL, {
