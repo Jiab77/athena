@@ -136,9 +136,9 @@ export async function callOpenAIAPI(
     const inputBase = toolsNeeded
       ? userMessages  // plain prose expected — no JSON wrapper needed
       : [
-          { role: 'system' as const, content: 'Always respond with valid JSON format.' },
-          ...userMessages,
-        ]
+        { role: 'system' as const, content: 'Always respond with valid JSON format.' },
+        ...userMessages,
+      ]
 
     const reqBody: any = {
       model: model,
@@ -159,7 +159,6 @@ export async function callOpenAIAPI(
       maxOutputTokens: reqBody.max_output_tokens,
       reasoning: reqBody.reasoning,
       textFormat: reqBody.text?.format,
-      tools: reqBody.tools,
       toolsNeeded,
     })
 
