@@ -144,11 +144,14 @@ export async function callOpenAIAPI(
       text: {
         format: { type: 'json_object' }
       },
+    }
+
+    {/*
       tools: [
         { type: 'web_search' }
       ],
       tool_choice: 'auto',
-    }
+      */}
 
     console.log('[v0] callOpenAIAPI: request body (no content)', {
       model: reqBody.model,
