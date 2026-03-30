@@ -1,6 +1,6 @@
 'use client'
 
-import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink } from 'lucide-react'
+import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink, Mic2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -40,6 +40,8 @@ interface CompanionWindowProps {
   onClose: () => void
   isChatVisible: boolean
   setIsChatVisible: (visible: boolean) => void
+  isVoiceMode?: boolean
+  onVoiceModeToggle?: () => void
   isOnline: boolean
   companion: CompanionData
   expressionState?: ExpressionState
@@ -60,6 +62,8 @@ export function CompanionWindow({
   onClose,
   isChatVisible,
   setIsChatVisible,
+  isVoiceMode = false,
+  onVoiceModeToggle,
   isOnline,
   companion,
   expressionState = 'idle',
@@ -305,12 +309,37 @@ export function CompanionWindow({
         </div>
       </ScrollArea>
 
-      {/* Footer Action - Toggle Button */}
-      <div className="p-4 border-t border-border bg-background flex-shrink-0">
-        <Button 
+      {/* Footer Action — Voice Mode toggle + Chat toggle */}
+      <div className="p-4 border-t border-border bg-background flex-shrink-0 flex items-center gap-2">
+        {/* Voice Mode toggle — left */}
+        {onVoiceModeToggle && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isVoiceMode ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex items-center gap-1.5 cursor-pointer flex-shrink-0"
+                  onClick={onVoiceModeToggle}
+                >
+                  <Mic2 className="h-4 w-4" />
+                  <span className="text-xs">Voice</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>{isVoiceMode ? 'Disable voice mode' : 'Enable voice mode'}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+
+        {/* Start / Hide chat button — right, fills remaining space */}
+        <Button
           onClick={() => setIsChatVisible(!isChatVisible)}
-          className="w-full cursor-pointer"
-          variant={isChatVisible ? "default" : "outline"}
+          className="flex-1 cursor-pointer"
+          variant={isChatVisible ? 'default' : 'outline'}
+          size="sm"
+          disabled={isVoiceMode}
         >
           {isChatVisible ? 'Hide chat' : 'Start chat'}
         </Button>

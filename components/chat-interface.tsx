@@ -57,6 +57,8 @@ const CheckIcon = () => (
 interface ChatInterfaceProps {
   isChatVisible: boolean
   setIsChatVisible: (visible: boolean) => void
+  /** When true, STT transcriptions are auto-submitted without requiring Enter/send */
+  isVoiceMode?: boolean
   isOnline: boolean
   voiceOutputEnabled: boolean
   selectedVoice: string
@@ -72,6 +74,7 @@ interface ChatInterfaceProps {
 
 export function ChatInterface({
   setIsChatVisible,
+  isVoiceMode = false,
   isOnline,
   voiceOutputEnabled,
   selectedVoice,
@@ -259,7 +262,18 @@ export function ChatInterface({
       try {
         const audioBlob = new Blob(audioChunksRef.current, { type: DEFAULT_AUDIO_TYPE })
         const transcribed = await transcribeAudio(audioBlob)
-        setInput((prev) => (prev ? prev + ' ' + transcribed : transcribed))
+
+        if (isVoiceMode && transcribed.trim()) {
+          // Voice mode: auto-submit without waiting for Enter
+          // Set input synchronously via a ref-safe approach then send
+          setInput(transcribed)
+          // Use setTimeout(0) to let React flush the state before sending
+          setTimeout(() => {
+            handleSendMessage(transcribed)
+          }, 0)
+        } else {
+          setInput((prev) => (prev ? prev + ' ' + transcribed : transcribed))
+        }
       } catch (error) {
         alert('Failed to transcribe audio. Please try again.')
       } finally {
@@ -321,14 +335,15 @@ export function ChatInterface({
     }
   }
 
-  const handleSendMessage = async () => {
-    if ((!input.trim() && !selectedImage && !selectedDocument) || isLoading || !conversationId) return
+  const handleSendMessage = async (overrideText?: string) => {
+    const messageText = overrideText ?? input
+    if ((!messageText.trim() && !selectedImage && !selectedDocument) || isLoading || !conversationId) return
 
     // Add user message with optional image or document (for current session only)
     const userMessage: Message = {
       id: `msg-${Date.now()}`,
       role: 'user',
-      content: input,
+      content: messageText,
       imageBase64: selectedImage?.base64,
       imageFormat: selectedImage?.format,
       documentContent: selectedDocument?.content,

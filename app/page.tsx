@@ -28,6 +28,7 @@ import {
 } from '@/lib/constants'
 import type { PersonalityType, CompanionData, VisualFormat } from '@/lib/types'
 import { useDB } from '@/lib/db-context'
+import { getAPIKey } from '@/lib/utils'
 
 export default function Home() {
   const [showCompanion, setShowCompanion] = useState(false)
@@ -36,6 +37,7 @@ export default function Home() {
   const [showImportModal, setShowImportModal] = useState(false)
   const [selectedImportFile, setSelectedImportFile] = useState<File | null>(null)
   const [isChatVisible, setIsChatVisible] = useState(false)
+  const [isVoiceMode, setIsVoiceMode] = useState(false)
   const [companion, setCompanion] = useState<CompanionData>(DEFAULT_COMPANION)
   const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(ENABLE_VOICE_OUTPUT)
   const [selectedVoice, setSelectedVoice] = useState(DEFAULT_VOICE_ID)
@@ -135,6 +137,29 @@ export default function Home() {
       refreshConnectionStatus()
     } catch (error) {
       // ignore
+    }
+  }
+
+  // Handle voice mode toggle — activating hides chat and enables TTS if a key is configured
+  const handleVoiceModeToggle = async () => {
+    const activating = !isVoiceMode
+    setIsVoiceMode(activating)
+
+    if (activating) {
+      setIsChatVisible(false)
+
+      // Auto-enable voice output if a TTS key is available and voice is currently off
+      if (!voiceOutputEnabled && db) {
+        try {
+          const settings = await db.getSettings()
+          const provider = settings?.voiceProvider || voiceProvider
+          await getAPIKey(provider)
+          // Key exists — enable voice output
+          await handleVoiceOutputToggle()
+        } catch {
+          // No TTS key configured — leave voice output as-is
+        }
+      }
     }
   }
 
@@ -472,6 +497,8 @@ export default function Home() {
           onClose={() => setShowCompanion(false)}
           isChatVisible={isChatVisible}
           setIsChatVisible={setIsChatVisible}
+          isVoiceMode={isVoiceMode}
+          onVoiceModeToggle={handleVoiceModeToggle}
           isOnline={isOnline}
           companion={companion}
           voiceOutputEnabled={voiceOutputEnabled}
