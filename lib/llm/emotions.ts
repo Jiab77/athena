@@ -45,7 +45,7 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
 
 /**
  * Detect the dominant emotion in an AI response
- * Uses gpt-5.4-nano with JSON mode for fast, structured classification
+ * Uses llama-3.1-8b-instant and gpt-5.4-nano with JSON mode for fast, structured classification
  * 
  * Only sends the AI response text - no conversation history needed
  * 

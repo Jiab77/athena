@@ -29,6 +29,7 @@ import {
   DEFAULT_AUDIO_TYPE,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_MODEL_PROVIDER,
+  DOCUMENT_FORMAT_MIME_TYPES,
   EMOTION_DISPLAY_DURATION,
   MAX_DISPLAY_MESSAGES,
 } from '@/lib/constants'
@@ -959,7 +960,7 @@ export function ChatInterface({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,.txt,.md,.json,.csv,.pdf"
+              accept={`image/*,${DOCUMENT_FORMAT_MIME_TYPES.join(',')}`}
               onChange={handleFileSelect}
               className="hidden"
             />

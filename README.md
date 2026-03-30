@@ -67,14 +67,14 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 - Full multi-turn conversation with encrypted persistent memory (IndexedDB, AES-GCM, PBKDF2 600k iterations)
 - Configurable memory window (1–10 messages) — balance privacy vs. context depth
 - Document/image attachments in chat (txt, md, json, csv, pdf, images, code files)
-- Tool detection — pre-flight model (`groq/compound-mini`) determines if a tool call is needed before main inference
-- Emotion detection — post-response model (`groq/llama-3.1-8b-instant`) classifies the AI's emotional state, displayed as an emoji badge
+- Tool detection — pre-flight model (`groq/compound-mini` and `gpt-5.4-nano`) determines if a tool call is needed before main inference
+- Emotion detection — post-response model (`llama-3.1-8b-instant` and `gpt-5.4-nano`) classifies the AI's emotional state, displayed as an emoji badge
 - Token usage display — per-message cost breakdown in a popover
 - `MAX_DISPLAY_MESSAGES = 30` render cap for UI performance; full history persists in IndexedDB
 - Markdown rendering with syntax highlighting and emoji support
 
 ### Voice I/O
-- **STT (Speech-to-Text):** Groq Whisper — tap-to-record with a waveform visualizer
+- **STT (Speech-to-Text):** Groq / OpenAI Whisper — tap-to-record with a waveform visualizer
 - **TTS (Text-to-Speech):** OpenAI TTS (alloy, echo, fable, nova, onyx, shimmer voices) and ResembleAI Chatterbox
 - Per-message audio replay — click any message to hear it again
 - Voice provider selectable per-companion in settings
@@ -240,7 +240,7 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 
 **Tier 1 — Cloud (Fast, Trust-based)**
 - **[Groq](https://groq.com/)** (Primary) — Ultra-fast inference, explicit no-training-on-data policy
-- **[OpenAI](https://openai.com/)** — GPT-4o and GPT-4o-mini via Responses API
+- **[OpenAI](https://openai.com/)** — GPT-5.4 and GPT-5.4-mini via Responses API
 - **Custom** — Any OpenAI-compatible API (LM Studio, vLLM, Kobold, etc.); requires `https://` for external hosts
 
 **Tier 2 — Hybrid (planned)**
