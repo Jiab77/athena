@@ -1,6 +1,6 @@
 'use client'
 
-import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink, Mic2 } from 'lucide-react'
+import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink, Mic2, Keyboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -338,20 +338,21 @@ export function CompanionWindow({
           </TooltipProvider>
         )}
 
-        {/* Start / Hide chat button — right, fills remaining space */}
+        {/* Start Chat / Hide Chat button — right, fills remaining space */}
         <Button
           onClick={() => setIsChatVisible(!isChatVisible)}
           size="sm"
           disabled={isVoiceMode}
           className={[
-            'flex-1 cursor-pointer font-medium',
+            'flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-medium',
             isChatVisible
               ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
               : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
             isVoiceMode ? 'opacity-40 cursor-not-allowed' : '',
           ].join(' ')}
         >
-          {isChatVisible ? 'Hide chat' : 'Start chat'}
+          <Keyboard className="h-4 w-4" />
+          <span className="text-xs">{isChatVisible ? 'Hide Chat' : 'Start Chat'}</span>
         </Button>
       </div>
     </>
