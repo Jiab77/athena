@@ -320,7 +320,7 @@ export function CompanionWindow({
                 <Button
                   size="sm"
                   className={[
-                    'flex items-center gap-1.5 cursor-pointer flex-shrink-0 font-medium',
+                    'flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-medium',
                     isVoiceMode
                       ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                       : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
