@@ -293,7 +293,7 @@ export function CompanionWindow({
                   <TooltipTrigger asChild>
                     <p className="text-foreground truncate cursor-help">{PERSONALITY_TRAITS[companion.personality as PersonalityType] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]}</p>
                   </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-xs">
+                  <TooltipContent side="bottom" className="max-w-xs bg-popover text-popover-foreground border-border dark:bg-zinc-900 dark:text-zinc-50 dark:border-zinc-700">
                     <p>{PERSONALITY_TRAITS[companion.personality as PersonalityType] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -331,7 +331,7 @@ export function CompanionWindow({
                   <span className="text-xs">Voice Mode</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">
+              <TooltipContent side="top" className="bg-popover text-popover-foreground border-border dark:bg-zinc-900 dark:text-zinc-50 dark:border-zinc-700">
                 <p>{isVoiceMode ? 'Disable voice mode' : 'Enable voice mode'}</p>
               </TooltipContent>
             </Tooltip>
@@ -358,7 +358,7 @@ export function CompanionWindow({
                 <span className="text-xs">{isChatVisible ? 'Hide Chat' : 'Start Chat'}</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top">
+            <TooltipContent side="top" className="bg-popover text-popover-foreground border-border dark:bg-zinc-900 dark:text-zinc-50 dark:border-zinc-700">
               <p>{isChatVisible ? 'Close the chat window' : 'Open the chat window'}</p>
             </TooltipContent>
           </Tooltip>
