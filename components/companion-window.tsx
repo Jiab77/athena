@@ -2,7 +2,6 @@
 
 import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink, Mic2, Keyboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
@@ -133,10 +132,9 @@ export function CompanionWindow({
         </div>
       </div>}
 
-      <ScrollArea className="flex-1 overflow-hidden">
-        <div className="flex flex-col h-full">
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Character Display - conditionally animated or static */}
-        <div className="flex-1 px-4 pt-5 pb-4 bg-background border-t border-border flex items-center justify-center">
+        <div className="flex-1 px-4 pt-5 pb-4 bg-background border-t border-border flex items-center justify-center min-h-0">
           <div className="relative w-48 min-h-[264px]">
             {/* Emotion emoji badge — top-left corner, always visible */}
             {/* Uses lastDetectedEmotion (independent of animation state) so TTS/thinking never overrides it */}
@@ -311,8 +309,7 @@ export function CompanionWindow({
             </div>
           </div>
         </div>
-        </div>{/* end flex flex-col wrapper */}
-      </ScrollArea>
+      </div>{/* end flex flex-col */}
 
       {/* Footer Action — hidden in tabbed mode (rendered by parent) */}
       {!tabbed && <div className="p-4 pr-20 sm:pr-4 border-t border-border bg-card flex-shrink-0 flex items-center gap-2">
