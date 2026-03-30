@@ -75,12 +75,12 @@ export function MergedCompanionChat({
 
   if (!isOpen) return null
 
-  // ─── Mobile / Tablet: vertical stack, full width, anchored to bottom ─────────
+  // ─── Mobile / Tablet: vertical stack, full viewport height, anchored to top ──
   if (isSmallScreen) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col w-full">
-        {/* Companion panel — always visible */}
-        <Card className="w-full rounded-b-none shadow-2xl border-b border-border overflow-hidden flex flex-col">
+      <div className="fixed inset-0 z-40 flex flex-col w-full h-[100dvh] overflow-hidden">
+        {/* Companion panel — fixed height, scrollable internally */}
+        <Card className="w-full flex-shrink-0 rounded-none shadow-2xl border-b border-border overflow-hidden flex flex-col" style={{ height: showChat ? '50%' : '100%' }}>
           <CompanionWindow
             isOpen={true}
             onClose={onClose}
@@ -103,9 +103,9 @@ export function MergedCompanionChat({
           />
         </Card>
 
-        {/* Chat panel — below companion, only when visible and not in voice mode */}
+        {/* Chat panel — fills remaining height, scrollable internally */}
         {showChat && (
-          <Card className="w-full rounded-t-none shadow-2xl border-t border-border overflow-hidden flex flex-col h-96">
+          <Card className="w-full flex-1 rounded-none shadow-2xl border-t border-border overflow-hidden flex flex-col min-h-0">
             <ChatInterface
               isChatVisible={showChat}
               setIsChatVisible={setIsChatVisible}
