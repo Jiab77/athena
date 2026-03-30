@@ -134,8 +134,9 @@ export function CompanionWindow({
       </div>}
 
       <ScrollArea className="flex-1 overflow-hidden">
+        <div className="flex flex-col h-full">
         {/* Character Display - conditionally animated or static */}
-        <div className="px-4 pt-5 pb-10 bg-background border-t border-border flex items-center justify-center">
+        <div className="flex-1 px-4 pt-5 pb-4 bg-background border-t border-border flex items-center justify-center">
           <div className="relative w-48 min-h-[264px]">
             {/* Emotion emoji badge — top-left corner, always visible */}
             {/* Uses lastDetectedEmotion (independent of animation state) so TTS/thinking never overrides it */}
@@ -286,8 +287,8 @@ export function CompanionWindow({
           </div>
         </div>
 
-        {/* Info Section */}
-        <div className="p-4 bg-muted/30 border-t border-border">
+        {/* Info Section — pinned to bottom of the flex column */}
+        <div className="mt-auto p-4 bg-muted/30 border-t border-border">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-xs text-muted-foreground font-medium">Personality</p>
@@ -310,6 +311,7 @@ export function CompanionWindow({
             </div>
           </div>
         </div>
+        </div>{/* end flex flex-col wrapper */}
       </ScrollArea>
 
       {/* Footer Action — hidden in tabbed mode (rendered by parent) */}

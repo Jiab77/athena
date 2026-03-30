@@ -227,7 +227,7 @@ export function MergedCompanionChat({
             <button
               onClick={() => setActiveTab('companion')}
               className={[
-                'flex-1 text-sm font-medium pb-2 transition-colors border-b-2',
+                'flex-1 text-sm font-medium pb-2 transition-colors border-b-2 cursor-pointer',
                 activeTab === 'companion'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground',
@@ -238,7 +238,7 @@ export function MergedCompanionChat({
             <button
               onClick={() => setActiveTab('chat')}
               className={[
-                'flex-1 text-sm font-medium pb-2 transition-colors border-b-2',
+                'flex-1 text-sm font-medium pb-2 transition-colors border-b-2 cursor-pointer',
                 activeTab === 'chat'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground',
