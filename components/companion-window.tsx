@@ -331,7 +331,7 @@ export function CompanionWindow({
                   <span className="text-xs">Voice Mode</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">
+              <TooltipContent side="bottom">
                 <p>{isVoiceMode ? 'Disable voice mode' : 'Enable voice mode'}</p>
               </TooltipContent>
             </Tooltip>
@@ -339,21 +339,30 @@ export function CompanionWindow({
         )}
 
         {/* Start Chat / Hide Chat button — right, fills remaining space */}
-        <Button
-          onClick={() => setIsChatVisible(!isChatVisible)}
-          size="sm"
-          disabled={isVoiceMode}
-          className={[
-            'flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-medium',
-            isChatVisible
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
-              : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
-            isVoiceMode ? 'opacity-40 cursor-not-allowed' : '',
-          ].join(' ')}
-        >
-          <Keyboard className="h-4 w-4" />
-          <span className="text-xs">{isChatVisible ? 'Hide Chat' : 'Start Chat'}</span>
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => setIsChatVisible(!isChatVisible)}
+                size="sm"
+                disabled={isVoiceMode}
+                className={[
+                  'flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-medium',
+                  isChatVisible
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+                    : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
+                  isVoiceMode ? 'opacity-40 cursor-not-allowed' : '',
+                ].join(' ')}
+              >
+                <Keyboard className="h-4 w-4" />
+                <span className="text-xs">{isChatVisible ? 'Hide Chat' : 'Start Chat'}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{isChatVisible ? 'Close the chat window' : 'Open the chat window'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </>
   )
