@@ -310,20 +310,25 @@ export function CompanionWindow({
       </ScrollArea>
 
       {/* Footer Action — Voice Mode toggle + Chat toggle */}
-      <div className="p-4 border-t border-border bg-background flex-shrink-0 flex items-center gap-2">
+      {/* pr-20 ensures buttons don't slide under the fixed FAB on mobile */}
+      <div className="p-4 pr-20 sm:pr-4 border-t border-border bg-card flex-shrink-0 flex items-center gap-2">
         {/* Voice Mode toggle — left */}
         {onVoiceModeToggle && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={isVoiceMode ? 'default' : 'outline'}
                   size="sm"
-                  className="flex items-center gap-1.5 cursor-pointer flex-shrink-0"
+                  className={[
+                    'flex items-center gap-1.5 cursor-pointer flex-shrink-0 font-medium',
+                    isVoiceMode
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+                      : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
+                  ].join(' ')}
                   onClick={onVoiceModeToggle}
                 >
                   <Mic2 className="h-4 w-4" />
-                  <span className="text-xs">Voice</span>
+                  <span className="text-xs">Voice Mode</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
@@ -336,10 +341,15 @@ export function CompanionWindow({
         {/* Start / Hide chat button — right, fills remaining space */}
         <Button
           onClick={() => setIsChatVisible(!isChatVisible)}
-          className="flex-1 cursor-pointer"
-          variant={isChatVisible ? 'default' : 'outline'}
           size="sm"
           disabled={isVoiceMode}
+          className={[
+            'flex-1 cursor-pointer font-medium',
+            isChatVisible
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+              : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
+            isVoiceMode ? 'opacity-40 cursor-not-allowed' : '',
+          ].join(' ')}
         >
           {isChatVisible ? 'Hide chat' : 'Start chat'}
         </Button>
