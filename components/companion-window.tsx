@@ -15,7 +15,7 @@ import { lazy, Suspense, useEffect, useRef } from 'react'
 // Module-level ref so it persists across renders
 let _companionPopupRef: Window | null = null
 
-function openCompanionPopup(url: string, name: string) {
+export function openCompanionPopup(url: string, name: string) {
   if (_companionPopupRef && !_companionPopupRef.closed) {
     _companionPopupRef.focus()
     return
@@ -55,6 +55,8 @@ interface CompanionWindowProps {
   voiceOutputEnabled?: boolean
   onVoiceOutputToggle?: () => void
   sttSupported?: boolean
+  /** When true, hides the built-in header and footer — used by the mobile tabbed layout */
+  tabbed?: boolean
 }
 
 export function CompanionWindow({
@@ -76,6 +78,7 @@ export function CompanionWindow({
   voiceOutputEnabled = true,
   onVoiceOutputToggle,
   sttSupported = true,
+  tabbed = false,
 }: CompanionWindowProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -90,8 +93,8 @@ export function CompanionWindow({
 
   return (
     <>
-      {/* Header with close button */}
-      <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 p-4 flex items-start justify-between flex-shrink-0">
+      {/* Header with close button — hidden in tabbed mode (rendered by parent) */}
+      {!tabbed && <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 p-4 flex items-start justify-between flex-shrink-0">
         <div className="flex-1">
           <h2 className="text-lg font-bold text-foreground">{companion.name || DEFAULT_COMPANION_NAME}</h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -128,7 +131,7 @@ export function CompanionWindow({
             <X className="h-4 w-4" />
           </Button>
         </div>
-      </div>
+      </div>}
 
       <ScrollArea className="flex-1 overflow-hidden">
         {/* Character Display - conditionally animated or static */}
@@ -309,9 +312,8 @@ export function CompanionWindow({
         </div>
       </ScrollArea>
 
-      {/* Footer Action — Voice Mode toggle + Chat toggle */}
-      {/* pr-20 ensures buttons don't slide under the fixed FAB on mobile */}
-      <div className="p-4 pr-20 sm:pr-4 border-t border-border bg-card flex-shrink-0 flex items-center gap-2">
+      {/* Footer Action — hidden in tabbed mode (rendered by parent) */}
+      {!tabbed && <div className="p-4 pr-20 sm:pr-4 border-t border-border bg-card flex-shrink-0 flex items-center gap-2">
         {/* Voice Mode toggle — left */}
         {onVoiceModeToggle && (
           <TooltipProvider>
@@ -363,7 +365,7 @@ export function CompanionWindow({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-      </div>
+      </div>}
     </>
   )
 }
