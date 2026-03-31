@@ -151,7 +151,7 @@ export function CompanionWindow({
 
             {visualFormat === 'live-avatar' ? (
               <>
-                <div className="w-full h-full rounded-lg overflow-hidden border border-primary/30 shadow-lg shadow-primary/20">
+                <div className="w-full h-full rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
                   {decartStream ? (
                     <video
                       ref={videoRef}
@@ -166,7 +166,7 @@ export function CompanionWindow({
                     <img
                       src={companion.imageUrl || "/placeholder.svg"}
                       alt={companion.name}
-                      className={`w-full h-full object-cover ${decartError ? 'opacity-80' : 'opacity-60 animate-pulse'}`}
+                      className="w-full h-full object-cover"
                     />
                   )}
                 </div>
