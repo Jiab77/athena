@@ -13,7 +13,6 @@ import { useSearchParams } from 'next/navigation'
 import { CompanionPopupView } from '@/components/companion-popup-view'
 import { useBrain } from '@/lib/brain'
 import { DBProvider, useDB } from '@/lib/db-context'
-import { useConnectionStatus } from '@/hooks/use-connection-status'
 import type { CompanionData, VisualFormat } from '@/lib/types'
 
 interface CompanionPopupPageProps {
@@ -94,10 +93,8 @@ function CompanionPopup({ id }: { id: string }) {
   const paramName = searchParams.get('name') || ''
   const paramImage = searchParams.get('image') || ''
   const visualFormat = (searchParams.get('format') || 'static-2d') as VisualFormat
+  const isOnline = searchParams.get('online') === '1'
   const { db, dbReady } = useDB()
-  const { isOnline } = useConnectionStatus()
-
-  console.log('[v0] CompanionPopup — dbReady:', dbReady, '| isOnline:', isOnline)
 
   // URL params are the source of truth — no DB needed
   // If missing, fall back to DB once ready

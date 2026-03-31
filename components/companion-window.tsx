@@ -110,7 +110,7 @@ export function CompanionWindow({
                   size="icon"
                   className="h-8 w-8 cursor-pointer"
                   onClick={() => {
-                    const url = `/companion/${companion.id}?name=${encodeURIComponent(companion.name)}&image=${encodeURIComponent(companion.imageUrl || '')}&format=${visualFormat || 'static-2d'}`
+                    const url = `/companion/${companion.id}?name=${encodeURIComponent(companion.name)}&image=${encodeURIComponent(companion.imageUrl || '')}&format=${visualFormat || 'static-2d'}&online=${isOnline ? '1' : '0'}`
                     openCompanionPopup(url, `companion-${companion.id}`)
                   }}
                 >
