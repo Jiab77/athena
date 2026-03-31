@@ -4,124 +4,61 @@
  * /companion/[id] — Pop-out companion window
  *
  * Opens as a standalone browser popup via window.open().
- * Renders just the CompanionWindow with the useBrain() hook for full interactivity.
+ * Display-only window — renders CompanionPopupView directly with state
+ * passed via URL params (name, image, format, online).
  * Designed to be pinned always-on-top by the user via their OS or browser.
  */
 
-import { use, useEffect, useState } from 'react' // useEffect + useState used in CompanionPopup
+import { use } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CompanionPopupView } from '@/components/companion-popup-view'
-import { useBrain } from '@/lib/brain'
-import { DBProvider, useDB } from '@/lib/db-context'
-import { useConnectionStatus } from '@/hooks/use-connection-status'
-import type { CompanionData, VisualFormat } from '@/lib/types'
+import { DBProvider } from '@/lib/db-context'
+import type { CompanionData, PersonalityType, VisualFormat } from '@/lib/types'
+import { DEFAULT_VISUAL_FORMAT, DEFAULT_COMPANION } from '@/lib/constants'
 
 interface CompanionPopupPageProps {
   params: Promise<{ id: string }>
 }
 
-function CompanionBrain({ id, name, imageUrl, visualFormat, isOnline }: {
-  id: string
-  name: string
-  imageUrl: string
-  visualFormat: VisualFormat
-  isOnline: boolean
-}) {
+function CompanionPopup({ id }: { id: string }) {
+  const searchParams = useSearchParams()
+  const paramName = searchParams.get('name') || DEFAULT_COMPANION.name
+  const paramImage = searchParams.get('image') || DEFAULT_COMPANION.imageUrl
+  const paramPersonality = searchParams.get('personality') || DEFAULT_COMPANION.personality as PersonalityType
+  const paramAppearance = searchParams.get('appearance') || DEFAULT_COMPANION.appearance
+  const paramCreatedAt = searchParams.get('createdAt') || DEFAULT_COMPANION.createdAt
+  const visualFormat = (searchParams.get('format') || DEFAULT_VISUAL_FORMAT) as VisualFormat
+  const isOnline = searchParams.get('online') === '1'
 
   const companion: CompanionData = {
     id,
-    name,
-    imageUrl,
-    personality: 'friendly',
-    gender: 'F',
-    createdAt: new Date().toISOString(),
-    category: 'general',
+    name: paramName,
+    personality: paramPersonality,
+    appearance: paramAppearance,
+    imageUrl: paramImage,
+    createdAt: paramCreatedAt,
   }
-
-  const {
-    expressionState,
-    lastDetectedEmotion,
-    voiceState,
-    sttSupported,
-    decartStream,
-    decartError,
-    handleMicClick,
-  } = useBrain({
-    companion,
-    visualFormat,
-    voiceOutputEnabled: true,
-    isOpen: true,
-  })
 
   const openChat = () => {
     const chatName = `chat-${id}`
     const w = 800, h = 636
     const top = Math.round((screen.availHeight - h) / 2)
-    // Check if chat popup is already open
     const existing = (window as Window & { _chatPopupRef?: Window | null })._chatPopupRef
     if (existing && !existing.closed) {
       existing.focus()
       return
     }
     const ref = window.open(`/chat/${id}`, chatName, `width=${w},height=${h},left=0,top=${top},resizable=no,scrollbars=no`)
-    ;(window as Window & { _chatPopupRef?: Window | null })._chatPopupRef = ref
-    // Also expose this companion window ref to the chat popup via opener
-    ;(window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
+      ; (window as Window & { _chatPopupRef?: Window | null })._chatPopupRef = ref
+      ; (window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
   }
-
-  console.log('[v0] CompanionBrain — isOnline prop received:', isOnline)
 
   return (
     <CompanionPopupView
       companion={companion}
       visualFormat={visualFormat}
       isOnline={isOnline}
-      expressionState={expressionState}
-      lastDetectedEmotion={lastDetectedEmotion}
-      decartStream={decartStream}
-      decartError={decartError}
-      voiceState={voiceState}
-      voiceOutputEnabled={true}
-      sttSupported={sttSupported}
-      onMicClick={handleMicClick}
       onOpenChat={openChat}
-    />
-  )
-}
-
-function CompanionPopup({ id }: { id: string }) {
-  const searchParams = useSearchParams()
-  const paramName = searchParams.get('name') || ''
-  const paramImage = searchParams.get('image') || ''
-  const visualFormat = (searchParams.get('format') || 'static-2d') as VisualFormat
-  const { db, dbReady } = useDB()
-  const { isOnline } = useConnectionStatus()
-
-  console.log('[v0] CompanionPopup — dbReady:', dbReady, '| isOnline:', isOnline)
-
-  // URL params are the source of truth — no DB needed
-  // If missing, fall back to DB once ready
-  const [resolvedName, setResolvedName] = useState(paramName || 'Companion')
-  const [resolvedImage, setResolvedImage] = useState(paramImage)
-
-  useEffect(() => {
-    if (!dbReady || !db || (paramName && paramImage)) return
-    // Fallback: load from DB if URL params were missing
-    Promise.all([db.getSettings(), db.getCompanion(id)])
-      .then(([settings, comp]) => {
-        if (!paramName && settings?.selectedCompanionName) setResolvedName(settings.selectedCompanionName)
-        if (!paramImage && comp?.imageUrl) setResolvedImage(comp.imageUrl)
-      })
-      .catch(() => {})
-  }, [dbReady, db, id, paramName, paramImage])
-
-  return (
-    <CompanionBrain
-      id={id}
-      name={resolvedName}
-      imageUrl={resolvedImage}
-      visualFormat={visualFormat}
-      isOnline={isOnline}
     />
   )
 }

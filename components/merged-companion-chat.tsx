@@ -21,8 +21,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { openCompanionPopup } from '@/components/companion-window'
-import type { PersonalityType } from '@/lib/types'
-import { DEFAULT_COMPANION_NAME, PERSONALITY_TRAITS, DEFAULT_PERSONALITY } from '@/lib/constants'
+import type { MobileTab, PersonalityType } from '@/lib/types'
+import {
+  DEFAULT_COMPANION_NAME,
+  PERSONALITY_TRAITS,
+  DEFAULT_PERSONALITY,
+  MOBILE_SWIPE_THRESHOLD
+} from '@/lib/constants'
 
 interface MergedCompanionChatProps {
   isOpen: boolean
@@ -39,10 +44,6 @@ interface MergedCompanionChatProps {
   onVoiceOutputToggle: () => Promise<void>
   visualFormat?: VisualFormat
 }
-
-type MobileTab = 'companion' | 'chat'
-
-const SWIPE_THRESHOLD = 50 // px
 
 export function MergedCompanionChat({
   isOpen,
@@ -107,10 +108,10 @@ export function MergedCompanionChat({
     const deltaX = e.changedTouches[0].clientX - touchStartX.current
     touchStartX.current = null
 
-    if (deltaX < -SWIPE_THRESHOLD && showChat) {
+    if (deltaX < -MOBILE_SWIPE_THRESHOLD && showChat) {
       // Swipe left → Chat tab
       setActiveTab('chat')
-    } else if (deltaX > SWIPE_THRESHOLD) {
+    } else if (deltaX > MOBILE_SWIPE_THRESHOLD) {
       // Swipe right → Companion tab
       setActiveTab('companion')
     }

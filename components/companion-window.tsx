@@ -1,5 +1,6 @@
 'use client'
 
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink, Mic2, Keyboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,7 +11,22 @@ import {
 } from '@/components/ui/tooltip'
 import { AnimatedCharacter } from '@/components/animated-character'
 import { StatusBadge } from '@/components/status-badge'
-import { lazy, Suspense, useEffect, useRef } from 'react'
+import type {
+  CompanionData,
+  PersonalityType,
+  VisualFormat,
+  ExpressionState,
+  EmotionState,
+  VoiceState
+} from '@/lib/types'
+import {
+  DEFAULT_COMPANION,
+  DEFAULT_COMPANION_NAME,
+  DEFAULT_PERSONALITY,
+  PERSONALITY_TRAITS,
+  DEFAULT_VISUAL_FORMAT,
+  DEFAULT_IDLE_EMOJI
+} from '@/lib/constants'
 
 // Module-level ref so it persists across renders
 let _companionPopupRef: Window | null = null
@@ -30,10 +46,6 @@ export function getCompanionPopupRef() { return _companionPopupRef }
 export function setCompanionPopupRef(ref: Window | null) { _companionPopupRef = ref }
 
 const Avatar25D = lazy(() => import('@/components/avatar-2-5d').then(m => ({ default: m.Avatar25D })))
-import type { CompanionData, PersonalityType, VisualFormat, ExpressionState, EmotionState } from '@/lib/types'
-import { DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, PERSONALITY_TRAITS, DEFAULT_VISUAL_FORMAT } from '@/lib/constants'
-
-type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
 
 interface CompanionWindowProps {
   isOpen: boolean
@@ -110,7 +122,7 @@ export function CompanionWindow({
                   size="icon"
                   className="h-8 w-8 cursor-pointer"
                   onClick={() => {
-                    const url = `/companion/${companion.id}?name=${encodeURIComponent(companion.name)}&image=${encodeURIComponent(companion.imageUrl || '')}&format=${visualFormat || 'static-2d'}`
+                    const url = `/companion/${encodeURIComponent(companion.id)}?name=${encodeURIComponent(companion.name)}&personality=${encodeURIComponent(companion.personality)}&appearance=${encodeURIComponent(companion.appearance)}&image=${encodeURIComponent(companion.imageUrl || DEFAULT_COMPANION.imageUrl)}&createdAt=${encodeURIComponent(companion.createdAt)}&format=${visualFormat || DEFAULT_VISUAL_FORMAT}&online=${isOnline ? '1' : '0'}`
                     openCompanionPopup(url, `companion-${companion.id}`)
                   }}
                 >
@@ -146,7 +158,7 @@ export function CompanionWindow({
               {lastDetectedEmotion === 'angry' && '😠'}
               {lastDetectedEmotion === 'surprised' && '😲'}
               {lastDetectedEmotion === 'thoughtful' && '🤔'}
-              {!lastDetectedEmotion && '😌'}
+              {!lastDetectedEmotion && DEFAULT_IDLE_EMOJI}
             </div>
 
             {visualFormat === 'live-avatar' ? (
@@ -180,34 +192,34 @@ export function CompanionWindow({
               </>
             ) : visualFormat === 'animated-3d' ? (
               <>
-              <Suspense fallback={
-                <img
-                  src={companion.imageUrl || "/placeholder.svg"}
-                  alt={companion.name}
-                  className="w-full h-full object-cover opacity-60 animate-pulse rounded-lg"
-                />
-              }>
-                <Avatar25D
+                <Suspense fallback={
+                  <img
+                    src={companion.imageUrl || "/placeholder.svg"}
+                    alt={companion.name}
+                    className="w-full h-full object-cover opacity-60 animate-pulse rounded-lg"
+                  />
+                }>
+                  <Avatar25D
+                    imageUrl={companion.imageUrl || "/placeholder.svg"}
+                    name={companion.name}
+                    expressionState={expressionState}
+                    isOnline={isOnline}
+                    hideStatus={true}
+                  />
+                </Suspense>
+                <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+              </>
+            ) : visualFormat === 'animated-2d' ? (
+              <>
+                <AnimatedCharacter
                   imageUrl={companion.imageUrl || "/placeholder.svg"}
                   name={companion.name}
                   expressionState={expressionState}
                   isOnline={isOnline}
+                  usePixi={true}
                   hideStatus={true}
                 />
-              </Suspense>
-              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
-            </>
-            ) : visualFormat === 'animated-2d' ? (
-              <>
-              <AnimatedCharacter
-                imageUrl={companion.imageUrl || "/placeholder.svg"}
-                name={companion.name}
-                expressionState={expressionState}
-                isOnline={isOnline}
-                usePixi={true}
-                hideStatus={true}
-              />
-              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+                <StatusBadge isOnline={isOnline} expressionState={expressionState} />
               </>
             ) : (
               <>
@@ -230,11 +242,10 @@ export function CompanionWindow({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`absolute top-1 right-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${
-                        voiceOutputEnabled 
-                          ? 'bg-primary/20 text-primary hover:bg-primary/30' 
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                      }`}
+                      className={`absolute top-1 right-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${voiceOutputEnabled
+                        ? 'bg-primary/20 text-primary hover:bg-primary/30'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
                       onClick={onVoiceOutputToggle}
                     >
                       {voiceOutputEnabled ? (
@@ -259,13 +270,12 @@ export function CompanionWindow({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${
-                        voiceState === 'recording'
-                          ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
-                          : voiceState === 'transcribing' || voiceState === 'processing'
+                      className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${voiceState === 'recording'
+                        ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
+                        : voiceState === 'transcribing' || voiceState === 'processing'
                           ? 'bg-amber-500/20 text-amber-500'
                           : 'bg-primary/20 text-primary hover:bg-primary/30'
-                      }`}
+                        }`}
                       onClick={onMicClick}
                       disabled={voiceState === 'transcribing' || voiceState === 'processing'}
                     >
@@ -278,13 +288,13 @@ export function CompanionWindow({
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
                     <p>
-                      {voiceState === 'recording' 
-                        ? 'Tap to stop' 
+                      {voiceState === 'recording'
+                        ? 'Tap to stop'
                         : voiceState === 'transcribing'
-                        ? 'Transcribing...'
-                        : voiceState === 'processing'
-                        ? 'Processing...'
-                        : 'Tap to speak'}
+                          ? 'Transcribing...'
+                          : voiceState === 'processing'
+                            ? 'Processing...'
+                            : 'Tap to speak'}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -347,7 +357,7 @@ export function CompanionWindow({
           </TooltipProvider>
         )}
 
-        {/* Start Chat / Hide Chat button — right, fills remaining space */}
+        {/* Start Chat / Hide Chat button — right */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

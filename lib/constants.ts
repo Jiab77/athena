@@ -455,6 +455,11 @@ export const EMOTION_EMOJIS = {
 } as const
 
 /**
+ * Default 'idle' emoji
+ */
+export const DEFAULT_IDLE_EMOJI = '😌'
+
+/**
  * Duration in ms to hold an emotion state before reverting to idle
  */
 export const EMOTION_DISPLAY_DURATION = 4000
@@ -470,3 +475,8 @@ export const MAX_DISPLAY_MESSAGES = 30
  */
 export const MIN_MEMORY_SIZE = 4
 export const MAX_MEMORY_SIZE = 50
+
+/**
+ * Mobile swipping threshold
+ */
+export const MOBILE_SWIPE_THRESHOLD = 50 // px
