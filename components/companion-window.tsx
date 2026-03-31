@@ -180,34 +180,34 @@ export function CompanionWindow({
               </>
             ) : visualFormat === 'animated-3d' ? (
               <>
-              <Suspense fallback={
-                <img
-                  src={companion.imageUrl || "/placeholder.svg"}
-                  alt={companion.name}
-                  className="w-full h-full object-cover opacity-60 animate-pulse rounded-lg"
-                />
-              }>
-                <Avatar25D
+                <Suspense fallback={
+                  <img
+                    src={companion.imageUrl || "/placeholder.svg"}
+                    alt={companion.name}
+                    className="w-full h-full object-cover opacity-60 animate-pulse rounded-lg"
+                  />
+                }>
+                  <Avatar25D
+                    imageUrl={companion.imageUrl || "/placeholder.svg"}
+                    name={companion.name}
+                    expressionState={expressionState}
+                    isOnline={isOnline}
+                    hideStatus={true}
+                  />
+                </Suspense>
+                <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+              </>
+            ) : visualFormat === 'animated-2d' ? (
+              <>
+                <AnimatedCharacter
                   imageUrl={companion.imageUrl || "/placeholder.svg"}
                   name={companion.name}
                   expressionState={expressionState}
                   isOnline={isOnline}
+                  usePixi={true}
                   hideStatus={true}
                 />
-              </Suspense>
-              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
-            </>
-            ) : visualFormat === 'animated-2d' ? (
-              <>
-              <AnimatedCharacter
-                imageUrl={companion.imageUrl || "/placeholder.svg"}
-                name={companion.name}
-                expressionState={expressionState}
-                isOnline={isOnline}
-                usePixi={true}
-                hideStatus={true}
-              />
-              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+                <StatusBadge isOnline={isOnline} expressionState={expressionState} />
               </>
             ) : (
               <>
@@ -230,11 +230,10 @@ export function CompanionWindow({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`absolute top-1 right-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${
-                        voiceOutputEnabled 
-                          ? 'bg-primary/20 text-primary hover:bg-primary/30' 
+                      className={`absolute top-1 right-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${voiceOutputEnabled
+                          ? 'bg-primary/20 text-primary hover:bg-primary/30'
                           : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                      }`}
+                        }`}
                       onClick={onVoiceOutputToggle}
                     >
                       {voiceOutputEnabled ? (
@@ -259,13 +258,12 @@ export function CompanionWindow({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${
-                        voiceState === 'recording'
+                      className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${voiceState === 'recording'
                           ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
                           : voiceState === 'transcribing' || voiceState === 'processing'
-                          ? 'bg-amber-500/20 text-amber-500'
-                          : 'bg-primary/20 text-primary hover:bg-primary/30'
-                      }`}
+                            ? 'bg-amber-500/20 text-amber-500'
+                            : 'bg-primary/20 text-primary hover:bg-primary/30'
+                        }`}
                       onClick={onMicClick}
                       disabled={voiceState === 'transcribing' || voiceState === 'processing'}
                     >
@@ -278,13 +276,13 @@ export function CompanionWindow({
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
                     <p>
-                      {voiceState === 'recording' 
-                        ? 'Tap to stop' 
+                      {voiceState === 'recording'
+                        ? 'Tap to stop'
                         : voiceState === 'transcribing'
-                        ? 'Transcribing...'
-                        : voiceState === 'processing'
-                        ? 'Processing...'
-                        : 'Tap to speak'}
+                          ? 'Transcribing...'
+                          : voiceState === 'processing'
+                            ? 'Processing...'
+                            : 'Tap to speak'}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -347,7 +345,7 @@ export function CompanionWindow({
           </TooltipProvider>
         )}
 
-        {/* Start Chat / Hide Chat button — right, fills remaining space */}
+        {/* Start Chat / Hide Chat button — right */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
