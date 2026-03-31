@@ -470,3 +470,8 @@ export const MAX_DISPLAY_MESSAGES = 30
  */
 export const MIN_MEMORY_SIZE = 4
 export const MAX_MEMORY_SIZE = 50
+
+/**
+ * Mobile swipping threshold
+ */
+export const MOBILE_SWIPE_THRESHOLD = 50 // px

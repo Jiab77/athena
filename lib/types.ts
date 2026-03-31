@@ -198,3 +198,8 @@ export interface AudioControls {
   getCurrentTime: () => number
   getAnalyser: () => AnalyserNode | null
 }
+
+/**
+ * Responsive design tabs
+ */
+export type MobileTab = 'companion' | 'chat'
