@@ -215,7 +215,7 @@ export function CompanionWindow({
                   <img
                     src={companion.imageUrl || "/placeholder.svg"}
                     alt={companion.name}
-                    className="w-full h-full object-cover animate-[float_6s_ease-in-out_infinite]"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <StatusBadge isOnline={isOnline} expressionState={expressionState} />
