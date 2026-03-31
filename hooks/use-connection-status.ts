@@ -17,11 +17,8 @@ export function useConnectionStatus() {
         const apiKey = await db.getAPIKey('groq') || await db.getAPIKey('openai')
         
         // Online only if settings exist AND API key is configured
-        const result = !!settings && !!apiKey
-        console.log('[v0] useConnectionStatus — dbReady:', dbReady, '| settings:', !!settings, '| apiKey:', !!apiKey, '| result:', result)
-        setIsOnline(result)
+        setIsOnline(!!settings && !!apiKey)
       } catch (error) {
-        console.log('[v0] useConnectionStatus — error:', error)
         setIsOnline(false)
       }
     }
@@ -31,6 +28,5 @@ export function useConnectionStatus() {
 
   const refresh = () => setRefreshTrigger(prev => prev + 1)
 
-  console.log('[v0] useConnectionStatus — current isOnline state:', isOnline)
   return { isOnline, refresh }
 }
