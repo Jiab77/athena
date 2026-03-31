@@ -8,11 +8,12 @@
  * Designed to be pinned always-on-top by the user via their OS or browser.
  */
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react' // useEffect + useState used in CompanionPopup
 import { useSearchParams } from 'next/navigation'
 import { CompanionPopupView } from '@/components/companion-popup-view'
 import { useBrain } from '@/lib/brain'
 import { DBProvider, useDB } from '@/lib/db-context'
+import { useConnectionStatus } from '@/hooks/use-connection-status'
 import type { CompanionData, VisualFormat } from '@/lib/types'
 
 interface CompanionPopupPageProps {
@@ -25,18 +26,7 @@ function CompanionBrain({ id, name, imageUrl, visualFormat }: {
   imageUrl: string
   visualFormat: VisualFormat
 }) {
-  const [isOnline, setIsOnline] = useState(true)
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
-    }
-  }, [])
+  const { isOnline } = useConnectionStatus()
 
   const companion: CompanionData = {
     id,
