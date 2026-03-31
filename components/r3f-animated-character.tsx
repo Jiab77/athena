@@ -306,7 +306,7 @@ export function R3FAnimatedCharacter({
           camera={{ position: [0, 0, 10], zoom: 100 }}
           dpr={[1, 2]}
           gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-          style={{ background: 'transparent' }}
+          style={{ background: 'transparent', width: '100%', height: '100%' }}
         >
           <ambientLight intensity={1.2} />
           <AvatarMesh

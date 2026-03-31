@@ -135,9 +135,9 @@ export function CompanionWindow({
 
       <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Character Display - conditionally animated or static */}
-        <div className="flex-1 px-4 pt-5 pb-4 bg-background border-t border-border flex items-start justify-center min-h-0 overflow-hidden">
-          {/* aspect-[3/4] gives a concrete calculable height from width, breaking the h-full circular dependency */}
-          <div className="relative w-full aspect-[3/4] max-h-full mx-auto">
+        <div className="flex-1 pt-5 pb-4 bg-background border-t border-border flex items-center justify-center min-h-0 overflow-hidden">
+          {/* h-full drives width via aspect-[3/4] — height is the known dimension from flex-1 */}
+          <div className="relative h-full aspect-[3/4] max-w-full">
             {/* Emotion emoji badge — top-left corner, always visible */}
             {/* Uses lastDetectedEmotion (independent of animation state) so TTS/thinking never overrides it */}
             <div className="absolute duration-300 flex h-7 items-center justify-center leading-none left-1 select-none text-xl top-1 transition-all w-8 z-20">
