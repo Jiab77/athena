@@ -135,7 +135,7 @@ export function CompanionWindow({
       <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Character Display - conditionally animated or static */}
         <div className="flex-1 px-4 pt-5 pb-4 bg-background border-t border-border flex items-center justify-center min-h-0">
-          <div className="relative w-48 min-h-[264px]">
+          <div className="relative w-full h-full">
             {/* Emotion emoji badge — top-left corner, always visible */}
             {/* Uses lastDetectedEmotion (independent of animation state) so TTS/thinking never overrides it */}
             <div className="absolute duration-300 flex h-7 items-center justify-center leading-none left-1 select-none text-xl top-1 transition-all w-8 z-20">
@@ -149,7 +149,7 @@ export function CompanionWindow({
 
             {visualFormat === 'live-avatar' ? (
               <>
-                <div className="w-48 rounded-lg overflow-hidden border border-primary/30 shadow-lg shadow-primary/20" style={{ height: '264px' }}>
+                <div className="w-full h-full rounded-lg overflow-hidden border border-primary/30 shadow-lg shadow-primary/20">
                   {decartStream ? (
                     <video
                       ref={videoRef}
@@ -200,7 +200,7 @@ export function CompanionWindow({
               />
             ) : (
               <>
-                <div className="w-48 h-66 rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
+                <div className="w-full h-full rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
                   <img
                     src={companion.imageUrl || "/placeholder.svg"}
                     alt={companion.name}
