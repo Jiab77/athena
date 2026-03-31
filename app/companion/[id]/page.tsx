@@ -20,13 +20,13 @@ interface CompanionPopupPageProps {
   params: Promise<{ id: string }>
 }
 
-function CompanionBrain({ id, name, imageUrl, visualFormat }: {
+function CompanionBrain({ id, name, imageUrl, visualFormat, isOnline }: {
   id: string
   name: string
   imageUrl: string
   visualFormat: VisualFormat
+  isOnline: boolean
 }) {
-  const { isOnline } = useConnectionStatus()
 
   const companion: CompanionData = {
     id,
@@ -93,6 +93,7 @@ function CompanionPopup({ id }: { id: string }) {
   const paramImage = searchParams.get('image') || ''
   const visualFormat = (searchParams.get('format') || 'static-2d') as VisualFormat
   const { db, dbReady } = useDB()
+  const { isOnline } = useConnectionStatus()
 
   // URL params are the source of truth — no DB needed
   // If missing, fall back to DB once ready
@@ -116,6 +117,7 @@ function CompanionPopup({ id }: { id: string }) {
       name={resolvedName}
       imageUrl={resolvedImage}
       visualFormat={visualFormat}
+      isOnline={isOnline}
     />
   )
 }
