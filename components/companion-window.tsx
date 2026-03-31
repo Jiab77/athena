@@ -31,7 +31,7 @@ export function setCompanionPopupRef(ref: Window | null) { _companionPopupRef = 
 
 const Avatar25D = lazy(() => import('@/components/avatar-2-5d').then(m => ({ default: m.Avatar25D })))
 import type { CompanionData, PersonalityType, VisualFormat, ExpressionState, EmotionState } from '@/lib/types'
-import { DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, PERSONALITY_TRAITS, DEFAULT_VISUAL_FORMAT } from '@/lib/constants'
+import { DEFAULT_COMPANION, DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, PERSONALITY_TRAITS, DEFAULT_VISUAL_FORMAT } from '@/lib/constants'
 
 type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
 
@@ -110,7 +110,7 @@ export function CompanionWindow({
                   size="icon"
                   className="h-8 w-8 cursor-pointer"
                   onClick={() => {
-                    const url = `/companion/${companion.id}?name=${encodeURIComponent(companion.name)}&image=${encodeURIComponent(companion.imageUrl || '')}&format=${visualFormat || 'static-2d'}&online=${isOnline ? '1' : '0'}`
+                    const url = `/companion/${encodeURIComponent(companion.id)}?name=${encodeURIComponent(companion.name)}&personality=${encodeURIComponent(companion.personality)}&appearance=${encodeURIComponent(companion.appearance)}&image=${encodeURIComponent(companion.imageUrl || DEFAULT_COMPANION.imageUrl)}&createdAt=${encodeURIComponent(companion.createdAt)}&format=${visualFormat || DEFAULT_VISUAL_FORMAT}&online=${isOnline ? '1' : '0'}`
                     openCompanionPopup(url, `companion-${companion.id}`)
                   }}
                 >
@@ -231,8 +231,8 @@ export function CompanionWindow({
                       variant="ghost"
                       size="icon"
                       className={`absolute top-1 right-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${voiceOutputEnabled
-                          ? 'bg-primary/20 text-primary hover:bg-primary/30'
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        ? 'bg-primary/20 text-primary hover:bg-primary/30'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
                         }`}
                       onClick={onVoiceOutputToggle}
                     >
@@ -259,10 +259,10 @@ export function CompanionWindow({
                       variant="ghost"
                       size="icon"
                       className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${voiceState === 'recording'
-                          ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
-                          : voiceState === 'transcribing' || voiceState === 'processing'
-                            ? 'bg-amber-500/20 text-amber-500'
-                            : 'bg-primary/20 text-primary hover:bg-primary/30'
+                        ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
+                        : voiceState === 'transcribing' || voiceState === 'processing'
+                          ? 'bg-amber-500/20 text-amber-500'
+                          : 'bg-primary/20 text-primary hover:bg-primary/30'
                         }`}
                       onClick={onMicClick}
                       disabled={voiceState === 'transcribing' || voiceState === 'processing'}

@@ -9,11 +9,12 @@
  * Designed to be pinned always-on-top by the user via their OS or browser.
  */
 
-import { use, useEffect, useState } from 'react'
+import { use } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CompanionPopupView } from '@/components/companion-popup-view'
-import { DBProvider, useDB } from '@/lib/db-context'
-import type { CompanionData, VisualFormat } from '@/lib/types'
+import { DBProvider } from '@/lib/db-context'
+import type { CompanionData, PersonalityType, VisualFormat } from '@/lib/types'
+import { DEFAULT_VISUAL_FORMAT, DEFAULT_COMPANION } from '@/lib/constants'
 
 interface CompanionPopupPageProps {
   params: Promise<{ id: string }>
@@ -21,36 +22,21 @@ interface CompanionPopupPageProps {
 
 function CompanionPopup({ id }: { id: string }) {
   const searchParams = useSearchParams()
-  const paramName = searchParams.get('name') || ''
-  const paramImage = searchParams.get('image') || ''
-  const visualFormat = (searchParams.get('format') || 'static-2d') as VisualFormat
+  const paramName = searchParams.get('name') || DEFAULT_COMPANION.name
+  const paramImage = searchParams.get('image') || DEFAULT_COMPANION.imageUrl
+  const paramPersonality = searchParams.get('personality') || DEFAULT_COMPANION.personality as PersonalityType
+  const paramAppearance = searchParams.get('appearance') || DEFAULT_COMPANION.appearance
+  const paramCreatedAt = searchParams.get('createdAt') || DEFAULT_COMPANION.createdAt
+  const visualFormat = (searchParams.get('format') || DEFAULT_VISUAL_FORMAT) as VisualFormat
   const isOnline = searchParams.get('online') === '1'
-  const { db, dbReady } = useDB()
-
-  // URL params are the source of truth — no DB needed
-  // If missing, fall back to DB once ready
-  const [resolvedName, setResolvedName] = useState(paramName || 'Companion')
-  const [resolvedImage, setResolvedImage] = useState(paramImage)
-
-  useEffect(() => {
-    if (!dbReady || !db || (paramName && paramImage)) return
-    // Fallback: load from DB if URL params were missing
-    Promise.all([db.getSettings(), db.getCompanion(id)])
-      .then(([settings, comp]) => {
-        if (!paramName && settings?.selectedCompanionName) setResolvedName(settings.selectedCompanionName)
-        if (!paramImage && comp?.imageUrl) setResolvedImage(comp.imageUrl)
-      })
-      .catch(() => {})
-  }, [dbReady, db, id, paramName, paramImage])
 
   const companion: CompanionData = {
     id,
-    name: resolvedName,
-    imageUrl: resolvedImage,
-    personality: '',
-    gender: 'F',
-    createdAt: new Date().toISOString(),
-    category: 'general',
+    name: paramName,
+    personality: paramPersonality,
+    appearance: paramAppearance,
+    imageUrl: paramImage,
+    createdAt: paramCreatedAt,
   }
 
   const openChat = () => {
@@ -63,8 +49,8 @@ function CompanionPopup({ id }: { id: string }) {
       return
     }
     const ref = window.open(`/chat/${id}`, chatName, `width=${w},height=${h},left=0,top=${top},resizable=no,scrollbars=no`)
-    ;(window as Window & { _chatPopupRef?: Window | null })._chatPopupRef = ref
-    ;(window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
+      ; (window as Window & { _chatPopupRef?: Window | null })._chatPopupRef = ref
+      ; (window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
   }
 
   return (
