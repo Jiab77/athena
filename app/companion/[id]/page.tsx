@@ -4,88 +4,19 @@
  * /companion/[id] — Pop-out companion window
  *
  * Opens as a standalone browser popup via window.open().
- * Renders just the CompanionWindow with the useBrain() hook for full interactivity.
+ * Display-only window — renders CompanionPopupView directly with state
+ * passed via URL params (name, image, format, online).
  * Designed to be pinned always-on-top by the user via their OS or browser.
  */
 
-import { use, useEffect, useState } from 'react' // useEffect + useState used in CompanionPopup
+import { use, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CompanionPopupView } from '@/components/companion-popup-view'
-import { useBrain } from '@/lib/brain'
 import { DBProvider, useDB } from '@/lib/db-context'
 import type { CompanionData, VisualFormat } from '@/lib/types'
 
 interface CompanionPopupPageProps {
   params: Promise<{ id: string }>
-}
-
-function CompanionBrain({ id, name, imageUrl, visualFormat, isOnline }: {
-  id: string
-  name: string
-  imageUrl: string
-  visualFormat: VisualFormat
-  isOnline: boolean
-}) {
-
-  const companion: CompanionData = {
-    id,
-    name,
-    imageUrl,
-    personality: 'friendly',
-    gender: 'F',
-    createdAt: new Date().toISOString(),
-    category: 'general',
-  }
-
-  const {
-    expressionState,
-    lastDetectedEmotion,
-    voiceState,
-    sttSupported,
-    decartStream,
-    decartError,
-    handleMicClick,
-  } = useBrain({
-    companion,
-    visualFormat,
-    voiceOutputEnabled: true,
-    isOpen: true,
-  })
-
-  const openChat = () => {
-    const chatName = `chat-${id}`
-    const w = 800, h = 636
-    const top = Math.round((screen.availHeight - h) / 2)
-    // Check if chat popup is already open
-    const existing = (window as Window & { _chatPopupRef?: Window | null })._chatPopupRef
-    if (existing && !existing.closed) {
-      existing.focus()
-      return
-    }
-    const ref = window.open(`/chat/${id}`, chatName, `width=${w},height=${h},left=0,top=${top},resizable=no,scrollbars=no`)
-    ;(window as Window & { _chatPopupRef?: Window | null })._chatPopupRef = ref
-    // Also expose this companion window ref to the chat popup via opener
-    ;(window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
-  }
-
-  console.log('[v0] CompanionBrain — isOnline prop received:', isOnline)
-
-  return (
-    <CompanionPopupView
-      companion={companion}
-      visualFormat={visualFormat}
-      isOnline={isOnline}
-      expressionState={expressionState}
-      lastDetectedEmotion={lastDetectedEmotion}
-      decartStream={decartStream}
-      decartError={decartError}
-      voiceState={voiceState}
-      voiceOutputEnabled={true}
-      sttSupported={sttSupported}
-      onMicClick={handleMicClick}
-      onOpenChat={openChat}
-    />
-  )
 }
 
 function CompanionPopup({ id }: { id: string }) {
@@ -112,13 +43,36 @@ function CompanionPopup({ id }: { id: string }) {
       .catch(() => {})
   }, [dbReady, db, id, paramName, paramImage])
 
+  const companion: CompanionData = {
+    id,
+    name: resolvedName,
+    imageUrl: resolvedImage,
+    personality: '',
+    gender: 'F',
+    createdAt: new Date().toISOString(),
+    category: 'general',
+  }
+
+  const openChat = () => {
+    const chatName = `chat-${id}`
+    const w = 800, h = 636
+    const top = Math.round((screen.availHeight - h) / 2)
+    const existing = (window as Window & { _chatPopupRef?: Window | null })._chatPopupRef
+    if (existing && !existing.closed) {
+      existing.focus()
+      return
+    }
+    const ref = window.open(`/chat/${id}`, chatName, `width=${w},height=${h},left=0,top=${top},resizable=no,scrollbars=no`)
+    ;(window as Window & { _chatPopupRef?: Window | null })._chatPopupRef = ref
+    ;(window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
+  }
+
   return (
-    <CompanionBrain
-      id={id}
-      name={resolvedName}
-      imageUrl={resolvedImage}
+    <CompanionPopupView
+      companion={companion}
       visualFormat={visualFormat}
       isOnline={isOnline}
+      onOpenChat={openChat}
     />
   )
 }
