@@ -166,7 +166,7 @@ export function CompanionWindow({
                     <img
                       src={companion.imageUrl || "/placeholder.svg"}
                       alt={companion.name}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full object-cover ${decartError ? 'opacity-80' : 'opacity-60 animate-pulse'}`}
                     />
                   )}
                 </div>
