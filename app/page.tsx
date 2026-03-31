@@ -510,7 +510,7 @@ export default function Home() {
       )}
 
       {showSettings && (
-        <div className="fixed bottom-24 right-6 z-40 w-96">
+        <div className="fixed bottom-24 z-40 inset-x-4 md:inset-x-auto md:right-6 md:w-96">
           <SettingsPanel 
             onClose={() => setShowSettings(false)}
             onSettingsSaved={handleSettingsSaved}
