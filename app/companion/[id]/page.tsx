@@ -69,6 +69,8 @@ function CompanionBrain({ id, name, imageUrl, visualFormat, isOnline }: {
     ;(window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
   }
 
+  console.log('[v0] CompanionBrain — isOnline prop received:', isOnline)
+
   return (
     <CompanionPopupView
       companion={companion}
@@ -94,6 +96,8 @@ function CompanionPopup({ id }: { id: string }) {
   const visualFormat = (searchParams.get('format') || 'static-2d') as VisualFormat
   const { db, dbReady } = useDB()
   const { isOnline } = useConnectionStatus()
+
+  console.log('[v0] CompanionPopup — dbReady:', dbReady, '| isOnline:', isOnline)
 
   // URL params are the source of truth — no DB needed
   // If missing, fall back to DB once ready

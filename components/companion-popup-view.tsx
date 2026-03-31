@@ -59,6 +59,8 @@ export function CompanionPopupView({
     }
   }, [decartStream])
 
+  console.log('[v0] CompanionPopupView — isOnline prop received:', isOnline, '| visualFormat:', visualFormat)
+
   const statusLabel = visualFormat === 'live-avatar'
     ? decartStream ? 'Live' : decartError ? 'Connection failed' : 'Connecting...'
     : isOnline ? 'Online' : 'Offline'
