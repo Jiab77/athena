@@ -5,20 +5,10 @@ import { MessageSquare, Mic, Volume2, VolumeX, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { AnimatedCharacter } from '@/components/animated-character'
-import type { CompanionData, VisualFormat, ExpressionState, EmotionState } from '@/lib/types'
-import { DEFAULT_VISUAL_FORMAT } from '@/lib/constants'
+import type { CompanionData, VisualFormat, ExpressionState, EmotionState, VoiceState } from '@/lib/types'
+import { DEFAULT_VISUAL_FORMAT, DEFAULT_IDLE_EMOJI, EMOTION_EMOJIS } from '@/lib/constants'
 
 const Avatar25D = lazy(() => import('@/components/avatar-2-5d').then(m => ({ default: m.Avatar25D })))
-
-type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
-
-const EMOTION_EMOJI: Record<NonNullable<EmotionState>, string> = {
-  happy:      '😊',
-  sad:        '😢',
-  angry:      '😠',
-  surprised:  '😲',
-  thoughtful: '🤔',
-}
 
 interface CompanionPopupViewProps {
   companion: CompanionData
@@ -130,7 +120,7 @@ export function CompanionPopupView({
 
       {/* ── TOP-LEFT: emotion emoji ───────────────────────────────── */}
       <div className="absolute top-4 left-4 z-20 text-3xl select-none leading-none">
-        {lastDetectedEmotion ? EMOTION_EMOJI[lastDetectedEmotion] : '😌'}
+        {lastDetectedEmotion ? EMOTION_EMOJIS[lastDetectedEmotion] : DEFAULT_IDLE_EMOJI}
       </div>
 
       {/* ── TOP-RIGHT: open chat button ───────────────────────────── */}
@@ -161,13 +151,12 @@ export function CompanionPopupView({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-10 w-10 rounded-full cursor-pointer backdrop-blur-sm transition-colors ${
-                    voiceState === 'recording'
-                      ? 'bg-red-500/30 text-red-400 hover:bg-red-500/40 animate-pulse'
-                      : voiceState === 'transcribing' || voiceState === 'processing'
+                  className={`h-10 w-10 rounded-full cursor-pointer backdrop-blur-sm transition-colors ${voiceState === 'recording'
+                    ? 'bg-red-500/30 text-red-400 hover:bg-red-500/40 animate-pulse'
+                    : voiceState === 'transcribing' || voiceState === 'processing'
                       ? 'bg-amber-500/30 text-amber-400'
                       : 'bg-background/60 hover:bg-background/80 text-foreground'
-                  }`}
+                    }`}
                   onClick={onMicClick}
                   disabled={voiceState === 'transcribing' || voiceState === 'processing'}
                 >
@@ -191,11 +180,10 @@ export function CompanionPopupView({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-10 w-10 rounded-full cursor-pointer backdrop-blur-sm transition-colors ${
-                    voiceOutputEnabled
-                      ? 'bg-primary/30 text-primary hover:bg-primary/40'
-                      : 'bg-background/60 text-muted-foreground hover:bg-background/80'
-                  }`}
+                  className={`h-10 w-10 rounded-full cursor-pointer backdrop-blur-sm transition-colors ${voiceOutputEnabled
+                    ? 'bg-primary/30 text-primary hover:bg-primary/40'
+                    : 'bg-background/60 text-muted-foreground hover:bg-background/80'
+                    }`}
                   onClick={onVoiceOutputToggle}
                 >
                   {voiceOutputEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}

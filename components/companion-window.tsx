@@ -1,5 +1,6 @@
 'use client'
 
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink, Mic2, Keyboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,7 +11,22 @@ import {
 } from '@/components/ui/tooltip'
 import { AnimatedCharacter } from '@/components/animated-character'
 import { StatusBadge } from '@/components/status-badge'
-import { lazy, Suspense, useEffect, useRef } from 'react'
+import type {
+  CompanionData,
+  PersonalityType,
+  VisualFormat,
+  ExpressionState,
+  EmotionState,
+  VoiceState
+} from '@/lib/types'
+import {
+  DEFAULT_COMPANION,
+  DEFAULT_COMPANION_NAME,
+  DEFAULT_PERSONALITY,
+  PERSONALITY_TRAITS,
+  DEFAULT_VISUAL_FORMAT,
+  DEFAULT_IDLE_EMOJI
+} from '@/lib/constants'
 
 // Module-level ref so it persists across renders
 let _companionPopupRef: Window | null = null
@@ -30,8 +46,6 @@ export function getCompanionPopupRef() { return _companionPopupRef }
 export function setCompanionPopupRef(ref: Window | null) { _companionPopupRef = ref }
 
 const Avatar25D = lazy(() => import('@/components/avatar-2-5d').then(m => ({ default: m.Avatar25D })))
-import type { CompanionData, PersonalityType, VisualFormat, ExpressionState, EmotionState, VoiceState } from '@/lib/types'
-import { DEFAULT_COMPANION, DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, PERSONALITY_TRAITS, DEFAULT_VISUAL_FORMAT } from '@/lib/constants'
 
 interface CompanionWindowProps {
   isOpen: boolean
@@ -144,7 +158,7 @@ export function CompanionWindow({
               {lastDetectedEmotion === 'angry' && '😠'}
               {lastDetectedEmotion === 'surprised' && '😲'}
               {lastDetectedEmotion === 'thoughtful' && '🤔'}
-              {!lastDetectedEmotion && '😌'}
+              {!lastDetectedEmotion && DEFAULT_IDLE_EMOJI}
             </div>
 
             {visualFormat === 'live-avatar' ? (

@@ -455,6 +455,11 @@ export const EMOTION_EMOJIS = {
 } as const
 
 /**
+ * Default 'idle' emoji
+ */
+export const DEFAULT_IDLE_EMOJI = '😌'
+
+/**
  * Duration in ms to hold an emotion state before reverting to idle
  */
 export const EMOTION_DISPLAY_DURATION = 4000

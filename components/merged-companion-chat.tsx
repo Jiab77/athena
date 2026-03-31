@@ -22,7 +22,12 @@ import {
 } from '@/components/ui/tooltip'
 import { openCompanionPopup } from '@/components/companion-window'
 import type { MobileTab, PersonalityType } from '@/lib/types'
-import { DEFAULT_COMPANION_NAME, PERSONALITY_TRAITS, DEFAULT_PERSONALITY, MOBILE_SWIPE_THRESHOLD } from '@/lib/constants'
+import {
+  DEFAULT_COMPANION_NAME,
+  PERSONALITY_TRAITS,
+  DEFAULT_PERSONALITY,
+  MOBILE_SWIPE_THRESHOLD
+} from '@/lib/constants'
 
 interface MergedCompanionChatProps {
   isOpen: boolean
