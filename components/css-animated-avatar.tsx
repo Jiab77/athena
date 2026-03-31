@@ -89,34 +89,14 @@ export function CssAnimatedAvatar({
     }
   }
 
-  const getStatusText = () => {
-    if (!isOnline) return 'Offline'
-    switch (expressionState) {
-      case 'listening': return 'Listening...'
-      case 'thinking': return 'Thinking...'
-      case 'speaking': return 'Speaking...'
-      default: return 'Online'
-    }
-  }
-
-  const getStatusColor = () => {
-    if (!isOnline) return 'bg-gray-500'
-    switch (expressionState) {
-      case 'listening': return 'bg-blue-500'
-      case 'thinking': return 'bg-purple-500'
-      case 'speaking': return 'bg-green-500'
-      default: return 'bg-green-500'
-    }
-  }
-
   const styles = getExpressionStyles()
 
   return (
-    <div className="relative">
+    <div className="relative w-full h-full">
       {/* Character container */}
       <div
         className={`
-          w-48 h-66 rounded-lg overflow-hidden border-2
+          w-full h-full rounded-lg overflow-hidden border-2
           transition-all duration-300 ease-out
           ${getAnimationClass()}
         `}
@@ -149,12 +129,6 @@ export function CssAnimatedAvatar({
             }}
           />
         </div>
-      </div>
-
-      {/* Status indicator badge */}
-      <div className="absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border border-border/50 shadow-md">
-        <div className={`h-2 w-2 rounded-full ${getStatusColor()} ${expressionState !== 'idle' && isOnline ? 'animate-pulse' : ''}`} />
-        <span className="text-xs font-medium text-foreground">{getStatusText()}</span>
       </div>
 
       {/* CSS Animations */}

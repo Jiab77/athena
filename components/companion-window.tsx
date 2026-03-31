@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { AnimatedCharacter } from '@/components/animated-character'
+import { StatusBadge } from '@/components/status-badge'
 import { lazy, Suspense, useEffect, useRef } from 'react'
 
 // Module-level ref so it persists across renders
@@ -134,8 +135,9 @@ export function CompanionWindow({
 
       <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Character Display - conditionally animated or static */}
-        <div className="flex-1 px-4 pt-5 pb-4 bg-background border-t border-border flex items-center justify-center min-h-0">
-          <div className="relative w-full h-full">
+        <div className="flex-1 px-4 pt-5 pb-4 bg-background border-t border-border flex items-start justify-center min-h-0 overflow-hidden">
+          {/* aspect-[3/4] gives a concrete calculable height from width, breaking the h-full circular dependency */}
+          <div className="relative w-full aspect-[3/4] max-h-full mx-auto">
             {/* Emotion emoji badge — top-left corner, always visible */}
             {/* Uses lastDetectedEmotion (independent of animation state) so TTS/thinking never overrides it */}
             <div className="absolute duration-300 flex h-7 items-center justify-center leading-none left-1 select-none text-xl top-1 transition-all w-8 z-20">
@@ -168,7 +170,8 @@ export function CompanionWindow({
                     />
                   )}
                 </div>
-                <div className={`absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 px-3 py-1 rounded-full border shadow-md ${decartError ? 'border-destructive/40' : 'border-primary/30'}`}>
+                {/* Live-avatar uses its own status logic — inline for specificity */}
+                <div className={`absolute bottom-1 right-1 z-10 flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border shadow-md ${decartError ? 'border-destructive/40' : 'border-primary/30'}`}>
                   <div className={`h-2 w-2 rounded-full flex-shrink-0 ${decartStream ? 'bg-green-500 animate-pulse' : decartError ? 'bg-destructive' : 'bg-amber-500 animate-pulse'}`} />
                   <span className="text-xs font-medium text-foreground truncate max-w-[140px]">
                     {decartStream ? 'Live' : decartError ? (decartError.toLowerCase().includes('credit') ? 'Insufficient credits' : 'Connection failed') : 'Connecting...'}
@@ -188,8 +191,10 @@ export function CompanionWindow({
                   name={companion.name}
                   expressionState={expressionState}
                   isOnline={isOnline}
+                  hideStatus={true}
                 />
               </Suspense>
+              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
             ) : visualFormat === 'animated-2d' ? (
               <AnimatedCharacter
                 imageUrl={companion.imageUrl || "/placeholder.svg"}
@@ -197,7 +202,9 @@ export function CompanionWindow({
                 expressionState={expressionState}
                 isOnline={isOnline}
                 usePixi={true}
+                hideStatus={true}
               />
+              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
             ) : (
               <>
                 <div className="w-full h-full rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
@@ -207,10 +214,7 @@ export function CompanionWindow({
                     className="w-full h-full object-cover animate-[float_6s_ease-in-out_infinite]"
                   />
                 </div>
-                <div className="absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 px-3 py-1 rounded-full border border-primary/30 shadow-md">
-                  <div className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
-                  <span className="text-xs font-medium text-foreground">{isOnline ? 'Online' : 'Offline'}</span>
-                </div>
+                <StatusBadge isOnline={isOnline} expressionState={expressionState} />
               </>
             )}
 
