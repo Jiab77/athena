@@ -39,7 +39,7 @@ interface CompanionPopupViewProps {
 export function CompanionPopupView({
   companion,
   visualFormat = DEFAULT_VISUAL_FORMAT,
-  isOnline = true,
+  isOnline = false,
   expressionState = 'idle',
   lastDetectedEmotion = null,
   decartStream = null,
