@@ -1,8 +1,7 @@
 'use client'
 
-import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink } from 'lucide-react'
+import { X, Mic, Volume2, VolumeX, Loader2, ExternalLink, Mic2, Keyboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
@@ -10,12 +9,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { AnimatedCharacter } from '@/components/animated-character'
+import { StatusBadge } from '@/components/status-badge'
 import { lazy, Suspense, useEffect, useRef } from 'react'
 
 // Module-level ref so it persists across renders
 let _companionPopupRef: Window | null = null
 
-function openCompanionPopup(url: string, name: string) {
+export function openCompanionPopup(url: string, name: string) {
   if (_companionPopupRef && !_companionPopupRef.closed) {
     _companionPopupRef.focus()
     return
@@ -40,6 +40,8 @@ interface CompanionWindowProps {
   onClose: () => void
   isChatVisible: boolean
   setIsChatVisible: (visible: boolean) => void
+  isVoiceMode?: boolean
+  onVoiceModeToggle?: () => void
   isOnline: boolean
   companion: CompanionData
   expressionState?: ExpressionState
@@ -53,6 +55,8 @@ interface CompanionWindowProps {
   voiceOutputEnabled?: boolean
   onVoiceOutputToggle?: () => void
   sttSupported?: boolean
+  /** When true, hides the built-in header and footer — used by the mobile tabbed layout */
+  tabbed?: boolean
 }
 
 export function CompanionWindow({
@@ -60,6 +64,8 @@ export function CompanionWindow({
   onClose,
   isChatVisible,
   setIsChatVisible,
+  isVoiceMode = false,
+  onVoiceModeToggle,
   isOnline,
   companion,
   expressionState = 'idle',
@@ -72,6 +78,7 @@ export function CompanionWindow({
   voiceOutputEnabled = true,
   onVoiceOutputToggle,
   sttSupported = true,
+  tabbed = false,
 }: CompanionWindowProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -86,8 +93,8 @@ export function CompanionWindow({
 
   return (
     <>
-      {/* Header with close button */}
-      <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 p-4 flex items-start justify-between flex-shrink-0">
+      {/* Header with close button — hidden in tabbed mode (rendered by parent) */}
+      {!tabbed && <div className="relative bg-gradient-to-r from-primary/10 to-accent/10 p-4 flex items-start justify-between flex-shrink-0">
         <div className="flex-1">
           <h2 className="text-lg font-bold text-foreground">{companion.name || DEFAULT_COMPANION_NAME}</h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -124,12 +131,13 @@ export function CompanionWindow({
             <X className="h-4 w-4" />
           </Button>
         </div>
-      </div>
+      </div>}
 
-      <ScrollArea className="flex-1 overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Character Display - conditionally animated or static */}
-        <div className="px-4 pt-5 pb-10 bg-background border-t border-border flex items-center justify-center">
-          <div className="relative w-48 min-h-[264px]">
+        <div className="flex-1 pt-5 pb-4 bg-background border-t border-border flex items-center justify-center min-h-0 overflow-hidden">
+          {/* h-full drives width via aspect-[3/4] — height is the known dimension from flex-1 */}
+          <div className="relative h-full aspect-[3/4] max-w-full">
             {/* Emotion emoji badge — top-left corner, always visible */}
             {/* Uses lastDetectedEmotion (independent of animation state) so TTS/thinking never overrides it */}
             <div className="absolute duration-300 flex h-7 items-center justify-center leading-none left-1 select-none text-xl top-1 transition-all w-8 z-20">
@@ -143,7 +151,7 @@ export function CompanionWindow({
 
             {visualFormat === 'live-avatar' ? (
               <>
-                <div className="w-48 rounded-lg overflow-hidden border border-primary/30 shadow-lg shadow-primary/20" style={{ height: '264px' }}>
+                <div className="w-full h-full rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
                   {decartStream ? (
                     <video
                       ref={videoRef}
@@ -162,7 +170,8 @@ export function CompanionWindow({
                     />
                   )}
                 </div>
-                <div className={`absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 px-3 py-1 rounded-full border shadow-md ${decartError ? 'border-destructive/40' : 'border-primary/30'}`}>
+                {/* Live-avatar uses its own status logic — inline for specificity */}
+                <div className={`absolute bottom-1 right-1 z-10 flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border shadow-md ${decartError ? 'border-destructive/40' : 'border-primary/30'}`}>
                   <div className={`h-2 w-2 rounded-full flex-shrink-0 ${decartStream ? 'bg-green-500 animate-pulse' : decartError ? 'bg-destructive' : 'bg-amber-500 animate-pulse'}`} />
                   <span className="text-xs font-medium text-foreground truncate max-w-[140px]">
                     {decartStream ? 'Live' : decartError ? (decartError.toLowerCase().includes('credit') ? 'Insufficient credits' : 'Connection failed') : 'Connecting...'}
@@ -170,6 +179,7 @@ export function CompanionWindow({
                 </div>
               </>
             ) : visualFormat === 'animated-3d' ? (
+              <>
               <Suspense fallback={
                 <img
                   src={companion.imageUrl || "/placeholder.svg"}
@@ -182,29 +192,33 @@ export function CompanionWindow({
                   name={companion.name}
                   expressionState={expressionState}
                   isOnline={isOnline}
+                  hideStatus={true}
                 />
               </Suspense>
+              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+            </>
             ) : visualFormat === 'animated-2d' ? (
+              <>
               <AnimatedCharacter
                 imageUrl={companion.imageUrl || "/placeholder.svg"}
                 name={companion.name}
                 expressionState={expressionState}
                 isOnline={isOnline}
                 usePixi={true}
+                hideStatus={true}
               />
+              <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+              </>
             ) : (
               <>
-                <div className="w-48 h-66 rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
+                <div className="w-full h-full rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
                   <img
                     src={companion.imageUrl || "/placeholder.svg"}
                     alt={companion.name}
-                    className="w-full h-full object-cover animate-[float_6s_ease-in-out_infinite]"
+                    className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 px-3 py-1 rounded-full border border-primary/30 shadow-md">
-                  <div className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
-                  <span className="text-xs font-medium text-foreground">{isOnline ? 'Online' : 'Offline'}</span>
-                </div>
+                <StatusBadge isOnline={isOnline} expressionState={expressionState} />
               </>
             )}
 
@@ -279,8 +293,8 @@ export function CompanionWindow({
           </div>
         </div>
 
-        {/* Info Section */}
-        <div className="p-4 bg-muted/30 border-t border-border">
+        {/* Info Section — pinned to bottom of the flex column */}
+        <div className="mt-auto p-4 bg-muted/30 border-t border-border">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-xs text-muted-foreground font-medium">Personality</p>
@@ -289,7 +303,7 @@ export function CompanionWindow({
                   <TooltipTrigger asChild>
                     <p className="text-foreground truncate cursor-help">{PERSONALITY_TRAITS[companion.personality as PersonalityType] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]}</p>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom" className="max-w-xs bg-slate-900 text-slate-50 border-slate-700">
+                  <TooltipContent side="bottom" className="max-w-xs">
                     <p>{PERSONALITY_TRAITS[companion.personality as PersonalityType] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -303,18 +317,62 @@ export function CompanionWindow({
             </div>
           </div>
         </div>
-      </ScrollArea>
+      </div>{/* end flex flex-col */}
 
-      {/* Footer Action - Toggle Button */}
-      <div className="p-4 border-t border-border bg-background flex-shrink-0">
-        <Button 
-          onClick={() => setIsChatVisible(!isChatVisible)}
-          className="w-full cursor-pointer"
-          variant={isChatVisible ? "default" : "outline"}
-        >
-          {isChatVisible ? 'Hide chat' : 'Start chat'}
-        </Button>
-      </div>
+      {/* Footer Action — hidden in tabbed mode (rendered by parent) */}
+      {!tabbed && <div className="p-4 pr-20 sm:pr-4 border-t border-border bg-card flex-shrink-0 flex items-center gap-2">
+        {/* Voice Mode toggle — left */}
+        {onVoiceModeToggle && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  className={[
+                    'flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-medium',
+                    isVoiceMode
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+                      : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
+                  ].join(' ')}
+                  onClick={onVoiceModeToggle}
+                >
+                  <Mic2 className="h-4 w-4" />
+                  <span className="text-xs">Voice Mode</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>{isVoiceMode ? 'Disable voice mode' : 'Enable voice mode'}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+
+        {/* Start Chat / Hide Chat button — right, fills remaining space */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => setIsChatVisible(!isChatVisible)}
+                size="sm"
+                disabled={isVoiceMode}
+                className={[
+                  'flex-1 flex items-center justify-center gap-1.5 cursor-pointer font-medium',
+                  isChatVisible
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+                    : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
+                  isVoiceMode ? 'opacity-40 cursor-not-allowed' : '',
+                ].join(' ')}
+              >
+                <Keyboard className="h-4 w-4" />
+                <span className="text-xs">{isChatVisible ? 'Hide Chat' : 'Start Chat'}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{isChatVisible ? 'Close the chat window' : 'Open the chat window'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>}
     </>
   )
 }

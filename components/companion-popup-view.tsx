@@ -39,7 +39,7 @@ interface CompanionPopupViewProps {
 export function CompanionPopupView({
   companion,
   visualFormat = DEFAULT_VISUAL_FORMAT,
-  isOnline = true,
+  isOnline = false,
   expressionState = 'idle',
   lastDetectedEmotion = null,
   decartStream = null,
@@ -58,6 +58,8 @@ export function CompanionPopupView({
       videoRef.current.srcObject = decartStream
     }
   }, [decartStream])
+
+  console.log('[v0] CompanionPopupView — isOnline prop received:', isOnline, '| visualFormat:', visualFormat)
 
   const statusLabel = visualFormat === 'live-avatar'
     ? decartStream ? 'Live' : decartError ? 'Connection failed' : 'Connecting...'

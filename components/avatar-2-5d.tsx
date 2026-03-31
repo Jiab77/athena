@@ -275,38 +275,6 @@ function AvatarMesh25D({
   )
 }
 
-// ─── Status helpers (shared logic) ────────────────────────────────────────────
-
-function getStatusText(expressionState: ExpressionState, isOnline: boolean): string {
-  if (!isOnline) return 'Offline'
-  switch (expressionState) {
-    case 'listening':  return 'Listening...'
-    case 'thinking':   return 'Thinking...'
-    case 'speaking':   return 'Speaking...'
-    case 'happy':      return 'Happy'
-    case 'sad':        return 'Sad'
-    case 'angry':      return 'Frustrated'
-    case 'surprised':  return 'Surprised'
-    case 'thoughtful': return 'Thoughtful'
-    default:           return 'Online'
-  }
-}
-
-function getStatusDotColor(expressionState: ExpressionState, isOnline: boolean): string {
-  if (!isOnline) return 'bg-gray-500'
-  switch (expressionState) {
-    case 'listening':  return 'bg-blue-500'
-    case 'thinking':   return 'bg-purple-500'
-    case 'speaking':   return 'bg-green-500'
-    case 'happy':      return 'bg-yellow-400'
-    case 'sad':        return 'bg-slate-400'
-    case 'angry':      return 'bg-red-500'
-    case 'surprised':  return 'bg-orange-400'
-    case 'thoughtful': return 'bg-indigo-400'
-    default:           return 'bg-green-500'
-  }
-}
-
 // ─── Public component ─────────────────────────────────────────────────────────
 
 interface Avatar25DProps {
@@ -388,8 +356,7 @@ export function Avatar25D({
   return (
     <div
       ref={containerRef}
-      className={`${fullscreen ? 'absolute inset-0' : 'relative w-48'} cursor-default`}
-      style={fullscreen ? undefined : { height: '264px' }}
+      className={`${fullscreen ? 'absolute inset-0' : 'relative w-full h-full'} cursor-default`}
     >
       {/* Outer glow ring */}
       <div
@@ -418,17 +385,6 @@ export function Avatar25D({
         </Canvas>
       </div>
 
-      {/* Status badge */}
-      {!hideStatus && <div className="absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border border-border/50 shadow-md">
-        <div
-          className={`h-2 w-2 rounded-full ${getStatusDotColor(expressionState, isOnline)} ${
-            expressionState !== 'idle' && isOnline ? 'animate-pulse' : ''
-          }`}
-        />
-        <span className="text-xs font-medium text-foreground">
-          {getStatusText(expressionState, isOnline)}
-        </span>
-      </div>}
     </div>
   )
 }

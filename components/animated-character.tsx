@@ -93,43 +93,13 @@ export function AnimatedCharacter({
     }
   }
 
-  const getStatusText = () => {
-    if (!isOnline) return 'Offline'
-    switch (expressionState) {
-      case 'listening': return 'Listening...'
-      case 'thinking': return 'Thinking...'
-      case 'speaking': return 'Speaking...'
-      case 'happy': return 'Happy'
-      case 'sad': return 'Sad'
-      case 'angry': return 'Frustrated'
-      case 'surprised': return 'Surprised'
-      case 'thoughtful': return 'Thoughtful'
-      default: return 'Online'
-    }
-  }
-
-  const getStatusColor = () => {
-    if (!isOnline) return 'bg-gray-500'
-    switch (expressionState) {
-      case 'listening': return 'bg-blue-500'
-      case 'thinking': return 'bg-purple-500'
-      case 'speaking': return 'bg-green-500'
-      case 'happy': return 'bg-yellow-400'
-      case 'sad': return 'bg-slate-400'
-      case 'angry': return 'bg-red-500'
-      case 'surprised': return 'bg-orange-400'
-      case 'thoughtful': return 'bg-indigo-400'
-      default: return 'bg-green-500'
-    }
-  }
-
   const styles = getExpressionStyles()
 
   // Use Three.js (R3F) canvas rendering when enabled
   if (usePixi) {
     return (
       <Suspense fallback={
-        <div className="w-48 rounded-lg overflow-hidden border border-primary/30 bg-muted animate-pulse flex items-center justify-center" style={{ height: '264px' }}>
+        <div className="w-full h-full rounded-lg overflow-hidden border border-primary/30 bg-muted animate-pulse flex items-center justify-center">
           <span className="text-xs text-muted-foreground">Loading...</span>
         </div>
       }>
@@ -145,10 +115,10 @@ export function AnimatedCharacter({
 
   // CSS fallback for lower-end devices
   return (
-    <div className="relative">
+    <div className="relative w-full h-full">
       {/* Character container with dynamic expression effects */}
-      <div 
-        className={`w-48 h-66 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+      <div
+        className={`w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-300 ${
           expressionState === 'listening' ? 'border-blue-500/60' :
           expressionState === 'thinking' ? 'border-purple-500/60' :
           expressionState === 'speaking' ? 'border-green-500/60' :
@@ -197,14 +167,6 @@ export function AnimatedCharacter({
           <div className="absolute inset-0 bg-indigo-400/10 animate-pulse" />
         )}
       </div>
-
-      {/* Dynamic status indicator */}
-      {!hideStatus && (
-        <div className="absolute bottom-1 right-1 flex items-center gap-2 bg-background/80 px-3 py-1 rounded-full border border-primary/30 shadow-md">
-          <div className={`h-2 w-2 rounded-full ${getStatusColor()} ${expressionState !== 'idle' && isOnline ? 'animate-pulse' : ''}`} />
-          <span className="text-xs font-medium text-foreground">{getStatusText()}</span>
-        </div>
-      )}
 
       {/* CSS Animations */}
       <style jsx>{`

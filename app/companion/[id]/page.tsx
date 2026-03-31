@@ -8,35 +8,25 @@
  * Designed to be pinned always-on-top by the user via their OS or browser.
  */
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react' // useEffect + useState used in CompanionPopup
 import { useSearchParams } from 'next/navigation'
 import { CompanionPopupView } from '@/components/companion-popup-view'
 import { useBrain } from '@/lib/brain'
 import { DBProvider, useDB } from '@/lib/db-context'
+import { useConnectionStatus } from '@/hooks/use-connection-status'
 import type { CompanionData, VisualFormat } from '@/lib/types'
 
 interface CompanionPopupPageProps {
   params: Promise<{ id: string }>
 }
 
-function CompanionBrain({ id, name, imageUrl, visualFormat }: {
+function CompanionBrain({ id, name, imageUrl, visualFormat, isOnline }: {
   id: string
   name: string
   imageUrl: string
   visualFormat: VisualFormat
+  isOnline: boolean
 }) {
-  const [isOnline, setIsOnline] = useState(true)
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
-    }
-  }, [])
 
   const companion: CompanionData = {
     id,
@@ -79,6 +69,8 @@ function CompanionBrain({ id, name, imageUrl, visualFormat }: {
     ;(window as Window & { _companionPopupRef?: Window | null })._companionPopupRef = window
   }
 
+  console.log('[v0] CompanionBrain — isOnline prop received:', isOnline)
+
   return (
     <CompanionPopupView
       companion={companion}
@@ -103,6 +95,9 @@ function CompanionPopup({ id }: { id: string }) {
   const paramImage = searchParams.get('image') || ''
   const visualFormat = (searchParams.get('format') || 'static-2d') as VisualFormat
   const { db, dbReady } = useDB()
+  const { isOnline } = useConnectionStatus()
+
+  console.log('[v0] CompanionPopup — dbReady:', dbReady, '| isOnline:', isOnline)
 
   // URL params are the source of truth — no DB needed
   // If missing, fall back to DB once ready
@@ -126,6 +121,7 @@ function CompanionPopup({ id }: { id: string }) {
       name={resolvedName}
       imageUrl={resolvedImage}
       visualFormat={visualFormat}
+      isOnline={isOnline}
     />
   )
 }
