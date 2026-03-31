@@ -26,6 +26,7 @@ export type GenderType = keyof typeof GENDER_MAPPING
 export type ConversationState = 'idle' | 'listening' | 'thinking' | 'speaking'
 export type EmotionState = 'happy' | 'sad' | 'angry' | 'surprised' | 'thoughtful'
 export type ExpressionState = ConversationState | EmotionState
+export type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
 
 /**
  * Supported file types

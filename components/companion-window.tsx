@@ -30,10 +30,8 @@ export function getCompanionPopupRef() { return _companionPopupRef }
 export function setCompanionPopupRef(ref: Window | null) { _companionPopupRef = ref }
 
 const Avatar25D = lazy(() => import('@/components/avatar-2-5d').then(m => ({ default: m.Avatar25D })))
-import type { CompanionData, PersonalityType, VisualFormat, ExpressionState, EmotionState } from '@/lib/types'
+import type { CompanionData, PersonalityType, VisualFormat, ExpressionState, EmotionState, VoiceState } from '@/lib/types'
 import { DEFAULT_COMPANION, DEFAULT_COMPANION_NAME, DEFAULT_PERSONALITY, PERSONALITY_TRAITS, DEFAULT_VISUAL_FORMAT } from '@/lib/constants'
-
-type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
 
 interface CompanionWindowProps {
   isOpen: boolean
