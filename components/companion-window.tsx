@@ -179,6 +179,7 @@ export function CompanionWindow({
                 </div>
               </>
             ) : visualFormat === 'animated-3d' ? (
+              <>
               <Suspense fallback={
                 <img
                   src={companion.imageUrl || "/placeholder.svg"}
@@ -195,7 +196,9 @@ export function CompanionWindow({
                 />
               </Suspense>
               <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+            </>
             ) : visualFormat === 'animated-2d' ? (
+              <>
               <AnimatedCharacter
                 imageUrl={companion.imageUrl || "/placeholder.svg"}
                 name={companion.name}
@@ -205,6 +208,7 @@ export function CompanionWindow({
                 hideStatus={true}
               />
               <StatusBadge isOnline={isOnline} expressionState={expressionState} />
+              </>
             ) : (
               <>
                 <div className="w-full h-full rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg shadow-primary/20">
