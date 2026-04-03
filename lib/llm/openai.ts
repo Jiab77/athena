@@ -180,6 +180,7 @@ export async function callOpenAIAPI(
 
     // Parse JSON response from Responses API
     let parsedResponse: { response: string; reasoning?: string, image_generation_call?: string }
+    let imageOutput: any = null
     try {
       // Check response status first
       if (data.status !== 'completed') {
@@ -207,7 +208,7 @@ export async function callOpenAIAPI(
         textLength: messageOutput?.content?.[0]?.text?.length,
       })
 
-      const imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call')
+      imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call') ?? null
       if (imageOutput) {
         console.log('[Athena] callOpenAIAPI: image received as base64')
       }
