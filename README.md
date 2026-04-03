@@ -321,6 +321,19 @@ Add your API keys in **Settings > Model** within the app — they are encrypted 
 
 ---
 
+## Roadmap
+
+| Phase | Status | Focus |
+|---|---|---|
+| Phase 1 — MVP | Complete | Core architecture, LLM, voice, avatars, encryption, PWA |
+| Phase 2 — Quality & Hardening | In Progress | UX fixes, state conflicts, CSP, KISS refactor, dependency hardening |
+| Phase 3 — Advanced Features | Planned | Runway avatar, BroadcastChannel sync, RAG, Claude, offline STT/TTS |
+| Phase 4 — Desktop & Local AI | Future | Tauri app, Ollama, fine-tuning, federated learning |
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for details and [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) for granular feature tracking.
+
+---
+
 ## Development Philosophy
 
 - [Zero Trust](https://en.wikipedia.org/wiki/Zero_trust_architecture) (verify the system is not manipulating)
