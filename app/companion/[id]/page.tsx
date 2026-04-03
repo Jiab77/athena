@@ -9,7 +9,7 @@
  * Designed to be pinned always-on-top by the user via their OS or browser.
  */
 
-import { use } from 'react'
+import { use, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CompanionPopupView } from '@/components/companion-popup-view'
 import { DBProvider } from '@/lib/db-context'
@@ -68,7 +68,9 @@ export default function CompanionPopupPage({ params }: CompanionPopupPageProps) 
 
   return (
     <DBProvider>
-      <CompanionPopup id={id} />
+      <Suspense>
+        <CompanionPopup id={id} />
+      </Suspense>
     </DBProvider>
   )
 }
