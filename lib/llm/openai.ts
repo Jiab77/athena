@@ -180,6 +180,7 @@ export async function callOpenAIAPI(
       status: item.status,
       ...(item.type === 'image_generation_call' ? { output_format: item.output_format, quality: item.quality } : {}),
       ...(item.type === 'message' ? { contentLength: item.content?.[0]?.text?.length } : {}),
+      ...(item.type === 'reasoning' ? { summary: item.summary } : {}),
     }))
     console.log('[Athena] callOpenAIAPI: response data shape', { id: data.id, status: data.status, model: data.model, outputShape })
 
