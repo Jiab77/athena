@@ -324,9 +324,9 @@ Add your API keys in **Settings > Model** within the app — they are encrypted 
 ## Development Philosophy
 
 - Zero Trust (verify the system is not manipulating)
-- DRY and KISS (simplicity over cleverness)
-- Kerckhoffs's Principle (no hidden agendas in data)
-- OWASP-first security (staged security reviews, see `docs/SECURITY_REPORT.md`)
+- [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) and [KISS](https://en.wikipedia.org/wiki/KISS_principle) (simplicity over cleverness)
+- [Kerckhoffs's Principle](https://en.wikipedia.org/wiki/Kerckhoffs%27s_principle) (no hidden agendas in data)
+- [OWASP](https://owasp.org/Top10/2025/)-first security (staged security reviews, see `docs/SECURITY_REPORT.md`)
 - No try/catch control flow (validate upfront, do not catch expected errors)
 - Privacy by default (opt-in to any external data sharing)
 
