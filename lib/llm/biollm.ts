@@ -4,7 +4,6 @@ import type { Message, PersonalityType, GenderType, LLMResponse } from '../types
 import {
   DEFAULT_GENDER,
   DEFAULT_COMPANION_NAME,
-  DEFAULT_MODEL_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
 } from '../constants'
