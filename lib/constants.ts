@@ -12,7 +12,7 @@ import type { Avatar, LLMProvider, PersonalityType, VisualFormat, STTProvider, T
 export const DEFAULT_COMPANION_ID = 'athena'
 export const DEFAULT_COMPANION_NAME = 'Athena'
 export const DEFAULT_PERSONALITY: PersonalityType = 'Sarcastic'
-export const DEFAULT_VISUAL_FORMAT: VisualFormat = 'animated-2d'
+export const DEFAULT_VISUAL_FORMAT: VisualFormat = 'static-2d'
 export const DEFAULT_GENDER = 'F'
 export const DEFAULT_COLOR_SCHEME = 'vibrant'
 export const DEFAULT_AVATAR_CATEGORY = 'cyberpunk'
