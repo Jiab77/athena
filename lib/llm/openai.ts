@@ -242,12 +242,14 @@ export async function callOpenAIAPI(
       // The output array can have multiple items (reasoning, message, web_search_call)
       // We need to find the item with type: "message" and get its content[0].text
       const messageOutput = data.output?.find((item: any) => item.type === 'message')
-
       console.log('[Athena] callOpenAIAPI: messageOutput', {
         found: !!messageOutput,
         contentType: messageOutput?.content?.[0]?.type,
         textLength: messageOutput?.content?.[0]?.text?.length,
       })
+
+      const imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call')
+      console.log('[Athena] callOpenAIAPI: imageOutput', imageOutput)
 
       // Check for model refusal
       if (messageOutput?.content?.[0]?.type === 'refusal') {
