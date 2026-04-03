@@ -156,13 +156,14 @@ export async function callOpenAIAPI(
       tool_choice: 'auto',
     }
 
-    console.log('[Athena] callOpenAIAPI: request body (no content)', {
-      model: reqBody.model,
-      instructions: reqBody.instructions,
-      inputMessageCount: reqBody.input.length,
-      maxOutputTokens: reqBody.max_output_tokens,
-      reasoning: reqBody.reasoning,
-      tools: reqBody.tools,
+    console.log('[Athena] callOpenAIAPI: request body', {
+      ...reqBody,
+      input: reqBody.input.map((msg: any) => ({
+        ...msg,
+        content: Array.isArray(msg.content)
+          ? msg.content.map((c: any) => c.type === 'input_image' ? { ...c, image_url: '[base64]' } : c)
+          : msg.content,
+      })),
     })
 
     const response = await fetch(CHAT_API_URL, {
@@ -184,15 +185,13 @@ export async function callOpenAIAPI(
 
     const data = await response.json()
 
-    // Log response shape without leaking base64 image data
-    const outputShape = (data.output || []).map((item: any) => ({
-      type: item.type,
-      status: item.status,
-      ...(item.type === 'image_generation_call' ? { output_format: item.output_format, quality: item.quality } : {}),
-      ...(item.type === 'message' ? { contentLength: item.content?.[0]?.text?.length } : {}),
-      ...(item.type === 'reasoning' ? { summary: item.summary } : {}),
-    }))
-    console.log('[Athena] callOpenAIAPI: response data shape', { id: data.id, status: data.status, model: data.model, outputShape })
+    // Log full response data without leaking base64 image data
+    console.log('[Athena] callOpenAIAPI: response data', {
+      ...data,
+      output: (data.output || []).map((item: any) =>
+        item.type === 'image_generation_call' ? { ...item, result: '[base64]' } : item
+      ),
+    })
 
     const usage = data.usage || null
 
