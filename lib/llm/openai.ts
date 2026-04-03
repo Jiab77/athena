@@ -215,19 +215,12 @@ export async function callOpenAIAPI(
 
     const data = await response.json()
 
-    console.log('[Athena] callOpenAIAPI: response data shape', {
-      id: data.id,
-      status: data.status,
-      incomplete_details: data.incomplete_details,
-      outputCount: data.output?.length,
-      outputTypes: data.output?.map((o: any) => o.type),
-      usage: data.usage,
-    })
+    console.log('[Athena] callOpenAIAPI: response data shape', JSON.stringify(data))
 
     const usage = data.usage || null
 
     // Parse JSON response from Responses API
-    let parsedResponse: { response: string; reasoning?: string }
+    let parsedResponse: { response: string; reasoning?: string, image_generation_call?: string }
     try {
       // Check response status first
       if (data.status !== 'completed') {
