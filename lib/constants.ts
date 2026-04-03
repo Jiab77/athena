@@ -26,6 +26,7 @@ export const DEFAULT_MEMORY_SIZE = 10
  * Single source of truth for LLM services
  */
 export const DEFAULT_GROQ_EMOTION_DETECTION_MODEL = 'llama-3.1-8b-instant'
+export const DEFAULT_OPENAI_EMOTION_DETECTION_MODEL = 'gpt-5.4-nano'
 export const DEFAULT_GROQ_STT_MODEL = 'whisper-large-v3-turbo'
 export const DEFAULT_GROQ_TOOL_DETECTION_MODEL = 'groq/compound-mini'
 export const DEFAULT_GROQ_URL_CAPABLE_MODEL = 'groq/compound'

@@ -3,7 +3,7 @@
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
 import {
   DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
-  DEFAULT_OPENAI_TOOL_DETECTION_MODEL,
+  DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
   EMOTION_KEYWORDS,
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
@@ -67,7 +67,7 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
     console.log('[Athena] Emotion detection - provider:', provider, 'companion:', companion, 'personality:', personality)
 
     const reqBody = {
-      model: isOpenAI ? DEFAULT_OPENAI_TOOL_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
+      model: isOpenAI ? DEFAULT_OPENAI_EMOTION_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
       messages: [
         {
           role: 'system' as const,
