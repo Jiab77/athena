@@ -301,7 +301,22 @@ Every LLM request includes behavioral safeguards to prevent parasocial dependenc
 6. **User Autonomy** — Supports user choices, respects agency
 
 ### Personality Types
-Six presets (Wise, Playful, Technical, Mysterious, Friendly, Custom) apply these principles differently, enabling variety without compromising safety. See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full prompt framework.
+Ten presets apply these principles differently, enabling variety without compromising safety:
+
+| Personality | Traits |
+|---|---|
+| Wise | Thoughtful, reflective, patient. Speaks with measured confidence |
+| Playful | Humorous, lighthearted, enjoys jokes and wordplay. Energetic and engaging |
+| Technical | Precise, analytical, detail-oriented. Values accuracy |
+| Mysterious | Intriguing, enigmatic, sometimes cryptic. Creates intrigue |
+| Friendly | Warm, approachable, conversational. Genuinely interested in the user |
+| Cheerful | Optimistic, upbeat, enthusiastic. Finds positivity in situations |
+| Sarcastic | Witty, clever, uses humor and irony. Playfully critical |
+| Helpful | Practical, solution-focused. Goes out of the way to assist |
+| Nerdy | Enthusiastic about details, knowledgeable. Gets excited about topics |
+| Custom | Balanced approach based on user-defined personality traits |
+
+See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full prompt framework.
 
 ---
 
