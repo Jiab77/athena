@@ -92,6 +92,9 @@ Read `MEMORY.md` for **EVERY** session.
 10. **CSP header still missing**
 11. **Popup live-sync** — deferred, `BroadcastChannel` when the time comes
 12. **`DEBUG_MODE` constant + `debugLog()` utility** — next session priority
+13. **BioLLM provider integration** — text-only, no tools, no emotion detection. STT/TTS preserved if OpenAI API key configured. `thinking` state universal across all providers. Minimal clean integration first. Waiting for friend's GitHub page + approval before touching code.
+14. **`thinking` state universal** — all LLM providers must show companion thinking state during inference, independent of emotion detection capability
+15. **Model capabilities display** — show small capability icons (vision, tools, image gen, audio, reasoning) per model. Hybrid placement: primary in model selector dropdown next to each model name, secondary as active model summary row in settings panel header. Reference: OpenAI model docs pattern. Deferred until after BioLLM.
 
 ---
 
