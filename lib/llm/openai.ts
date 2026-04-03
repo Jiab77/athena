@@ -174,7 +174,14 @@ export async function callOpenAIAPI(
 
     const data = await response.json()
 
-    console.log('[Athena] callOpenAIAPI: response data shape', JSON.stringify(data))
+    // Log response shape without leaking base64 image data
+    const outputShape = (data.output || []).map((item: any) => ({
+      type: item.type,
+      status: item.status,
+      ...(item.type === 'image_generation_call' ? { output_format: item.output_format, quality: item.quality } : {}),
+      ...(item.type === 'message' ? { contentLength: item.content?.[0]?.text?.length } : {}),
+    }))
+    console.log('[Athena] callOpenAIAPI: response data shape', { id: data.id, status: data.status, model: data.model, outputShape })
 
     const usage = data.usage || null
 
@@ -198,9 +205,15 @@ export async function callOpenAIAPI(
         throw new Error(`Unexpected response status: ${data.status}`)
       }
 
+      // Extract image output first — model may return image-only (no message item)
+      imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call') ?? null
+      if (imageOutput) {
+        console.log('[Athena] callOpenAIAPI: image received', { format: imageOutput.output_format, quality: imageOutput.quality })
+      }
+
       // Extract text from Responses API output structure
-      // The output array can have multiple items (reasoning, message, web_search_call)
-      // We need to find the item with type: "message" and get its content[0].text
+      // The output array can have multiple items (reasoning, message, web_search_call, image_generation_call)
+      // When image_generation fires as primary output, there may be no message item
       const messageOutput = data.output?.find((item: any) => item.type === 'message')
       console.log('[Athena] callOpenAIAPI: messageOutput', {
         found: !!messageOutput,
@@ -208,9 +221,15 @@ export async function callOpenAIAPI(
         textLength: messageOutput?.content?.[0]?.text?.length,
       })
 
-      imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call') ?? null
-      if (imageOutput) {
-        console.log('[Athena] callOpenAIAPI: image received as base64')
+      // Image-only response — no text from the model, return empty response with image
+      if (!messageOutput && imageOutput) {
+        console.log('[Athena] callOpenAIAPI: image-only response — no message output')
+        return {
+          response: '',
+          usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
+          imageBase64: imageOutput.result,
+          imageFormat: imageOutput.output_format || 'png',
+        }
       }
 
       // Check for model refusal
@@ -223,7 +242,7 @@ export async function callOpenAIAPI(
       const content = messageOutput?.content?.[0]?.text
 
       if (!content) {
-        console.log('[Athena] callOpenAIAPI: no text content found in output', JSON.stringify(data.output))
+        console.log('[Athena] callOpenAIAPI: no text content found in output')
         throw new Error('No text found in OpenAI response output')
       }
 
@@ -252,7 +271,7 @@ export async function callOpenAIAPI(
     return {
       response: parsedResponse.response,
       usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
-      ...(imageOutput?.result ? { imageBase64: imageOutput.result } : {}),
+      ...(imageOutput?.result ? { imageBase64: imageOutput.result, imageFormat: imageOutput.output_format || 'png' } : {}),
     }
   } catch (error) {
     console.log('[Athena] callOpenAIAPI: caught error', error)

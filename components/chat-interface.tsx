@@ -444,7 +444,7 @@ export function ChatInterface({
         role: 'companion',
         content: result.response,
         timestamp: new Date().toISOString(),
-        ...(result.imageBase64 ? { imageBase64: result.imageBase64, imageFormat: 'png' } : {}),
+        ...(result.imageBase64 ? { imageBase64: result.imageBase64, imageFormat: result.imageFormat || 'png' } : {}),
       }
       
       // Strip document content from history after AI has processed it

@@ -137,6 +137,7 @@ export interface LLMResponse {
   response: string
   usage: TokenUsage | null
   imageBase64?: string
+  imageFormat?: string
 }
 
 export interface TTSModel {
