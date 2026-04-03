@@ -86,6 +86,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
 
   const isLiveAvatar = visualFormat === 'live-avatar'
   const isCustomProvider = provider === 'custom'
+  const isBioLLM = provider === 'biollm'
   const selectedProvider = LLM_PROVIDERS.find((p) => p.id === provider)
   const availableModels = selectedProvider?.models.filter(m => m.visible) || []
   
@@ -330,7 +331,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
         voiceOutputEnabled,
         privacyMode,
         customProviderName: isCustomProvider ? customProviderName : undefined,
-        customProviderUrl: isCustomProvider ? customProviderUrl : undefined,
+        customProviderUrl: (isCustomProvider || isBioLLM) ? customProviderUrl : undefined,
         customModelName: isCustomProvider ? customModelName : undefined,
         hasSTTSupport: isCustomProvider ? hasSTTSupport : undefined,
         customSTTModelName: isCustomProvider && hasSTTSupport ? customSTTModelName : undefined,
@@ -725,6 +726,22 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+
+                {/* BioLLM API Endpoint */}
+                {isBioLLM && (
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-2">
+                      API Endpoint
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Enter provided API endpoint"
+                      value={customProviderUrl}
+                      onChange={(e) => setCustomProviderUrl(e.target.value)}
+                      className="bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
+                    />
                   </div>
                 )}
 
