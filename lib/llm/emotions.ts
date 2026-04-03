@@ -88,7 +88,7 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
     }
 
     console.log('[Athena] Emotion detection - analyzing response:', aiResponse)
-    console.log('[Athena] Emotion detection request:', JSON.stringify(reqBody, null, 2))
+    console.log('[Athena] Emotion detection request:', reqBody)
 
     const response = await fetch(isOpenAI ? OPENAI_CHAT_API_URL : GROQ_CHAT_API_URL, {
       method: 'POST',
@@ -106,7 +106,7 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
     }
 
     const data = await response.json()
-    console.log('[Athena] Emotion detection - raw response:', JSON.stringify(data, null, 2))
+    console.log('[Athena] Emotion detection - raw response:', data)
     const content = data.choices?.[0]?.message?.content
 
     if (!content) {

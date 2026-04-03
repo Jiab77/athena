@@ -69,7 +69,7 @@ async function detectToolsGroq(userMessage: string): Promise<ToolDetectionResult
     }
 
     console.log('[Athena] Tool detection - calling', DEFAULT_GROQ_TOOL_DETECTION_MODEL, 'with message:', userMessage)
-    console.log('[Athena] Tool detection request:', JSON.stringify(reqBody, null, 2))
+    console.log('[Athena] Tool detection request:', reqBody)
 
     const response = await fetch(GROQ_CHAT_API_URL, {
       method: 'POST',
@@ -89,7 +89,7 @@ async function detectToolsGroq(userMessage: string): Promise<ToolDetectionResult
     }
 
     const data = await response.json()
-    console.log('[Athena] Tool detection - raw response:', JSON.stringify(data, null, 2))
+    console.log('[Athena] Tool detection - raw response:', data)
 
     const executedTools = data.choices?.[0]?.message?.executed_tools || null
     const content = data.choices?.[0]?.message?.content || ''
