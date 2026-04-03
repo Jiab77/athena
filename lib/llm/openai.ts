@@ -231,17 +231,6 @@ export async function callOpenAIAPI(
         textLength: messageOutput?.content?.[0]?.text?.length,
       })
 
-      // Image-only response — no text from the model, return empty response with image
-      if (!messageOutput && imageOutput) {
-        console.log('[Athena] callOpenAIAPI: image-only response — no message output')
-        return {
-          response: '',
-          usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
-          imageBase64: imageOutput.result,
-          imageFormat: imageOutput.output_format || 'png',
-        }
-      }
-
       // Check for model refusal
       if (messageOutput?.content?.[0]?.type === 'refusal') {
         const refusalReason = messageOutput.content[0].refusal
@@ -250,6 +239,18 @@ export async function callOpenAIAPI(
       }
 
       const content = messageOutput?.content?.[0]?.text
+
+      // Image-only response — no message item, or message item has empty text
+      // Model returns image with no accompanying text — return image directly
+      if ((!messageOutput || !content) && imageOutput) {
+        console.log('[Athena] callOpenAIAPI: image-only response — no text content alongside image')
+        return {
+          response: '',
+          usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
+          imageBase64: imageOutput.result,
+          imageFormat: imageOutput.output_format || 'png',
+        }
+      }
 
       if (!content) {
         console.log('[Athena] callOpenAIAPI: no text content found in output')
