@@ -8,6 +8,8 @@ import {
   GENDER_MAPPING,
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
+  DEFAULT_MODEL_ID,
+  DEFAULT_VOICE_MODEL,
   DEFAULT_VOICE_ID
 } from '../constants'
 import { getDB } from '../db'
@@ -43,7 +45,7 @@ export async function generateSpeech(text: string): Promise<Blob> {
     const selectedVoice = settings?.selectedVoice || DEFAULT_VOICE_ID
 
     const providers = TTS_PROVIDERS.find(p => p.id === 'openai')
-    const model = providers?.models[0]?.model || 'gpt-4o-mini-tts'
+    const model = providers?.models[0]?.model || DEFAULT_VOICE_MODEL
 
     const apiKey = await getAPIKey('openai')
     const audioFormat = getAudioFormat()

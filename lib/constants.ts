@@ -37,6 +37,7 @@ export const DEFAULT_GROQ_VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instr
  * Single source of truth for STT / TTS services
  */
 export const DEFAULT_VOICE_PROVIDER = 'openai'
+export const DEFAULT_VOICE_MODEL = 'gpt-4o-mini-tts'
 export const DEFAULT_VOICE_ID = 'marin'
 export const DEFAULT_AUDIO_TYPE = 'audio/webm'
 export const DEFAULT_AUDIO_FILE = 'audio.webm'
