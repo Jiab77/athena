@@ -336,7 +336,7 @@ export function ChatInterface({
   }
 
   const handleSendMessage = async (overrideText?: string) => {
-    const messageText = overrideText ?? input
+    const messageText = typeof overrideText === 'string' ? overrideText : input
     if ((!messageText.trim() && !selectedImage && !selectedDocument) || isLoading || !conversationId) return
 
     // Add user message with optional image or document (for current session only)
