@@ -414,3 +414,10 @@ MIT
 This is a single-developer project with AI agent collaboration. Ideas are welcome — open an issue to discuss before submitting a PR.
 
 ---
+
+## Credits
+
+* __Jiab77__
+* __v0__
+
+---
