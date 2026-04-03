@@ -65,6 +65,11 @@ export async function generateSpeech(text: string): Promise<Blob> {
       }),
     })
 
+    console.log('[Athena] Received AI audio response:', JSON.stringify(response))
+    console.log('[Athena] Model used:', model)
+    console.log('[Athena] Voice used:', selectedVoice)
+    console.log('[Athena] Instructions used:', instructions)
+
     if (!response.ok) {
       const errorData = await response.json()
       throw new Error(`OpenAI TTS API error: ${response.statusText}`)

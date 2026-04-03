@@ -29,7 +29,7 @@ export async function callOpenAIAPI(
     const db = await getDB()
     const settings = await db.getSettings()
 
-    console.log('[v0] callOpenAIAPI: settings loaded', { hasSettings: !!settings })
+    console.log('[Athena] callOpenAIAPI: settings loaded', { hasSettings: !!settings })
 
     if (!settings) {
       throw new Error('No settings found in database')
@@ -43,7 +43,7 @@ export async function callOpenAIAPI(
     const avatarGender = (settings.avatarGender as GenderType) || DEFAULT_GENDER
     const customPersonalityTraits = settings.customPersonalityTraits
 
-    console.log('[v0] callOpenAIAPI: resolved settings', { model, personality, companion, memoryWindowSize, avatarGender })
+    console.log('[Athena] callOpenAIAPI: resolved settings', { model, personality, companion, memoryWindowSize, avatarGender })
 
     // Build system prompt with companion name, personality, gender from database
     const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
@@ -52,7 +52,7 @@ export async function callOpenAIAPI(
     const windowSize = memoryWindowSize
     const windowedMessages = messages.slice(-windowSize)
 
-    console.log('[v0] callOpenAIAPI: message window', { total: messages.length, windowed: windowedMessages.length })
+    console.log('[Athena] callOpenAIAPI: message window', { total: messages.length, windowed: windowedMessages.length })
 
     // Detect if any message contains an actual image (base64 encoded)
     // Note: documentContent is for text files, not images
@@ -60,7 +60,7 @@ export async function callOpenAIAPI(
       msg.imageBase64 !== undefined && msg.imageBase64 !== null && msg.imageBase64.length > 0
     )
 
-    console.log('[v0] callOpenAIAPI: hasImage', hasImage)
+    console.log('[Athena] callOpenAIAPI: hasImage', hasImage)
 
     // Convert messages to OpenAI Responses API format
     // Note: system prompt goes in instructions parameter, messages only contain user/assistant
@@ -74,7 +74,7 @@ export async function callOpenAIAPI(
 
       // If message has document data, add as input_file
       if (msg.documentContent && msg.documentName) {
-        console.log('[v0] callOpenAIAPI: attaching document', { name: msg.documentName, contentLength: msg.documentContent.length })
+        console.log('[Athena] callOpenAIAPI: attaching document', { name: msg.documentName, contentLength: msg.documentContent.length })
 
         // Convert text content to base64
         const bytes = new TextEncoder().encode(msg.documentContent)
@@ -97,7 +97,7 @@ export async function callOpenAIAPI(
         }
         const mimeType = mimeTypes[ext || ''] || 'application/octet-stream'
 
-        console.log('[v0] callOpenAIAPI: document mime type resolved', { ext, mimeType })
+        console.log('[Athena] callOpenAIAPI: document mime type resolved', { ext, mimeType })
 
         content.push({
           type: 'input_file' as const,
@@ -109,7 +109,7 @@ export async function callOpenAIAPI(
 
       // If message has an image, add as input_image (Responses API format)
       if (msg.imageBase64 && msg.imageFormat) {
-        console.log('[v0] callOpenAIAPI: attaching image', { format: msg.imageFormat, base64Length: msg.imageBase64.length })
+        console.log('[Athena] callOpenAIAPI: attaching image', { format: msg.imageFormat, base64Length: msg.imageBase64.length })
         content.push({
           type: 'input_image' as const,
           image_url: `data:image/${msg.imageFormat};base64,${msg.imageBase64}`,
@@ -124,22 +124,31 @@ export async function callOpenAIAPI(
 
     // Read the toolsNeeded flag set by the router's pre-flight detection
     const lastMsg = messages[messages.length - 1] as any
-    const toolsNeeded = lastMsg?._toolsNeeded === true
-    // Clean up the flag so it doesn't leak into the payload
-    if (lastMsg) delete lastMsg._toolsNeeded
+    // const toolsNeeded = lastMsg?._toolsNeeded === true
+    const toolsNeeded = false
 
-    console.log('[v0] callOpenAIAPI: toolsNeeded from pre-flight', toolsNeeded)
+    // Clean up the flag so it doesn't leak into the payload
+    // if (lastMsg) delete lastMsg._toolsNeeded
+
+    // console.log('[Athena] callOpenAIAPI: toolsNeeded from pre-flight', toolsNeeded)
 
     // Build request body for OpenAI Responses API
     // - toolsNeeded: enable web_search, disable JSON mode (mutually exclusive on Responses API)
     // - no tools needed: enable JSON mode, no tools
+    {/*
     const inputBase = toolsNeeded
       ? userMessages  // plain prose expected — no JSON wrapper needed
       : [
         { role: 'system' as const, content: 'Always respond with valid JSON format.' },
         ...userMessages,
       ]
+    */}
+    const inputBase = [
+      { role: 'system' as const, content: 'Always respond with valid JSON format.' },
+      ...userMessages,
+    ]
 
+    {/*
     const reqBody: any = {
       model: model,
       instructions: systemPrompt,
@@ -159,14 +168,30 @@ export async function callOpenAIAPI(
         : { text: { format: { type: 'json_object' } } }
       ),
     }
+    */}
+    const reqBody: any = {
+      model: model,
+      instructions: systemPrompt,
+      input: inputBase,
+      temperature: 1,
+      max_output_tokens: 2048,
+      reasoning: { effort: 'low' },
+      tools: [
+        { type: 'web_search' },
+        { type: 'computer' },
+        { type: 'image_generation' }
+      ],
+      tool_choice: 'auto',
+    }
 
-    console.log('[v0] callOpenAIAPI: request body (no content)', {
+    console.log('[Athena] callOpenAIAPI: request body (no content)', {
       model: reqBody.model,
+      instructions: reqBody.systemPrompt,
       inputMessageCount: reqBody.input.length,
       maxOutputTokens: reqBody.max_output_tokens,
       reasoning: reqBody.reasoning,
       textFormat: reqBody.text?.format,
-      toolsNeeded,
+      tools: reqBody.tools,
     })
 
     const response = await fetch(CHAT_API_URL, {
@@ -178,17 +203,17 @@ export async function callOpenAIAPI(
       body: JSON.stringify(reqBody),
     })
 
-    console.log('[v0] callOpenAIAPI: HTTP response', { status: response.status, ok: response.ok })
+    console.log('[Athena] callOpenAIAPI: HTTP response', { status: response.status, ok: response.ok })
 
     if (!response.ok) {
       const error = await response.json()
-      console.log('[v0] callOpenAIAPI: API error response', error)
+      console.log('[Athena] callOpenAIAPI: API error response', error)
       throw new Error(error.error?.message || 'Failed to get OpenAI response')
     }
 
     const data = await response.json()
 
-    console.log('[v0] callOpenAIAPI: response data shape', {
+    console.log('[Athena] callOpenAIAPI: response data shape', {
       id: data.id,
       status: data.status,
       incomplete_details: data.incomplete_details,
@@ -206,7 +231,7 @@ export async function callOpenAIAPI(
       if (data.status !== 'completed') {
         if (data.status === 'incomplete') {
           const reason = data.incomplete_details?.reason
-          console.log('[v0] callOpenAIAPI: response incomplete', { reason })
+          console.log('[Athena] callOpenAIAPI: response incomplete', { reason })
           if (reason === 'max_output_tokens') {
             throw new Error('Response cut off due to max_output_tokens limit')
           } else if (reason === 'content_filter') {
@@ -214,7 +239,7 @@ export async function callOpenAIAPI(
           }
           throw new Error(`Response incomplete: ${reason}`)
         }
-        console.log('[v0] callOpenAIAPI: unexpected status', data.status)
+        console.log('[Athena] callOpenAIAPI: unexpected status', data.status)
         throw new Error(`Unexpected response status: ${data.status}`)
       }
 
@@ -223,7 +248,7 @@ export async function callOpenAIAPI(
       // We need to find the item with type: "message" and get its content[0].text
       const messageOutput = data.output?.find((item: any) => item.type === 'message')
 
-      console.log('[v0] callOpenAIAPI: messageOutput', {
+      console.log('[Athena] callOpenAIAPI: messageOutput', {
         found: !!messageOutput,
         contentType: messageOutput?.content?.[0]?.type,
         textLength: messageOutput?.content?.[0]?.text?.length,
@@ -232,45 +257,45 @@ export async function callOpenAIAPI(
       // Check for model refusal
       if (messageOutput?.content?.[0]?.type === 'refusal') {
         const refusalReason = messageOutput.content[0].refusal
-        console.log('[v0] callOpenAIAPI: model refusal', refusalReason)
+        console.log('[Athena] callOpenAIAPI: model refusal', refusalReason)
         throw new Error(`Model refused: ${refusalReason}`)
       }
 
       const content = messageOutput?.content?.[0]?.text
 
       if (!content) {
-        console.log('[v0] callOpenAIAPI: no text content found in output', JSON.stringify(data.output))
+        console.log('[Athena] callOpenAIAPI: no text content found in output', JSON.stringify(data.output))
         throw new Error('No text found in OpenAI response output')
       }
 
-      console.log('[v0] callOpenAIAPI: raw content before parse', content.slice(0, 200))
+      console.log('[Athena] callOpenAIAPI: raw content before parse', content.slice(0, 200))
       // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
       // Only fall back to wrapping as plain prose if parsing fails.
       try {
         parsedResponse = parseCompanionJSON(content)
-        console.log('[v0] callOpenAIAPI: parsedResponse keys', Object.keys(parsedResponse))
+        console.log('[Athena] callOpenAIAPI: parsedResponse keys', Object.keys(parsedResponse))
       } catch {
-        console.log('[v0] callOpenAIAPI: JSON parse failed — wrapping plain prose as response (toolsNeeded:', toolsNeeded, ')')
+        console.log('[Athena] callOpenAIAPI: JSON parse failed — wrapping plain prose as response (toolsNeeded:', toolsNeeded, ')')
         parsedResponse = { response: content }
       }
     } catch (parseError) {
-      console.log('[v0] callOpenAIAPI: parse error', parseError)
+      console.log('[Athena] callOpenAIAPI: parse error', parseError)
       throw new Error('Invalid response from OpenAI Responses API')
     }
 
     if (!parsedResponse.response) {
-      console.log('[v0] callOpenAIAPI: missing response field in parsed JSON', parsedResponse)
+      console.log('[Athena] callOpenAIAPI: missing response field in parsed JSON', parsedResponse)
       throw new Error('No response field in parsed JSON')
     }
 
-    console.log('[v0] callOpenAIAPI: success', { responseLength: parsedResponse.response.length, usage })
+    console.log('[Athena] callOpenAIAPI: success', { responseLength: parsedResponse.response.length, usage })
 
     return {
       response: parsedResponse.response,
       usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null
     }
   } catch (error) {
-    console.log('[v0] callOpenAIAPI: caught error', error)
+    console.log('[Athena] callOpenAIAPI: caught error', error)
     throw error
   }
 }
@@ -283,7 +308,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   try {
     const apiKey = await getAPIKey('openai')
 
-    console.log('[v0] transcribeAudio: starting', { blobSize: audioBlob.size, blobType: audioBlob.type })
+    console.log('[Athena] transcribeAudio: starting', { blobSize: audioBlob.size, blobType: audioBlob.type })
 
     // Create FormData for multipart file upload
     const formData = new FormData()
@@ -295,7 +320,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     formData.append('model', sttModel)
     // formData.append('language', 'fr')
 
-    console.log('[v0] transcribeAudio: using model', sttModel)
+    console.log('[Athena] transcribeAudio: using model', sttModel)
 
     const response = await fetch(STT_API_URL, {
       method: 'POST',
@@ -305,17 +330,17 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
       body: formData,
     })
 
-    console.log('[v0] transcribeAudio: HTTP response', { status: response.status, ok: response.ok })
+    console.log('[Athena] transcribeAudio: HTTP response', { status: response.status, ok: response.ok })
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => ({}))
-      console.log('[v0] transcribeAudio: error response', errorBody)
+      console.log('[Athena] transcribeAudio: error response', errorBody)
       throw new Error(`Transcription failed: ${response.statusText}`)
     }
 
     const data = await response.json()
 
-    console.log('[v0] transcribeAudio: result', { textLength: data.text?.length, hasText: !!data.text })
+    console.log('[Athena] transcribeAudio: result', { textLength: data.text?.length, hasText: !!data.text })
 
     if (!data.text) {
       throw new Error('No transcription text in response')
@@ -323,7 +348,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     return data.text
   } catch (error) {
-    console.log('[v0] transcribeAudio: caught error', error)
+    console.log('[Athena] transcribeAudio: caught error', error)
     throw error
   }
 }
