@@ -171,6 +171,9 @@ export async function callOpenAIAPI(
       ),
     }
     */}
+
+    // TODO: Implement 'file_search' feature
+    // SEE: https://developers.openai.com/api/docs/guides/tools-file-search
     const reqBody: any = {
       model: model,
       instructions: systemPrompt,
@@ -179,7 +182,6 @@ export async function callOpenAIAPI(
       max_output_tokens: 2048,
       reasoning: { effort: 'low' },
       tools: [
-        { type: 'file_search' },
         { type: 'web_search' },
         { type: 'image_generation' }
       ],
