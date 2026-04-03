@@ -112,8 +112,6 @@ export interface ToolDetectionResult {
   toolsUsed: boolean
   response?: string
   executedTools?: string[]
-  // OpenAI provider: pre-flight decision on whether tools are needed
-  toolsNeeded?: boolean
 }
 
 /**
@@ -138,6 +136,7 @@ export interface TokenUsage {
 export interface LLMResponse {
   response: string
   usage: TokenUsage | null
+  imageBase64?: string
 }
 
 export interface TTSModel {

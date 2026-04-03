@@ -124,53 +124,10 @@ export async function callOpenAIAPI(
       }
     })
 
-    // Read the toolsNeeded flag set by the router's pre-flight detection
-    const lastMsg = messages[messages.length - 1] as any
-    // const toolsNeeded = lastMsg?._toolsNeeded === true
-    const toolsNeeded = false
-
-    // Clean up the flag so it doesn't leak into the payload
-    // if (lastMsg) delete lastMsg._toolsNeeded
-
-    // console.log('[Athena] callOpenAIAPI: toolsNeeded from pre-flight', toolsNeeded)
-
-    // Build request body for OpenAI Responses API
-    // - toolsNeeded: enable web_search, disable JSON mode (mutually exclusive on Responses API)
-    // - no tools needed: enable JSON mode, no tools
-    {/*
-    const inputBase = toolsNeeded
-      ? userMessages  // plain prose expected — no JSON wrapper needed
-      : [
-        { role: 'system' as const, content: 'Always respond with valid JSON format.' },
-        ...userMessages,
-      ]
-    */}
     const inputBase = [
       { role: 'system' as const, content: 'Always respond with valid JSON format.' },
       ...userMessages,
     ]
-
-    {/*
-    const reqBody: any = {
-      model: model,
-      instructions: systemPrompt,
-      input: inputBase,
-      temperature: 1,
-      max_output_tokens: 2048,
-      reasoning: { effort: 'low' },
-      ...(toolsNeeded
-        ? {
-          tools: [
-            { type: 'web_search' },
-            { type: 'computer' },
-            { type: 'image_generation' }
-          ],
-          tool_choice: 'auto'
-        }
-        : { text: { format: { type: 'json_object' } } }
-      ),
-    }
-    */}
 
     // TODO: Implement 'file_search' feature
     // SEE: https://developers.openai.com/api/docs/guides/tools-file-search
@@ -181,6 +138,7 @@ export async function callOpenAIAPI(
       temperature: 1,
       max_output_tokens: 2048,
       reasoning: { effort: 'low' },
+      store: false,
       tools: [
         { type: 'web_search' },
         { type: 'image_generation' }
@@ -251,7 +209,9 @@ export async function callOpenAIAPI(
       })
 
       const imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call')
-      console.log('[Athena] callOpenAIAPI: imageOutput', imageOutput)
+      if (imageOutput) {
+        console.log('[Athena] callOpenAIAPI: image received as base64')
+      }
 
       // Check for model refusal
       if (messageOutput?.content?.[0]?.type === 'refusal') {
@@ -274,7 +234,7 @@ export async function callOpenAIAPI(
         parsedResponse = parseCompanionJSON(content)
         console.log('[Athena] callOpenAIAPI: parsedResponse keys', Object.keys(parsedResponse))
       } catch {
-        console.log('[Athena] callOpenAIAPI: JSON parse failed — wrapping plain prose as response (toolsNeeded:', toolsNeeded, ')')
+        console.log('[Athena] callOpenAIAPI: JSON parse failed — wrapping plain prose as response')
         parsedResponse = { response: content }
       }
     } catch (parseError) {
@@ -287,11 +247,12 @@ export async function callOpenAIAPI(
       throw new Error('No response field in parsed JSON')
     }
 
-    console.log('[Athena] callOpenAIAPI: success', { responseLength: parsedResponse.response.length, usage })
+    console.log('[Athena] callOpenAIAPI: success', { responseLength: parsedResponse.response.length, usage, hasImage: !!imageOutput })
 
     return {
       response: parsedResponse.response,
-      usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null
+      usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
+      ...(imageOutput?.result ? { imageBase64: imageOutput.result } : {}),
     }
   } catch (error) {
     console.log('[Athena] callOpenAIAPI: caught error', error)
