@@ -301,7 +301,22 @@ Every LLM request includes behavioral safeguards to prevent parasocial dependenc
 6. **User Autonomy** — Supports user choices, respects agency
 
 ### Personality Types
-Six presets (Wise, Playful, Technical, Mysterious, Friendly, Custom) apply these principles differently, enabling variety without compromising safety. See `/docs/IMPLEMENTATION_NOTES.md` for the full prompt framework.
+Ten presets apply these principles differently, enabling variety without compromising safety:
+
+| Personality | Traits |
+|---|---|
+| Wise | Thoughtful, reflective, patient. Speaks with measured confidence |
+| Playful | Humorous, lighthearted, enjoys jokes and wordplay. Energetic and engaging |
+| Technical | Precise, analytical, detail-oriented. Values accuracy |
+| Mysterious | Intriguing, enigmatic, sometimes cryptic. Creates intrigue |
+| Friendly | Warm, approachable, conversational. Genuinely interested in the user |
+| Cheerful | Optimistic, upbeat, enthusiastic. Finds positivity in situations |
+| Sarcastic | Witty, clever, uses humor and irony. Playfully critical |
+| Helpful | Practical, solution-focused. Goes out of the way to assist |
+| Nerdy | Enthusiastic about details, knowledgeable. Gets excited about topics |
+| Custom | Balanced approach based on user-defined personality traits |
+
+See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full prompt framework.
 
 ---
 
@@ -321,14 +336,43 @@ Add your API keys in **Settings > Model** within the app — they are encrypted 
 
 ---
 
+## Roadmap
+
+| Phase | Status | Focus |
+|---|---|---|
+| Phase 1 — MVP | Complete | Core architecture, LLM, voice, avatars, encryption, PWA |
+| Phase 2 — Quality & Hardening | In Progress | UX fixes, state conflicts, CSP, KISS refactor, dependency hardening |
+| Phase 3 — Advanced Features | Planned | Runway avatar, BroadcastChannel sync, RAG, Claude, offline STT/TTS |
+| Phase 4 — Desktop & Local AI | Future | Tauri app, Ollama, fine-tuning, federated learning |
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for details and [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) for granular feature tracking.
+
+---
+
 ## Development Philosophy
 
-- Zero Trust (verify the system is not manipulating)
-- DRY and KISS (simplicity over cleverness)
-- Kerckhoffs's Principle (no hidden agendas in data)
-- OWASP-first security (staged security reviews, see `docs/SECURITY_REPORT.md`)
+- [Zero Trust](https://en.wikipedia.org/wiki/Zero_trust_architecture) (verify the system is not manipulating)
+- [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) and [KISS](https://en.wikipedia.org/wiki/KISS_principle) (simplicity over cleverness)
+- [Kerckhoffs's Principle](https://en.wikipedia.org/wiki/Kerckhoffs%27s_principle) (no hidden agendas in data)
+- [OWASP](https://owasp.org/Top10/2025/)-first security (staged security reviews, see `docs/SECURITY_REPORT.md`)
 - No try/catch control flow (validate upfront, do not catch expected errors)
 - Privacy by default (opt-in to any external data sharing)
+
+### Compliance Score
+
+**Current: 85% — Last audited: 2026-04-03 (Session 27)**
+
+| Principle | Status | Gap |
+|---|---|---|
+| Zero Trust | Partial | No input validation on user message content before LLM; device ID trusted from localStorage without re-verification |
+| DRY | Mostly | Message-windowing logic and content-type mapping slightly duplicated across provider files |
+| KISS | Mostly | `chat-interface.tsx` at 1100+ lines is doing too much; try/catch-as-control-flow in `parseCompanionJSON()` and `import.ts` |
+| Kerckhoffs's Principle | Full | Encryption scheme fully documented, security posture publicly disclosed in `docs/SECURITY_REPORT.md` |
+| OWASP-first | Full | `SECURITY_REPORT.md` updated to OWASP Top 10:2025 |
+| No try/catch control flow | Partial | `export.ts` bare re-throw; `import.ts` and `parseCompanionJSON()` use try/catch for control flow |
+| Privacy by default | Full | IndexedDB only, `store: false`, no telemetry, full export/delete |
+
+> Goal: reach 100%. Each session moves the score forward.
 
 ---
 
@@ -343,18 +387,6 @@ Add your API keys in **Settings > Model** within the app — they are encrypted 
 
 ---
 
-## Contributing
-
-This is a single-developer project with AI agent collaboration. Ideas are welcome — open an issue to discuss before submitting a PR.
-
----
-
-## License
-
-MIT
-
----
-
 ## Ethical Guardrails
 
 Athena is designed with these ethical commitments:
@@ -364,7 +396,7 @@ Athena is designed with these ethical commitments:
 4. **Never trap users** — Export data, delete anytime, no lock-in
 5. **Never manipulate** — User autonomy comes first
 
-See `/docs/IMPLEMENTATION_NOTES.md` ("Athena Companion Design Philosophy") for the full ethical framework.
+See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) ("Athena Companion Design Philosophy") for the full ethical framework.
 
 ---
 
@@ -396,3 +428,24 @@ See `/docs/IMPLEMENTATION_NOTES.md` ("Athena Companion Design Philosophy") for t
 
 **Analytics:**
 [Vercel Analytics](https://vercel.com/analytics) (disabled by default via Privacy Mode)
+
+---
+
+## License
+
+MIT
+
+---
+
+## Contributing
+
+This is a single-developer project with AI agent collaboration. Ideas are welcome — open an issue to discuss before submitting a PR.
+
+---
+
+## Credits
+
+* __Jiab77__
+* __v0__
+
+---
