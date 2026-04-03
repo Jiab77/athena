@@ -242,7 +242,6 @@ export async function callOpenAIAPI(
 
       // Image-only response — no message item, or message item has empty text
       // Model returns image with no accompanying text — return image directly
-      console.log('[Athena] callOpenAIAPI: image early return check', { hasMessageOutput: !!messageOutput, content, hasImageOutput: !!imageOutput })
       if ((!messageOutput || !content) && imageOutput) {
         console.log('[Athena] callOpenAIAPI: image-only response — no text content alongside image')
         return {
