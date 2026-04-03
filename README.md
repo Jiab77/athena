@@ -223,22 +223,45 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 
 ### Inference Routing
 
-| Role | Provider / Model | When Used |
+#### Groq
+
+| Role | Model | When Used |
 |---|---|---|
-| Groq Tool detection (pre-flight) | `groq/compound-mini` | Every Groq request — determines if a tool call is needed |
-| OpenAI Tools (native) | `web_search`, `image_generation` | Every OpenAI request — handled natively via Responses API (`tool_choice: 'auto'`) |
-| URL detection | `groq/compound` | When a message includes an URL |
+| Tool detection (pre-flight) | `groq/compound-mini` | Every request — determines if a tool call is needed |
+| URL detection | `groq/compound` | When the message includes a URL |
 | Vision (image attachments) | `meta-llama/llama-4-scout-17b-16e-instruct` | When the message includes an image |
-| Main inference — Groq | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
-| Main inference — OpenAI | `gpt-5.4`, `gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
-| Main inference — Custom | Any OpenAI-compatible endpoint | Custom provider selected |
-| Groq Emotion classification | `llama-3.1-8b-instant` | Post-response, every message |
-| OpenAI Emotion classification | `gpt-5.4-nano` | Post-response, every message |
-| STT (Speech To Text) — Groq | `whisper-large-v3-turbo` | To convert user speech in text |
-| STT (Speech To Text) — OpenAI | `whisper-1` | To convert user speech to text |
-| TTS (Text To Speech) — OpenAI | `gpt-4o-mini-tts` | To convert companion text to speech |
-| TTS (Text To Speech) — ResembleAI | `chatterbox` | To convert companion text to speech |
-| Live Avatar — Decart AI | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
+| Main inference | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
+| Emotion classification | `llama-3.1-8b-instant` | Post-response, every message |
+| STT (Speech To Text) | `whisper-large-v3-turbo` | To convert user speech to text |
+
+#### OpenAI
+
+| Role | Model | When Used |
+|---|---|---|
+| Main inference | `gpt-5.4`, `gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
+| Tools (native) | `web_search`, `image_generation` | Every request — handled natively via Responses API (`tool_choice: 'auto'`) |
+| Image generation | `image_generation` tool | When the model judges an image is appropriate |
+| Emotion classification | `gpt-5.4-nano` | Post-response, every message |
+| STT (Speech To Text) | `whisper-1` | To convert user speech to text |
+| TTS (Text To Speech) | `gpt-4o-mini-tts` | To convert companion text to speech |
+
+#### ResembleAI
+
+| Role | Model | When Used |
+|---|---|---|
+| TTS (Text To Speech) | `chatterbox` | To convert companion text to speech |
+
+#### Decart AI
+
+| Role | Model | When Used |
+|---|---|---|
+| Live Avatar | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
+
+#### Custom
+
+| Role | Model | When Used |
+|---|---|---|
+| Main inference | Any OpenAI-compatible endpoint | Custom provider selected |
 
 ### Supported Providers
 
