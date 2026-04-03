@@ -330,6 +330,22 @@ Add your API keys in **Settings > Model** within the app — they are encrypted 
 - No try/catch control flow (validate upfront, do not catch expected errors)
 - Privacy by default (opt-in to any external data sharing)
 
+### Compliance Score
+
+**Current: 85% — Last audited: 2026-04-03 (Session 27)**
+
+| Principle | Status | Gap |
+|---|---|---|
+| Zero Trust | Partial | No input validation on user message content before LLM; device ID trusted from localStorage without re-verification |
+| DRY | Mostly | Message-windowing logic and content-type mapping slightly duplicated across provider files |
+| KISS | Mostly | `chat-interface.tsx` at 1100+ lines is doing too much; try/catch-as-control-flow in `parseCompanionJSON()` and `import.ts` |
+| Kerckhoffs's Principle | Full | Encryption scheme fully documented, security posture publicly disclosed in `docs/SECURITY_REPORT.md` |
+| OWASP-first | Full | `SECURITY_REPORT.md` updated to OWASP Top 10:2025 |
+| No try/catch control flow | Partial | `export.ts` bare re-throw; `import.ts` and `parseCompanionJSON()` use try/catch for control flow |
+| Privacy by default | Full | IndexedDB only, `store: false`, no telemetry, full export/delete |
+
+> Goal: reach 100%. Each session moves the score forward.
+
 ---
 
 ## Privacy & Data
