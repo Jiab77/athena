@@ -67,6 +67,17 @@ export async function callOpenAIAPI(
     // Convert messages to OpenAI Responses API format
     // Note: system prompt goes in instructions parameter, messages only contain user/assistant
     const userMessages = windowedMessages.map((msg) => {
+      const isUser = msg.role === 'user'
+
+      // Assistant/companion messages only carry output_text — never re-send generated images back
+      // to the model as the Responses API rejects input_image/input_text on assistant messages
+      if (!isUser) {
+        return {
+          role: 'assistant' as const,
+          content: [{ type: 'output_text' as const, text: msg.content }],
+        }
+      }
+
       const content: any[] = [
         {
           type: 'input_text' as const,
@@ -106,12 +117,11 @@ export async function callOpenAIAPI(
           filename: msg.documentName,
           file_data: `data:${mimeType};base64,${base64Content}`,
         })
-
       }
 
-      // If message has an image, add as input_image (Responses API format)
+      // If user message has an image attachment, add as input_image (Responses API format)
       if (msg.imageBase64 && msg.imageFormat) {
-        console.log('[Athena] callOpenAIAPI: attaching image', { format: msg.imageFormat, base64Length: msg.imageBase64.length })
+        console.log('[Athena] callOpenAIAPI: attaching user image', { format: msg.imageFormat, base64Length: msg.imageBase64.length })
         content.push({
           type: 'input_image' as const,
           image_url: `data:image/${msg.imageFormat};base64,${msg.imageBase64}`,
@@ -119,7 +129,7 @@ export async function callOpenAIAPI(
       }
 
       return {
-        role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
+        role: 'user' as const,
         content: content.length === 1 ? content[0].text : content,
       }
     })
