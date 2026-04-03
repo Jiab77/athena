@@ -179,8 +179,8 @@ export async function callOpenAIAPI(
       max_output_tokens: 2048,
       reasoning: { effort: 'low' },
       tools: [
+        { type: 'file_search' },
         { type: 'web_search' },
-        { type: 'computer' },
         { type: 'image_generation' }
       ],
       tool_choice: 'auto',
