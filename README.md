@@ -113,8 +113,7 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 - `registerProvider()` is internal-only — not exported from `lib/llm/router.ts`
 - All `[Athena]` debug logs active until MVP release; no conversation content, keys, or API payloads logged
 - **Privacy mode** — when enabled, suppresses Vercel Analytics entirely
-  - OpenAI requests sent with `store: false` — conversations are not persisted on OpenAI servers
-  - Open items: Content Security Policy header not yet set; runtime API key decryption is an accepted risk of the client-side architecture
+- OpenAI requests sent with `store: false` — conversations are not persisted on OpenAI servers
 
 ### Data Management
 - Export conversations: JSON (with SHA-256 integrity hash) or Markdown
