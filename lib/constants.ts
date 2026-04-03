@@ -44,6 +44,8 @@ export const DEFAULT_AUDIO_FILE = 'audio.webm'
 export const SECONDARY_AUDIO_TYPE = 'audio/mp3'
 export const SECONDARY_AUDIO_FILE = 'audio.mp3'
 export const ENABLE_VOICE_OUTPUT = false
+/** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
+export const ENABLE_BIOLLM_PERSONALITY = false
 /** Milliseconds of inactivity before Decart live avatar disconnects to stop consuming credits */
 export const LIVE_AVATAR_IDLE_TIMEOUT = 10000
 /** Milliseconds to wait for Decart to connect before aborting and falling back to local audio */

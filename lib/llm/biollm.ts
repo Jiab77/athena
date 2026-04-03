@@ -6,6 +6,7 @@ import {
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
+  ENABLE_BIOLLM_PERSONALITY,
 } from '../constants'
 import { getDB } from '../db'
 import { parseCompanionJSON, buildSystemPrompt, getAPIKey } from '../utils'
@@ -50,16 +51,15 @@ export async function callBioLLMAPI(
 
     console.log('[Athena] callBioLLMAPI: settings resolved', { personality, companion, memoryWindowSize, avatarGender, endpointUrl })
 
-    const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
-
     const windowedMessages = messages.slice(-memoryWindowSize)
 
     // BioLLM is text-only — plain string content for all messages
+    // System prompt is conditional — pending confirmation that BioLLM accepts it in the request body
     const bioMessages = [
-      {
+      ...(ENABLE_BIOLLM_PERSONALITY ? [{
         role: 'system' as const,
-        content: systemPrompt,
-      },
+        content: buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits),
+      }] : []),
       ...windowedMessages.map((msg) => ({
         role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
         content: msg.content,
