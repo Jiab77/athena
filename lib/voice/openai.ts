@@ -8,6 +8,8 @@ import {
   GENDER_MAPPING,
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
+  DEFAULT_MODEL_ID,
+  DEFAULT_VOICE_MODEL,
   DEFAULT_VOICE_ID
 } from '../constants'
 import { getDB } from '../db'
@@ -43,12 +45,22 @@ export async function generateSpeech(text: string): Promise<Blob> {
     const selectedVoice = settings?.selectedVoice || DEFAULT_VOICE_ID
 
     const providers = TTS_PROVIDERS.find(p => p.id === 'openai')
-    const model = providers?.models[0]?.model || 'gpt-4o-mini-tts'
+    const model = providers?.models[0]?.model || DEFAULT_VOICE_MODEL
 
     const apiKey = await getAPIKey('openai')
     const audioFormat = getAudioFormat()
     const { personality, gender } = await getCompanionSettings()
     const instructions = formatInstructions(personality, gender)
+
+    const reqBody = {
+      model: model,
+      input: text,
+      voice: selectedVoice,
+      response_format: audioFormat,
+      instructions: instructions,
+    }
+
+    console.log('[Athena] generateSpeech (OpenAI): request body', { ...reqBody })
 
     const response = await fetch(SPEECH_API_URL, {
       method: 'POST',
@@ -56,22 +68,22 @@ export async function generateSpeech(text: string): Promise<Blob> {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: model,
-        input: text,
-        voice: selectedVoice,
-        response_format: audioFormat,
-        instructions: instructions,
-      }),
+      body: JSON.stringify(reqBody),
     })
+
+    console.log('[Athena] generateSpeech (OpenAI): HTTP response status', response.status, response.ok)
 
     if (!response.ok) {
       const errorData = await response.json()
+      console.log('[Athena] generateSpeech (OpenAI): API error response', errorData)
       throw new Error(`OpenAI TTS API error: ${response.statusText}`)
     }
 
-    return await response.blob()
+    const blob = await response.blob()
+    console.log('[Athena] generateSpeech (OpenAI): success', { blobSize: blob.size, audioFormat })
+    return blob
   } catch (error) {
+    console.log('[Athena] generateSpeech (OpenAI): caught error', error)
     throw error
   }
 }

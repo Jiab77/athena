@@ -12,13 +12,13 @@ import type { Avatar, LLMProvider, PersonalityType, VisualFormat, STTProvider, T
 export const DEFAULT_COMPANION_ID = 'athena'
 export const DEFAULT_COMPANION_NAME = 'Athena'
 export const DEFAULT_PERSONALITY: PersonalityType = 'Sarcastic'
-export const DEFAULT_VISUAL_FORMAT: VisualFormat = 'animated-2d'
+export const DEFAULT_VISUAL_FORMAT: VisualFormat = 'static-2d'
 export const DEFAULT_GENDER = 'F'
 export const DEFAULT_COLOR_SCHEME = 'vibrant'
 export const DEFAULT_AVATAR_CATEGORY = 'cyberpunk'
-export const DEFAULT_MODEL_PROVIDER = 'groq'
-export const DEFAULT_MODEL_ID = 'gpt-oss-120b'
-export const DEFAULT_MODEL_NAME = 'openai/gpt-oss-120b'
+export const DEFAULT_MODEL_PROVIDER = 'openai'
+export const DEFAULT_MODEL_ID = 'gpt-5.4-mini'
+export const DEFAULT_MODEL_NAME = 'gpt-5.4-mini'
 export const DEFAULT_MEMORY_SIZE = 10
 
 /**
@@ -26,8 +26,8 @@ export const DEFAULT_MEMORY_SIZE = 10
  * Single source of truth for LLM services
  */
 export const DEFAULT_GROQ_EMOTION_DETECTION_MODEL = 'llama-3.1-8b-instant'
+export const DEFAULT_OPENAI_EMOTION_DETECTION_MODEL = 'gpt-5.4-nano'
 export const DEFAULT_GROQ_STT_MODEL = 'whisper-large-v3-turbo'
-export const DEFAULT_OPENAI_TOOL_DETECTION_MODEL = 'gpt-5.4-nano'
 export const DEFAULT_GROQ_TOOL_DETECTION_MODEL = 'groq/compound-mini'
 export const DEFAULT_GROQ_URL_CAPABLE_MODEL = 'groq/compound'
 export const DEFAULT_GROQ_VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
@@ -37,6 +37,7 @@ export const DEFAULT_GROQ_VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instr
  * Single source of truth for STT / TTS services
  */
 export const DEFAULT_VOICE_PROVIDER = 'openai'
+export const DEFAULT_VOICE_MODEL = 'gpt-4o-mini-tts'
 export const DEFAULT_VOICE_ID = 'marin'
 export const DEFAULT_AUDIO_TYPE = 'audio/webm'
 export const DEFAULT_AUDIO_FILE = 'audio.webm'

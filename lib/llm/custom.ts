@@ -66,7 +66,7 @@ export async function callCustomAPI(
     // Extract custom provider settings
     const customProviderUrl = settings.customProviderUrl
     const customModelName = settings.customModelName
-    
+
     if (!customProviderUrl) {
       throw new Error('Custom provider URL not configured')
     }
@@ -76,13 +76,15 @@ export async function callCustomAPI(
     if (!customModelName) {
       throw new Error('Custom model name not configured')
     }
-    
+
     // Extract settings with defaults
     const personality = (settings.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const companion = settings.selectedCompanion || DEFAULT_COMPANION_NAME
     const memoryWindowSize = settings.memoryWindowSize || DEFAULT_MEMORY_SIZE
     const avatarGender = (settings.avatarGender as GenderType) || DEFAULT_GENDER
     const customPersonalityTraits = settings.customPersonalityTraits
+
+    console.log('[Athena] callCustomAPI: settings resolved', { customProviderUrl, customModelName, personality, companion, memoryWindowSize, avatarGender })
 
     const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
 
@@ -117,6 +119,8 @@ export async function callCustomAPI(
       response_format: { type: 'json_object' }
     }
 
+    console.log('[Athena] callCustomAPI: request body', reqBody)
+
     const response = await fetch(customProviderUrl, {
       method: 'POST',
       headers: {
@@ -126,11 +130,13 @@ export async function callCustomAPI(
       body: JSON.stringify(reqBody),
     })
 
+    console.log('[Athena] callCustomAPI: HTTP response status', response.status, response.ok)
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: { message: response.statusText } }))
       const status = response.status
       const errorMessage = error.error?.message || 'Unknown error'
-      
+      console.log('[Athena] callCustomAPI: API error response', error)
       throw {
         status,
         message: errorMessage,
@@ -139,16 +145,20 @@ export async function callCustomAPI(
     }
 
     const data = await response.json()
+    console.log('[Athena] callCustomAPI: response data', data)
+
     const usage = data.usage || null
-    
+
     // Parse response - try JSON first, then plain text
     let responseText: string
     const content = data.choices?.[0]?.message?.content
-    
+
     if (!content) {
       throw new Error('No response content from Custom API')
     }
-    
+
+    console.log('[Athena] callCustomAPI: raw content before parse', content.slice(0, 200))
+
     try {
       // Try to parse as JSON (for providers that support structured output)
       const parsed = JSON.parse(content)
@@ -158,11 +168,14 @@ export async function callCustomAPI(
       responseText = content
     }
 
+    console.log('[Athena] callCustomAPI: success', { responseLength: responseText.length, usage })
+
     return {
       response: responseText,
       usage: usage as { prompt_tokens: number; completion_tokens: number; total_tokens: number } | null
     }
   } catch (error) {
+    console.log('[Athena] callCustomAPI: caught error', error)
     throw error
   }
 }
@@ -198,6 +211,8 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     formData.append('file', audioBlob, DEFAULT_AUDIO_FILE)
     formData.append('model', customSTTModelName)
 
+    console.log('[Athena] transcribeAudio (Custom): sending request', { customSTTUrl, customSTTModelName, blobSize: audioBlob.size })
+
     const response = await fetch(customSTTUrl, {
       method: 'POST',
       headers: {
@@ -206,18 +221,23 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
       body: formData,
     })
 
+    console.log('[Athena] transcribeAudio (Custom): HTTP response status', response.status, response.ok)
+
     if (!response.ok) {
       throw new Error(`Transcription failed: ${response.statusText}`)
     }
 
     const data = await response.json()
+    console.log('[Athena] transcribeAudio (Custom): response data', data)
 
     if (!data.text) {
       throw new Error('No transcription text in response')
     }
 
+    console.log('[Athena] transcribeAudio (Custom): success', { textLength: data.text.length })
     return data.text
   } catch (error) {
+    console.log('[Athena] transcribeAudio (Custom): caught error', error)
     throw error
   }
 }

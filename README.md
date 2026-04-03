@@ -67,7 +67,8 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 - Full multi-turn conversation with encrypted persistent memory (IndexedDB, AES-GCM, PBKDF2 600k iterations)
 - Configurable memory window (1–10 messages) — balance privacy vs. context depth
 - Document/image attachments in chat (txt, md, json, csv, pdf, images, code files)
-- Tool detection — pre-flight model (`groq/compound-mini` and `gpt-5.4-nano`) determines if a tool call is needed before main inference
+- Tool detection — Groq uses pre-flight model (`groq/compound-mini`) to determine if a tool call is needed; OpenAI handles tools natively via the Responses API (`tool_choice: 'auto'`, supports `web_search` and `image_generation`)
+- Image generation — OpenAI can generate images inline via the `image_generation` tool; generated images are rendered in the chat bubble with a download overlay
 - Emotion detection — post-response model (`llama-3.1-8b-instant` and `gpt-5.4-nano`) classifies the AI's emotional state, displayed as an emoji badge
 - Token usage display — per-message cost breakdown in a popover
 - `MAX_DISPLAY_MESSAGES = 30` render cap for UI performance; full history persists in IndexedDB
@@ -78,6 +79,7 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 - **TTS (Text-to-Speech):** OpenAI TTS (alloy, echo, fable, nova, onyx, shimmer voices) and ResembleAI Chatterbox
 - Per-message audio replay — click any message to hear it again
 - Voice provider selectable per-companion in settings
+- TTS voice instructions include a URL-suppression directive — model never reads URLs or hyperlinks aloud
 
 ### Avatar System — Four Visual Formats
 
@@ -111,7 +113,7 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 - `registerProvider()` is internal-only — not exported from `lib/llm/router.ts`
 - All `[Athena]` debug logs active until MVP release; no conversation content, keys, or API payloads logged
 - **Privacy mode** — when enabled, suppresses Vercel Analytics entirely
-- Open items: Content Security Policy header not yet set; runtime API key decryption is an accepted risk of the client-side architecture
+- OpenAI requests sent with `store: false` — conversations are not persisted on OpenAI servers
 
 ### Data Management
 - Export conversations: JSON (with SHA-256 integrity hash) or Markdown
@@ -165,6 +167,7 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 │   └── ui/                            # shadcn/ui component library
 │
 ├── hooks/
+│   ├── use-brain.ts                   # Central AI orchestration hook (LLM + tools + emotion)
 │   ├── use-connection-status.ts       # Online/offline detection
 │   ├── use-mobile.ts                  # Mobile breakpoint detection
 │   ├── use-settings.ts                # Settings read hook
@@ -219,22 +222,45 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 
 ### Inference Routing
 
-| Role | Provider / Model | When Used |
+#### Groq
+
+| Role | Model | When Used |
 |---|---|---|
-| Groq Tool detection (pre-flight) | `groq/compound-mini` | Every request — determines if a tool call is needed |
-| OpenAI Tool detection (pre-flight) | `gpt-5.4-nano` | Every request — determines if a tool call is needed |
-| URL detection | `groq/compound` | When a message includes an URL |
+| Tool detection (pre-flight) | `groq/compound-mini` | Every request — determines if a tool call is needed |
+| URL detection | `groq/compound` | When the message includes a URL |
 | Vision (image attachments) | `meta-llama/llama-4-scout-17b-16e-instruct` | When the message includes an image |
-| Main inference — Groq | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
-| Main inference — OpenAI | `gpt-5.4`, `gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
-| Main inference — Custom | Any OpenAI-compatible endpoint | Custom provider selected |
-| Groq Emotion classification | `llama-3.1-8b-instant` | Post-response, every message |
-| OpenAI Emotion classification | `gpt-5.4-nano` | Post-response, every message |
-| STT (Speech To Text) — Groq | `whisper-large-v3-turbo` | To convert user speech in text |
-| STT (Speech To Text) — OpenAI | `whisper-1` | To convert user speech to text |
-| TTS (Text To Speech) — OpenAI | `gpt-4o-mini-tts` | To convert companion text to speech |
-| TTS (Text To Speech) — RessembleAI | `chatterbox` | To convert companion text to speech |
-| Live Avatar — Decart AI | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
+| Main inference | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
+| Emotion classification | `llama-3.1-8b-instant` | Post-response, every message |
+| STT (Speech To Text) | `whisper-large-v3-turbo` | To convert user speech to text |
+
+#### OpenAI
+
+| Role | Model | When Used |
+|---|---|---|
+| Main inference | `gpt-5.4`, `gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
+| Tools (native) | `web_search`, `image_generation` | Every request — handled natively via Responses API (`tool_choice: 'auto'`) |
+| Image generation | `image_generation` tool | When the model judges an image is appropriate |
+| Emotion classification | `gpt-5.4-nano` | Post-response, every message |
+| STT (Speech To Text) | `whisper-1` | To convert user speech to text |
+| TTS (Text To Speech) | `gpt-4o-mini-tts` | To convert companion text to speech |
+
+#### ResembleAI
+
+| Role | Model | When Used |
+|---|---|---|
+| TTS (Text To Speech) | `chatterbox` | To convert companion text to speech |
+
+#### Decart AI
+
+| Role | Model | When Used |
+|---|---|---|
+| Live Avatar | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
+
+#### Custom
+
+| Role | Model | When Used |
+|---|---|---|
+| Main inference | Any OpenAI-compatible endpoint | Custom provider selected |
 
 ### Supported Providers
 

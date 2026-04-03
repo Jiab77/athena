@@ -3,7 +3,6 @@
 import type { ToolDetectionResult, PersonalityType, GenderType } from '../types'
 import {
   DEFAULT_GROQ_TOOL_DETECTION_MODEL,
-  DEFAULT_OPENAI_TOOL_DETECTION_MODEL,
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
@@ -12,84 +11,21 @@ import { getDB } from '../db'
 import { getAPIKey } from '../utils'
 
 const GROQ_CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const OPENAI_CHAT_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 /**
  * Detect if user message requires tools and optionally get the response.
  *
  * - For Groq: uses a compound model with automatic tool execution (web_search, etc.).
  *   If tools fired, the response is already ready — no main call needed.
- * - For OpenAI: uses a cheap model with JSON mode to decide whether tools are needed.
- *   Returns { toolsNeeded: true/false } so the main call can gate JSON mode vs web_search.
  *
  * Only sends the latest user message to avoid 413 Entity Too Large errors.
  *
  * @param userMessage - The latest user message to analyze
- * @param provider    - The selected LLM provider ('groq' | 'openai' | other)
+ * @param provider    - The selected LLM provider ('groq' | other)
  * @returns ToolDetectionResult
  */
-export async function detectTools(userMessage: string, provider = 'groq'): Promise<ToolDetectionResult> {
-  if (provider === 'openai') {
-    return detectToolsOpenAI(userMessage)
-  }
+export async function detectTools(userMessage: string): Promise<ToolDetectionResult> {
   return detectToolsGroq(userMessage)
-}
-
-// ─── OpenAI pre-flight ────────────────────────────────────────────────────────
-
-async function detectToolsOpenAI(userMessage: string): Promise<ToolDetectionResult> {
-  try {
-    const apiKey = await getAPIKey('openai')
-
-    console.log('[Athena] OpenAI tool detection - pre-flight for message:', userMessage)
-
-    const reqBody = {
-      model: DEFAULT_OPENAI_TOOL_DETECTION_MODEL,
-      messages: [
-        {
-          role: 'system' as const,
-          content: 'You are a routing assistant. Decide whether answering the user message requires a real-time web search (news, live data, current events, prices, weather, recent facts). Reply only with valid JSON: { "toolsNeeded": true } or { "toolsNeeded": false }.',
-        },
-        {
-          role: 'user' as const,
-          content: userMessage,
-        },
-      ],
-      temperature: 0,
-      max_completion_tokens: 16,
-      response_format: { type: 'json_object' },
-    }
-
-    const response = await fetch(OPENAI_CHAT_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reqBody),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('[Athena] OpenAI tool detection API error:', error)
-      return { toolsUsed: false, toolsNeeded: false }
-    }
-
-    const data = await response.json()
-    const content = data.choices?.[0]?.message?.content || '{}'
-
-    console.log('[Athena] OpenAI tool detection - raw response:', content)
-
-    const parsed = JSON.parse(content)
-    const toolsNeeded = parsed.toolsNeeded === true
-
-    console.log('[Athena] OpenAI tool detection - toolsNeeded:', toolsNeeded)
-    return { toolsUsed: false, toolsNeeded }
-
-  } catch (error) {
-    console.error('[Athena] OpenAI tool detection error:', error)
-    return { toolsUsed: false, toolsNeeded: false }
-  }
 }
 
 // ─── Groq pre-flight ──────────────────────────────────────────────────────────
@@ -133,7 +69,7 @@ async function detectToolsGroq(userMessage: string): Promise<ToolDetectionResult
     }
 
     console.log('[Athena] Tool detection - calling', DEFAULT_GROQ_TOOL_DETECTION_MODEL, 'with message:', userMessage)
-    console.log('[Athena] Tool detection request:', JSON.stringify(reqBody, null, 2))
+    console.log('[Athena] Tool detection request:', reqBody)
 
     const response = await fetch(GROQ_CHAT_API_URL, {
       method: 'POST',
@@ -153,7 +89,7 @@ async function detectToolsGroq(userMessage: string): Promise<ToolDetectionResult
     }
 
     const data = await response.json()
-    console.log('[Athena] Tool detection - raw response:', JSON.stringify(data, null, 2))
+    console.log('[Athena] Tool detection - raw response:', data)
 
     const executedTools = data.choices?.[0]?.message?.executed_tools || null
     const content = data.choices?.[0]?.message?.content || ''

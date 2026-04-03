@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink } from 'lucide-react'
+import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -336,7 +336,7 @@ export function ChatInterface({
   }
 
   const handleSendMessage = async (overrideText?: string) => {
-    const messageText = overrideText ?? input
+    const messageText = typeof overrideText === 'string' ? overrideText : input
     if ((!messageText.trim() && !selectedImage && !selectedDocument) || isLoading || !conversationId) return
 
     // Add user message with optional image or document (for current session only)
@@ -389,7 +389,6 @@ export function ChatInterface({
       const llmSettings = db ? await db.getSettings() : null
       const selectedProvider = llmSettings?.selectedProvider || DEFAULT_MODEL_PROVIDER
       const isGroqProvider = selectedProvider === 'groq'
-      const isOpenAIProvider = selectedProvider === 'openai'
       const isPlainText = !userMessage.imageBase64
         && !userMessage.documentContent
         && !/https?:\/\/\S+/.test(userMessage.content)
@@ -398,21 +397,20 @@ export function ChatInterface({
 
       let result: LLMResponse
 
-      if ((isGroqProvider || isOpenAIProvider) && isPlainText) {
-        console.log('[Athena] Running tool detection for provider:', selectedProvider, 'message:', userMessage.content)
-        const toolResult = await detectTools(userMessage.content, selectedProvider)
+      if (isGroqProvider && isPlainText) {
+        console.log('[Athena] Running Groq tool detection for message:', userMessage.content)
+        const toolResult = await detectTools(userMessage.content)
 
-        if (isGroqProvider && toolResult.toolsUsed && toolResult.response) {
+        if (toolResult.toolsUsed && toolResult.response) {
           // Groq: tools already executed — response is ready, skip main callLLM
           console.log('[Athena] Groq tools were used — skipping callLLM, using tool response directly')
           result = { response: toolResult.response, usage: null }
         } else {
-          // Groq: no tools fired, or OpenAI: toolsNeeded flag already set on last message by detectTools
-          console.log('[Athena] Tool detection complete — proceeding to callLLM, toolsNeeded:', toolResult.toolsNeeded)
+          console.log('[Athena] Groq tool detection complete — no tools fired, proceeding to callLLM')
           result = await callLLM(allMessages, selectedProvider)
         }
       } else {
-        console.log('[Athena] Skipping tool detection (multimodal or unsupported provider) — proceeding to callLLM')
+        console.log('[Athena] Skipping tool detection — proceeding to callLLM')
         result = await callLLM(allMessages, selectedProvider)
       }
       
@@ -446,6 +444,7 @@ export function ChatInterface({
         role: 'companion',
         content: result.response,
         timestamp: new Date().toISOString(),
+        ...(result.imageBase64 ? { imageBase64: result.imageBase64, imageFormat: result.imageFormat || 'png' } : {}),
       }
       
       // Strip document content from history after AI has processed it
@@ -824,11 +823,23 @@ export function ChatInterface({
                       }`}
                     >
                       {message.imageBase64 && message.imageFormat && (
-                        <img
-                          src={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
-                          alt="Chat image"
-                          className="max-w-xs rounded mb-2 max-h-64 object-cover"
-                        />
+                        <div className={`relative mb-2 group/img ${!isUser ? 'inline-block' : ''}`}>
+                          <img
+                            src={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
+                            alt={isUser ? 'Chat image' : 'Generated image'}
+                            className="max-w-xs rounded max-h-64 object-cover"
+                          />
+                          {!isUser && (
+                            <a
+                              href={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
+                              download={`athena-image-${message.id}.${message.imageFormat}`}
+                              className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity rounded"
+                              aria-label="Download generated image"
+                            >
+                              <Download className="h-6 w-6 text-white" />
+                            </a>
+                          )}
+                        </div>
                       )}
                       {message.documentName && (
                         <div className="flex items-center gap-1 mb-2 text-xs opacity-70">

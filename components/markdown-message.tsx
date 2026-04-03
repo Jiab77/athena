@@ -19,13 +19,9 @@ export function MarkdownMessage({ content }: { content: string }) {
             </pre>
           )
         },
-        p: ({ children }) => {
-          // Don't wrap pre tags in p tags (HTML spec violation)
-          if (Array.isArray(children) && children.some((child: any) => child?.type?.name === 'pre')) {
-            return <>{children}</>
-          }
-          return <p className="mb-2 text-foreground">{children}</p>
-        },
+        p: ({ children }) => (
+          <div className="mb-2 text-foreground">{children}</div>
+        ),
         strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
         em: ({ children }) => <em className="italic text-foreground">{children}</em>,
         ul: ({ children }) => <ul className="list-disc list-inside mb-2 text-foreground">{children}</ul>,

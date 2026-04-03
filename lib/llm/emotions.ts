@@ -3,7 +3,7 @@
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
 import {
   DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
-  DEFAULT_OPENAI_TOOL_DETECTION_MODEL,
+  DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
   EMOTION_KEYWORDS,
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
@@ -67,7 +67,7 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
     console.log('[Athena] Emotion detection - provider:', provider, 'companion:', companion, 'personality:', personality)
 
     const reqBody = {
-      model: isOpenAI ? DEFAULT_OPENAI_TOOL_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
+      model: isOpenAI ? DEFAULT_OPENAI_EMOTION_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
       messages: [
         {
           role: 'system' as const,
@@ -87,8 +87,7 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
       response_format: { type: 'json_object' },
     }
 
-    console.log('[Athena] Emotion detection - analyzing response:', aiResponse)
-    console.log('[Athena] Emotion detection request:', JSON.stringify(reqBody, null, 2))
+    console.log('[Athena] Emotion detection request:', reqBody)
 
     const response = await fetch(isOpenAI ? OPENAI_CHAT_API_URL : GROQ_CHAT_API_URL, {
       method: 'POST',
@@ -106,7 +105,7 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
     }
 
     const data = await response.json()
-    console.log('[Athena] Emotion detection - raw response:', JSON.stringify(data, null, 2))
+    console.log('[Athena] Emotion detection - raw response:', data)
     const content = data.choices?.[0]?.message?.content
 
     if (!content) {
