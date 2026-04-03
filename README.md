@@ -301,7 +301,7 @@ Every LLM request includes behavioral safeguards to prevent parasocial dependenc
 6. **User Autonomy** — Supports user choices, respects agency
 
 ### Personality Types
-Six presets (Wise, Playful, Technical, Mysterious, Friendly, Custom) apply these principles differently, enabling variety without compromising safety. See `/docs/IMPLEMENTATION_NOTES.md` for the full prompt framework.
+Six presets (Wise, Playful, Technical, Mysterious, Friendly, Custom) apply these principles differently, enabling variety without compromising safety. See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full prompt framework.
 
 ---
 
@@ -381,7 +381,7 @@ Athena is designed with these ethical commitments:
 4. **Never trap users** — Export data, delete anytime, no lock-in
 5. **Never manipulate** — User autonomy comes first
 
-See `/docs/IMPLEMENTATION_NOTES.md` ("Athena Companion Design Philosophy") for the full ethical framework.
+See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) ("Athena Companion Design Philosophy") for the full ethical framework.
 
 ---
 
