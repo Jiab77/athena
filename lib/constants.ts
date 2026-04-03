@@ -235,7 +235,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         id: 'shadow',
         name: 'Shadow',
         model: 'biollm-4b-shadow',
-        description: 'TBD',
+        description: 'Experimental 4B biological neural network model. Inference runs through a living cortical culture on Cortical Labs CL1 hardware.',
         url: 'https://biollm.com/about',
         visible: true,
       },
