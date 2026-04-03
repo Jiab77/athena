@@ -98,7 +98,7 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
-> ## Session 26: OpenAI Image Generation, Debug Logging Overhaul, Router Fix, Hydration Fixes (04/03/2026)
+## Session 26: OpenAI Image Generation, Debug Logging Overhaul, Router Fix, Hydration Fixes (04/03/2026)
 
 ### Overview
 
