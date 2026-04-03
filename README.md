@@ -359,18 +359,6 @@ Add your API keys in **Settings > Model** within the app — they are encrypted 
 
 ---
 
-## Contributing
-
-This is a single-developer project with AI agent collaboration. Ideas are welcome — open an issue to discuss before submitting a PR.
-
----
-
-## License
-
-MIT
-
----
-
 ## Ethical Guardrails
 
 Athena is designed with these ethical commitments:
@@ -412,3 +400,17 @@ See `/docs/IMPLEMENTATION_NOTES.md` ("Athena Companion Design Philosophy") for t
 
 **Analytics:**
 [Vercel Analytics](https://vercel.com/analytics) (disabled by default via Privacy Mode)
+
+---
+
+## License
+
+MIT
+
+---
+
+## Contributing
+
+This is a single-developer project with AI agent collaboration. Ideas are welcome — open an issue to discuss before submitting a PR.
+
+---
