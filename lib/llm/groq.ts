@@ -164,7 +164,7 @@ export async function callGroqAPI(
       messages: reqBody.messages.map((msg: any) => ({
         ...msg,
         content: Array.isArray(msg.content)
-          ? msg.content.map((c: any) => c.type === 'image_url' ? { ...c, image_url: '[base64]' } : c)
+          ? msg.content.map((c: any) => c.type === 'image_url' ? { ...c, image_url: { url: '[base64]' } } : c)
           : msg.content,
       })),
     })
