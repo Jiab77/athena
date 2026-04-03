@@ -48,7 +48,7 @@ export async function callOpenAIAPI(
     // Build system prompt with companion name, personality, gender from database
     const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
 
-    console.log('[Athena] callOpenAIAPI: system prompt --', systemPrompt)
+    console.log('[Athena] callOpenAIAPI: system prompt |', systemPrompt)
 
     // Apply sliding window based on user's memory preference
     const windowSize = memoryWindowSize
