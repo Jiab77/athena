@@ -213,9 +213,11 @@ export function formatInstructions(personality: string, gender: string): string 
   const subject = genderInfo?.subject || 'person'
   const pronouns = genderInfo?.gender || 'they/them'
   
-  return template
+  const base = template
     .replace(/{gender}/g, pronouns)
     .replace(/{subject}/g, subject)
+
+  return `${base} Never read URLs, hyperlinks, or web addresses aloud. When referencing a source, describe it naturally without speaking the URL.`
 }
 
 /**
