@@ -68,31 +68,46 @@ export async function generateSpeech(text: string): Promise<Blob> {
     const instructions = formatInstructions(personality, gender)
     const ssmlData = buildSSML(text, instructions)
 
+    console.log('[Athena] generateSpeech (ResembleAI): settings resolved', { selectedVoice, audioFormat, personality, gender })
+    console.log('[Athena] generateSpeech (ResembleAI): SSML data', ssmlData)
+
+    const reqBody = {
+      voice_uuid: selectedVoice,
+      data: ssmlData,
+      output_format: audioFormat,
+    }
+
+    console.log('[Athena] generateSpeech (ResembleAI): request body', reqBody)
+
     const response = await fetch(SYNTHESIZE_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        voice_uuid: selectedVoice,
-        data: ssmlData,
-        output_format: audioFormat,
-      }),
+      body: JSON.stringify(reqBody),
     })
 
+    console.log('[Athena] generateSpeech (ResembleAI): HTTP response status', response.status, response.ok)
+
     if (!response.ok) {
+      const errorData = await response.json()
+      console.log('[Athena] generateSpeech (ResembleAI): API error response', errorData)
       throw new Error(`ResembleAI TTS API error: ${response.statusText}`)
     }
 
     const responseData = await response.json()
+    console.log('[Athena] generateSpeech (ResembleAI): response data', { ...responseData, audio_content: '[base64]' })
 
     if (!responseData.audio_content) {
       throw new Error('No audio_content in ResembleAI response')
     }
 
-    return base64ToBlob(responseData.audio_content, SECONDARY_AUDIO_TYPE)
+    const blob = base64ToBlob(responseData.audio_content, SECONDARY_AUDIO_TYPE)
+    console.log('[Athena] generateSpeech (ResembleAI): success', { blobSize: blob.size, audioFormat })
+    return blob
   } catch (error) {
+    console.log('[Athena] generateSpeech (ResembleAI): caught error', error)
     throw error
   }
 }

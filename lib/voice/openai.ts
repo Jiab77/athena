@@ -52,33 +52,38 @@ export async function generateSpeech(text: string): Promise<Blob> {
     const { personality, gender } = await getCompanionSettings()
     const instructions = formatInstructions(personality, gender)
 
+    const reqBody = {
+      model: model,
+      input: text,
+      voice: selectedVoice,
+      response_format: audioFormat,
+      instructions: instructions,
+    }
+
+    console.log('[Athena] generateSpeech (OpenAI): request body', { ...reqBody, instructions: `[${instructions.length} chars]` })
+
     const response = await fetch(SPEECH_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: model,
-        input: text,
-        voice: selectedVoice,
-        response_format: audioFormat,
-        instructions: instructions,
-      }),
+      body: JSON.stringify(reqBody),
     })
 
-    console.log('[Athena] Received AI audio response:', JSON.stringify(response))
-    console.log('[Athena] Model used:', model)
-    console.log('[Athena] Voice used:', selectedVoice)
-    console.log('[Athena] Instructions used:', instructions)
+    console.log('[Athena] generateSpeech (OpenAI): HTTP response status', response.status, response.ok)
 
     if (!response.ok) {
       const errorData = await response.json()
+      console.log('[Athena] generateSpeech (OpenAI): API error response', errorData)
       throw new Error(`OpenAI TTS API error: ${response.statusText}`)
     }
 
-    return await response.blob()
+    const blob = await response.blob()
+    console.log('[Athena] generateSpeech (OpenAI): success', { blobSize: blob.size, audioFormat })
+    return blob
   } catch (error) {
+    console.log('[Athena] generateSpeech (OpenAI): caught error', error)
     throw error
   }
 }
