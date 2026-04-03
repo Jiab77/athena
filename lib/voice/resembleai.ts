@@ -33,7 +33,7 @@ function buildSSML(text: string, prompt: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')
-  
+
   return `<speak prompt="${prompt}">${escapedText}</speak>`
 }
 
@@ -77,7 +77,7 @@ export async function generateSpeech(text: string): Promise<Blob> {
       output_format: audioFormat,
     }
 
-    console.log('[Athena] generateSpeech (ResembleAI): request body', reqBody)
+    console.log('[Athena] generateSpeech (ResembleAI): request body', { ...reqBody })
 
     const response = await fetch(SYNTHESIZE_API_URL, {
       method: 'POST',

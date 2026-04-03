@@ -60,7 +60,7 @@ export async function generateSpeech(text: string): Promise<Blob> {
       instructions: instructions,
     }
 
-    console.log('[Athena] generateSpeech (OpenAI): request body', { ...reqBody, instructions: `[${instructions.length} chars]` })
+    console.log('[Athena] generateSpeech (OpenAI): request body', { ...reqBody })
 
     const response = await fetch(SPEECH_API_URL, {
       method: 'POST',
