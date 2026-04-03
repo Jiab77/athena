@@ -77,26 +77,17 @@ export async function callLLM(messages: Message[], selectedProvider?: string): P
     throw new Error(`Provider '${providerID}' not found in registry`)
   }
 
-  // Pre-flight tool detection for Groq and OpenAI
-  if (providerID === 'groq' || providerID === 'openai') {
+  // Pre-flight tool detection for Groq only
+  // OpenAI handles tools natively via Responses API (tool_choice: 'auto')
+  if (providerID === 'groq') {
     const lastUserMessage = [...messages].reverse().find(m => m.role === 'user')?.content || ''
     if (lastUserMessage) {
-      const detection = await detectTools(lastUserMessage, providerID)
+      const detection = await detectTools(lastUserMessage)
 
-      // Groq: tools already executed — response is ready
-      if (providerID === 'groq' && detection.toolsUsed && detection.response) {
+      // Groq: tools already executed — response is ready, skip main callLLM
+      if (detection.toolsUsed && detection.response) {
         console.log('[Router] Groq tools fired — returning pre-flight response')
         return { response: detection.response, usage: null }
-      }
-
-      // OpenAI: pass toolsNeeded flag through via the messages array metadata
-      // We signal it by passing a special property on the last user message object
-      if (providerID === 'openai' && detection.toolsNeeded !== undefined) {
-        const lastMsg = messages[messages.length - 1]
-        if (lastMsg) {
-          (lastMsg as any)._toolsNeeded = detection.toolsNeeded
-          console.log('[Router] OpenAI toolsNeeded:', detection.toolsNeeded)
-        }
       }
     }
   }

@@ -24,7 +24,7 @@ const GROQ_CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
  * @param provider    - The selected LLM provider ('groq' | other)
  * @returns ToolDetectionResult
  */
-export async function detectTools(userMessage: string, provider = 'groq'): Promise<ToolDetectionResult> {
+export async function detectTools(userMessage: string): Promise<ToolDetectionResult> {
   return detectToolsGroq(userMessage)
 }
 

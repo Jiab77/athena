@@ -399,7 +399,7 @@ export function ChatInterface({
 
       if (isGroqProvider && isPlainText) {
         console.log('[Athena] Running Groq tool detection for message:', userMessage.content)
-        const toolResult = await detectTools(userMessage.content, selectedProvider)
+        const toolResult = await detectTools(userMessage.content)
 
         if (toolResult.toolsUsed && toolResult.response) {
           // Groq: tools already executed — response is ready, skip main callLLM
