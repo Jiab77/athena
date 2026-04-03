@@ -56,15 +56,15 @@ export function isImageMimeType(mimeType: string): boolean {
  */
 export async function extractTextFromFile(file: File): Promise<string | null> {
   const mimeType = file.type
-  
+
   // Handle all text-based files directly — includes code, scripts, markup, config files
   if (mimeType.startsWith('text/') ||
-      mimeType === 'application/json' ||
-      mimeType === 'application/xml' ||
-      mimeType === 'application/x-shellscript') {
+    mimeType === 'application/json' ||
+    mimeType === 'application/xml' ||
+    mimeType === 'application/x-shellscript') {
     return await file.text()
   }
-  
+
   // Handle PDF files - extract text using basic approach
   if (mimeType === 'application/pdf') {
     // For PDF, we'll read as ArrayBuffer and attempt basic text extraction
@@ -74,7 +74,7 @@ export async function extractTextFromFile(file: File): Promise<string | null> {
       const bytes = new Uint8Array(arrayBuffer)
       const decoder = new TextDecoder('utf-8', { fatal: false })
       const rawText = decoder.decode(bytes)
-      
+
       // Extract text between stream markers (basic PDF text extraction)
       const textMatches = rawText.match(/\(([^)]+)\)/g)
       if (textMatches) {
@@ -84,19 +84,19 @@ export async function extractTextFromFile(file: File): Promise<string | null> {
           .replace(/\\n/g, '\n')
           .replace(/\s+/g, ' ')
           .trim()
-        
+
         if (extractedText.length > 50) {
           return extractedText
         }
       }
-      
+
       // Fallback: return a note that PDF content couldn't be fully extracted
       return `[PDF file: ${file.name}] Note: Complex PDF content may not be fully extracted. Consider using a text-based format for better results.`
     } catch (error) {
       return `[PDF file: ${file.name}] Unable to extract text content.`
     }
   }
-  
+
   return null
 }
 
@@ -128,17 +128,17 @@ export async function getAPIKey(providerId: string): Promise<string> {
  */
 export function parseCompanionJSON(jsonString: string): { response: string; reasoning?: string } {
   let cleaned = jsonString.trim()
-  
+
   // Remove duplicate opening braces ({{ → {)
   if (cleaned.startsWith('{{')) {
     cleaned = cleaned.replace(/^\{\{+/, '{')
   }
-  
+
   // Remove duplicate closing braces (}} → })
   if (cleaned.endsWith('}}')) {
     cleaned = cleaned.replace(/\}\}+$/, '}')
   }
-  
+
   try {
     return JSON.parse(cleaned)
   } catch (error) {
@@ -190,10 +190,10 @@ export async function getCompanionSettings(): Promise<{ personality: string; gen
   try {
     const db = await getDB()
     const settings = await db.getSettings()
-    
+
     const personality = settings?.selectedPersonality || DEFAULT_PERSONALITY
     const gender = settings?.avatarGender || DEFAULT_GENDER
-    
+
     return { personality, gender }
   } catch (error) {
     throw error
@@ -212,12 +212,12 @@ export function formatInstructions(personality: string, gender: string): string 
   const genderInfo = GENDER_MAPPING[gender as keyof typeof GENDER_MAPPING]
   const subject = genderInfo?.subject || 'person'
   const pronouns = genderInfo?.gender || 'they/them'
-  
+
   const base = template
     .replace(/{gender}/g, pronouns)
     .replace(/{subject}/g, subject)
 
-  return `${base} Never read URLs, hyperlinks, or web addresses aloud. When referencing a source, describe it naturally without speaking the URL.`
+  return `${base} Critical: Never read URLs, hyperlinks, or web addresses aloud. When referencing a source, describe it naturally without speaking the URL.`
 }
 
 /**
@@ -227,25 +227,25 @@ export function formatInstructions(personality: string, gender: string): string 
 export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: () => void): Promise<AudioControls> {
   let audioContext: AudioContext | null = null
   let analyser: AnalyserNode | null = null
-  
+
   try {
     const audioUrl = URL.createObjectURL(audioBlob)
     const audio = new Audio(audioUrl)
     audio.crossOrigin = 'anonymous'
-    
+
     // Set up audio context and analyser for waveform visualization
     audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
     analyser = audioContext.createAnalyser()
     analyser.fftSize = 64
-    
+
     const source = audioContext.createMediaElementSource(audio)
     source.connect(analyser)
     analyser.connect(audioContext.destination)
-    
+
     audio.addEventListener('play', () => {
       onPlay?.()
     })
-    
+
     audio.addEventListener('ended', () => {
       onEnd?.()
       URL.revokeObjectURL(audioUrl)
@@ -259,7 +259,7 @@ export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: ()
     })
 
     await audio.play()
-    
+
     // Return control interface
     return {
       stop: () => {
@@ -322,7 +322,7 @@ export async function generateAndPlayTTS(text: string, onPlay?: () => void, onEn
     const voiceProvider = settings?.voiceProvider || DEFAULT_VOICE_PROVIDER
     const selectedVoice = settings?.selectedVoice || DEFAULT_VOICE_ID
     let audioBlob: Blob
-    
+
     if (voiceProvider === 'openai') {
       const { generateSpeech } = await import('./voice/openai')
       audioBlob = await generateSpeech(text)
