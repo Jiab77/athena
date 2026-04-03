@@ -228,6 +228,20 @@ export const PERSONALITY_VOICES: Record<PersonalityType, string> = {
  */
 export const LLM_PROVIDERS: LLMProvider[] = [
   {
+    id: 'biollm',
+    name: 'BioLLM',
+    models: [
+      {
+        id: 'shadow',
+        name: 'Shadow',
+        model: 'biollm-4b-shadow',
+        description: 'TBD',
+        url: 'https://biollm.com/about',
+        visible: true,
+      },
+    ],
+  },
+  {
     id: 'groq',
     name: 'Groq',
     models: [
