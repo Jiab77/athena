@@ -27,12 +27,9 @@ yarn-error.log*
 next-env.d.ts
 
 # framework
-AGENTS.md
 HUMAN.md
 MEMORY.md
 MEMORY.old.md
-SOUL.md
-TEAM.md
 
 # v0
 pnpm-lock.yaml
