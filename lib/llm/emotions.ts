@@ -87,7 +87,6 @@ export async function detectEmotion(aiResponse: string, provider = 'groq'): Prom
       response_format: { type: 'json_object' },
     }
 
-    console.log('[Athena] Emotion detection - analyzing response:', aiResponse)
     console.log('[Athena] Emotion detection request:', reqBody)
 
     const response = await fetch(isOpenAI ? OPENAI_CHAT_API_URL : GROQ_CHAT_API_URL, {

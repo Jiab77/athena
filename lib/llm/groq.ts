@@ -51,7 +51,9 @@ export async function callGroqAPI(
     const memoryWindowSize = settings.memoryWindowSize || DEFAULT_MEMORY_SIZE
     const avatarGender = (settings.avatarGender as GenderType) || DEFAULT_GENDER
     const customPersonalityTraits = settings.customPersonalityTraits
-    
+
+    console.log('[Athena] callGroqAPI: settings resolved', { model, personality, companion, memoryWindowSize, avatarGender })
+
     const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
 
     const windowedMessages = messages.slice(-memoryWindowSize)
@@ -77,6 +79,8 @@ export async function callGroqAPI(
       : (hasUrls)
         ? DEFAULT_GROQ_URL_CAPABLE_MODEL
         : model
+
+    console.log('[Athena] callGroqAPI: model selection', { hasImage, hasUrls, isGptOssModel, isCompoundModel, isOllamaModel, modelToUse })
 
     // Convert messages to Groq API format, supporting both text and image content
     const groqMessages = [
@@ -155,6 +159,16 @@ export async function callGroqAPI(
       }
     }
 
+    console.log('[Athena] callGroqAPI: request body', {
+      ...reqBody,
+      messages: reqBody.messages.map((msg: any) => ({
+        ...msg,
+        content: Array.isArray(msg.content)
+          ? msg.content.map((c: any) => c.type === 'image_url' ? { ...c, image_url: '[base64]' } : c)
+          : msg.content,
+      })),
+    })
+
     const response = await fetch(CHAT_API_URL, {
       method: 'POST',
       headers: {
@@ -165,11 +179,13 @@ export async function callGroqAPI(
       body: JSON.stringify(reqBody),
     })
 
+    console.log('[Athena] callGroqAPI: HTTP response status', response.status, response.ok)
+
     if (!response.ok) {
       const error = await response.json()
       const status = response.status
       const errorMessage = error.error?.message || 'Unknown error'
-      
+      console.log('[Athena] callGroqAPI: API error response', error)
       throw {
         status,
         message: errorMessage,
@@ -178,19 +194,22 @@ export async function callGroqAPI(
     }
 
     const data = await response.json()
+    console.log('[Athena] callGroqAPI: response data', data)
 
     const tools = data.choices?.[0]?.message?.executed_tools || null
     const usage = data.usage || null
-    
+
     // Parse JSON response from structured output
     let parsedResponse: { response: string; reasoning?: string }
     try {
       const content = data.choices?.[0]?.message?.content
-      
+
       if (!content) {
         throw new Error('No response content from Groq API')
       }
+      console.log('[Athena] callGroqAPI: raw content before parse', content.slice(0, 200))
       parsedResponse = parseCompanionJSON(content)
+      console.log('[Athena] callGroqAPI: parsedResponse keys', Object.keys(parsedResponse))
     } catch {
       throw new Error('Invalid JSON response from Groq API')
     }
@@ -199,11 +218,14 @@ export async function callGroqAPI(
       throw new Error('No response field in parsed JSON')
     }
 
+    console.log('[Athena] callGroqAPI: success', { responseLength: parsedResponse.response.length, usage, executedTools: tools })
+
     return {
       response: parsedResponse.response,
       usage: usage as { prompt_tokens: number; completion_tokens: number; total_tokens: number } | null
     }
   } catch (error) {
+    console.log('[Athena] callGroqAPI: caught error', error)
     throw error
   }
 }
@@ -226,6 +248,8 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     formData.append('model', sttModel)
     // formData.append('language', 'fr')
 
+    console.log('[Athena] transcribeAudio (Groq): sending request', { model: sttModel, blobSize: audioBlob.size })
+
     const response = await fetch(STT_API_URL, {
       method: 'POST',
       headers: {
@@ -234,18 +258,23 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
       body: formData,
     })
 
+    console.log('[Athena] transcribeAudio (Groq): HTTP response status', response.status, response.ok)
+
     if (!response.ok) {
       throw new Error(`Transcription failed: ${response.statusText}`)
     }
 
     const data = await response.json()
+    console.log('[Athena] transcribeAudio (Groq): response data', data)
 
     if (!data.text) {
       throw new Error('No transcription text in response')
     }
 
+    console.log('[Athena] transcribeAudio (Groq): success', { textLength: data.text.length })
     return data.text
   } catch (error) {
+    console.log('[Athena] transcribeAudio (Groq): caught error', error)
     throw error
   }
 }

@@ -72,7 +72,9 @@ async function getCurrentProvider(): Promise<string> {
 export async function callLLM(messages: Message[], selectedProvider?: string): Promise<LLMResponse> {
   const providerID = selectedProvider || await getCurrentProvider()
   const provider = providers[providerID]
-  
+
+  console.log('[Router] callLLM - provider:', providerID, 'messageCount:', messages.length)
+
   if (!provider) {
     throw new Error(`Provider '${providerID}' not found in registry`)
   }
@@ -86,13 +88,15 @@ export async function callLLM(messages: Message[], selectedProvider?: string): P
 
       // Groq: tools already executed — response is ready, skip main callLLM
       if (detection.toolsUsed && detection.response) {
-        console.log('[Router] Groq tools fired — returning pre-flight response')
+        console.log('[Router] Groq tools fired — returning pre-flight response', { responseLength: detection.response.length })
         return { response: detection.response, usage: null }
       }
     }
   }
-  
-  return provider.callAPI(messages)
+
+  const result = await provider.callAPI(messages)
+  console.log('[Router] callLLM - response received', { responseLength: result.response.length, usage: result.usage, hasImage: !!result.imageBase64 })
+  return result
 }
 
 /**
