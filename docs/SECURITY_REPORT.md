@@ -133,7 +133,7 @@ This is a new entry replacing A10:2021 (Server-Side Request Forgery). It covers 
 - [x] **[PASS] Provider URL validation throws on invalid input** — `validateProviderUrl()` throws with a descriptive message for all invalid URL cases: unparseable URL, non-https external, unsupported protocol (CWE-234).
 - [ ] **[LOW] API error responses exposed to UI** — `lib/llm/custom.ts` and other provider files throw structured error objects that include `status`, `message`, and `originalError`. If the calling component surfaces `error.message` directly to the user (which `chat-interface.tsx` does), a provider's verbose error message (e.g. "Invalid API key — key starts with sk-...") could leak configuration hints (CWE-209). Mitigate by sanitizing error messages before display.
 - [ ] **[LOW] `export.ts` has bare `throw error` in catch blocks** — `exportAsJSON()`, `exportAsMarkdown()`, and `downloadExport()` all re-throw the raw error without wrapping or sanitizing it. If these errors bubble to a UI toast, the raw exception message from the browser/IndexedDB layer is shown to the user (CWE-209).
-- [ ] **[INFO] No global error boundary** — The Next.js app has no `error.tsx` global error boundary. An uncaught exception in a client component will crash the full page with the default Next.js error overlay in development, or a blank screen in production (CWE-703). A global boundary would catch these and render a recovery UI.
+- [x] ~~**[INFO] No global error boundary**~~ Fixed: `app/error.tsx` and `app/global-error.tsx` both exist and provide route-level and root-level error boundaries respectively. Uncaught exceptions render a recovery UI rather than a blank screen (CWE-703).
 
 ---
 
@@ -150,7 +150,7 @@ This is a new entry replacing A10:2021 (Server-Side Request Forgery). It covers 
 | **Info** | A03 | `package.json` | `tweetnacl` unmaintained — review if still needed |
 | **Info** | A03 | `package.json` | `@decartai/sdk` pre-1.0 — monitor for security updates |
 | **Info** | A04 | `lib/crypto.ts` | PQC readiness — track, no action needed before 2030 |
-| **Info** | A10 | `app/` | No global `error.tsx` boundary |
+| ~~Info~~ | ~~A10~~ | ~~`app/`~~ | ~~No global `error.tsx` boundary~~ — **Fixed** |
 | ~~High~~ | ~~A04~~ | ~~`lib/device-id.ts`~~ | ~~Silent ephemeral device ID on DB error~~ — **Fixed** |
 | ~~Medium~~ | ~~A05~~ | ~~`lib/import.ts`~~ | ~~No schema validation on import~~ — **Fixed** |
 | ~~Medium~~ | ~~A04/A06~~ | ~~`lib/llm/router.ts`~~ | ~~`registerProvider()` publicly callable~~ — **Fixed** |
