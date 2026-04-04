@@ -42,7 +42,7 @@ This file carries forward lessons learned, project constraints, architectural de
 
 Of course, these rules should be adapted to the programming language used in the user project.
 
-**YOU MUST REPLACE `.ext` BY THE FILE EXTENSION RELATED TO THE USED PROGRAMING LANGUAGE**
+**YOU MUST REPLACE `.ext` BY THE FILE EXTENSION RELATED TO THE USED PROGRAMING LANGUAGE.**
 
 ---
 
@@ -82,9 +82,9 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 
 ### 1. Framework Files — OPSEC Review & Git Commit
 
-- `HUMAN.md`, `MEMORY.md`, `MEMORY.old.md` — remain in `.gitignore`, always private
-- `AGENTS.md`, `SOUL.md`, `TEAM.md` — removed from `.gitignore`, now committed to the repo (no sensitive data)
-- `MEMORY.md` — `Technical Background` block removed by human, rest confirmed safe to make public in future
+- `HUMAN.md`, `MEMORY.old.md` — remain in `.gitignore`, always private
+- `AGENTS.md`, `MEMORY.md`, `SOUL.md`, `TEAM.md` — removed from `.gitignore`, now committed to the repo (no sensitive data)
+- `MEMORY.md` — Personal data removed by human, rest confirmed safe to make public in future
 - Root cause of disappearing files after PR merge identified: all framework files were in `.gitignore` and deleted with branch
 
 ---
@@ -143,9 +143,9 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 | Tool detection (future, item 16) | `compound-mini` pre-flight | `gpt-5.4-nano` pre-flight | OpenAI (priority) |
 | Image generation (future) | No | Yes | Yes |
 
-**CORS note:** BioLLM endpoint is a Cloudflare tunnel (`trycloudflare.com`) — ephemeral URLs that expire when tunnel stops. All requests routed through `/api/biollm` server-side proxy. If endpoint returns `ENOTFOUND`, the tunnel is down — contact friend for new URL.
+**CORS note:** BioLLM test endpoint uses ephemeral URLs that expire when tunnel stops. All requests routed through `/api/biollm` server-side proxy. If endpoint returns `ENOTFOUND`, the tunnel is down — It's a known issue.
 
-**`ENABLE_BIOLLM_PERSONALITY`:** Set to `false` — system prompt injection disabled until friend confirms BioLLM accepts `system` role in request body. One-line flip to enable.
+**`ENABLE_BIOLLM_PERSONALITY`:** Set to `false` — system prompt injection disabled until confirmed that BioLLM accepts `system` role in request body. One-line flip to enable.
 
 ---
 
@@ -170,7 +170,7 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 10. **CSP header still missing**
 11. **Popup live-sync** — `BroadcastChannel`, deferred
 12. **`DEBUG_MODE` constant + `debugLog()` utility** — priority
-13. **BioLLM endpoint test** — pending friend restarting Cloudflare tunnel with live URL
+13. **BioLLM endpoint test** — pending tunnel restart with live URL
 14. **`ENABLE_BIOLLM_PERSONALITY`** — pending friend's confirmation on system prompt support
 15. **`thinking` state universal** — all providers show thinking state during inference
 16. **Model capabilities display** — hybrid: dropdown icons + settings panel active model summary
