@@ -126,7 +126,7 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 
 **Files created/modified:**
 - `lib/llm/biollm.ts` — new provider file, text-only, no tools, no image injection
-- `app/api/biollm/route.ts` — server-side proxy (CORS workaround for Cloudflare tunnel endpoint)
+- `app/api/biollm/route.ts` — server-side proxy (CORS workaround for external endpoint)
 - `lib/constants.ts` — `ENABLE_BIOLLM_PERSONALITY = false` added (flip when friend confirms system prompt support)
 - `lib/llm/router.ts` — BioLLM registered in provider registry, STT fallback chain implemented
 - `lib/llm/brain.ts` — emotion detection gated on OpenAI or Groq key presence for BioLLM
