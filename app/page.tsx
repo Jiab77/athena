@@ -51,7 +51,7 @@ export default function Home() {
   // Load companion and voice settings when DB becomes ready
   useEffect(() => {
     if (!dbReady || !db) return
-    
+
     const loadSettings = async () => {
       try {
         const settings = await db.getSettings()
@@ -63,12 +63,12 @@ export default function Home() {
           const avatarCategory = settings.avatarCategory || DEFAULT_AVATAR_CATEGORY
           const avatarGender = settings.avatarGender || DEFAULT_GENDER
           const avatarColorScheme = settings.avatarColorScheme || DEFAULT_COLOR_SCHEME
-          
+
           // Find the matching avatar from AVATARS array
           const selectedAvatar = AVATARS.find(
             (a) => a.category === avatarCategory && a.gender === avatarGender && a.colorScheme === avatarColorScheme
           )
-          
+
           // Build companion with ALL aspects
           setCompanion({
             id: companionId,
@@ -78,7 +78,7 @@ export default function Home() {
             imageUrl: selectedAvatar?.imageUrl || DEFAULT_COMPANION.imageUrl,
             createdAt: DEFAULT_COMPANION.createdAt,
           })
-          
+
           // Load voice settings
           setVoiceOutputEnabled(settings.voiceOutputEnabled ?? ENABLE_VOICE_OUTPUT)
           setSelectedVoice(settings.selectedVoice || DEFAULT_VOICE_ID)
@@ -97,10 +97,10 @@ export default function Home() {
   // Refresh companion and voice settings when settings are saved
   const handleSettingsSaved = async () => {
     if (!db) return
-    
+
     try {
       const settings = await db.getSettings()
-      
+
       if (settings) {
         // Get ALL companion aspects from settings
         const companionId = settings.selectedCompanion || DEFAULT_COMPANION_ID
@@ -109,12 +109,12 @@ export default function Home() {
         const avatarCategory = settings.avatarCategory || DEFAULT_AVATAR_CATEGORY
         const avatarGender = settings.avatarGender || DEFAULT_GENDER
         const avatarColorScheme = settings.avatarColorScheme || DEFAULT_COLOR_SCHEME
-        
+
         // Find the matching avatar from AVATARS array
         const selectedAvatar = AVATARS.find(
           (a) => a.category === avatarCategory && a.gender === avatarGender && a.colorScheme === avatarColorScheme
         )
-        
+
         // Build companion with ALL aspects
         setCompanion({
           id: companionId,
@@ -124,7 +124,7 @@ export default function Home() {
           imageUrl: selectedAvatar?.imageUrl || DEFAULT_COMPANION.imageUrl,
           createdAt: DEFAULT_COMPANION.createdAt,
         })
-        
+
         // Update voice settings
         setVoiceOutputEnabled(settings.voiceOutputEnabled ?? ENABLE_VOICE_OUTPUT)
         setSelectedVoice(settings.selectedVoice || DEFAULT_VOICE_ID)
@@ -133,7 +133,7 @@ export default function Home() {
         // Update visual format
         if (settings.visualFormat) setVisualFormat(settings.visualFormat as VisualFormat)
       }
-      
+
       refreshConnectionStatus()
     } catch (error) {
       // ignore
@@ -166,7 +166,7 @@ export default function Home() {
   // Handle voice output toggle
   const handleVoiceOutputToggle = async () => {
     if (!db) return
-    
+
     try {
       const settings = await db.getSettings()
       if (settings) {
@@ -217,7 +217,7 @@ export default function Home() {
     try {
       setSelectedImportFile(file)
       setShowImportModal(true)
-      
+
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
@@ -272,7 +272,7 @@ export default function Home() {
         onChange={handleFileSelected}
         style={{ display: 'none' }}
       />
-      
+
       <CyberpunkBackground />
 
       {/* Hero Section - Cyberpunk Style */}
@@ -291,20 +291,20 @@ export default function Home() {
           </div>
 
           <p className="mx-auto max-w-3xl text-lg sm:text-2xl font-light text-foreground/90 mb-12 leading-relaxed">
-            Your <span className="text-primary font-semibold">privacy-first</span> AI companion.<br/>
+            Your <span className="text-primary font-semibold">privacy-first</span> AI companion.<br />
             <span className="text-accent">Always floating by your side.</span> <span className="text-primary">Never exposing your data.</span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={() => setShowCompanion(true)}
               className="bg-primary hover:bg-primary/80 text-foreground font-bold px-8 py-6 text-lg rounded-lg border-2 border-primary/50 shadow-lg shadow-primary/50 hover:shadow-primary/70 transition-all cursor-pointer"
             >
               ⚡ ACTIVATE ATHENA
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
               onClick={scrollToFeatures}
               className="border-2 border-accent text-accent hover:text-accent font-bold px-8 py-6 text-lg rounded-lg hover:shadow-accent/50 hover:shadow-lg transition-all bg-transparent cursor-pointer hover:bg-accent/5"
@@ -408,15 +408,15 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button 
-                onClick={() => {
-                  setShowCompanion(true)
-                  setIsChatVisible(true)
-                }}
-                className="bg-primary hover:bg-primary/80 text-foreground font-bold px-6 py-3 rounded-lg border border-primary/50 shadow-lg shadow-primary/50 hover:shadow-primary/70 transition-all cursor-pointer"
-              >
-                💬 START CHATTING
-              </Button>
+                <Button
+                  onClick={() => {
+                    setShowCompanion(true)
+                    setIsChatVisible(true)
+                  }}
+                  className="bg-primary hover:bg-primary/80 text-foreground font-bold px-6 py-3 rounded-lg border border-primary/50 shadow-lg shadow-primary/50 hover:shadow-primary/70 transition-all cursor-pointer"
+                >
+                  💬 START CHATTING
+                </Button>
               </div>
             </div>
           </div>
@@ -435,7 +435,7 @@ export default function Home() {
               <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
                 Click the floating button below to activate Athena. No sign-up required. Your privacy is guaranteed.
               </p>
-              <Button 
+              <Button
                 size="lg"
                 onClick={() => setShowCompanion(true)}
                 className="bg-accent hover:bg-accent/80 text-foreground font-bold px-4 sm:px-8 py-6 text-lg rounded-lg border-2 border-accent/50 shadow-lg shadow-accent/50 hover:shadow-accent/70 transition-all cursor-pointer"
@@ -481,8 +481,8 @@ export default function Home() {
       <ExportModal isOpen={showExportModal} onClose={() => setShowExportModal(false)} />
 
       {/* Import Modal */}
-      <ImportModal 
-        isOpen={showImportModal} 
+      <ImportModal
+        isOpen={showImportModal}
         onClose={() => {
           setShowImportModal(false)
           setSelectedImportFile(null)
@@ -511,7 +511,7 @@ export default function Home() {
 
       {showSettings && (
         <div className="fixed bottom-24 z-40 inset-x-4 md:inset-x-auto md:right-6 md:w-96">
-          <SettingsPanel 
+          <SettingsPanel
             onClose={() => setShowSettings(false)}
             onSettingsSaved={handleSettingsSaved}
           />
@@ -519,7 +519,7 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="w-full py-6 flex items-center justify-center">
+      <footer className="relative w-full py-6 flex items-center justify-center">
         <p className="text-xs text-muted-foreground/50">
           <a
             href="https://github.com/Jiab77/athena"
