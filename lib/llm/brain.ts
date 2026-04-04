@@ -19,18 +19,18 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { transcribeAudio, callLLM } from './router'
-import { generateAndPlayTTS, generateTTSBlob, playAudio } from '@/lib/utils'
-import { useDB } from '@/lib/db-context'
-import { encryptData, decryptData } from '@/lib/crypto'
+import { generateAndPlayTTS, generateTTSBlob, playAudio } from '../utils'
+import { useDB } from '../db-context'
+import { encryptData, decryptData } from '../crypto'
 import {
   DEFAULT_COMPANION_ID,
   DEFAULT_AUDIO_TYPE,
   LIVE_AVATAR_IDLE_TIMEOUT,
   LIVE_AVATAR_CONNECTION_TIMEOUT,
-} from '@/lib/constants'
+} from '../constants'
 import { detectEmotion } from './emotions'
-import { DecartAvatarClient } from '@/lib/avatar/decart'
-import type { CompanionData, Message, ExpressionState, EmotionState, VisualFormat } from '@/lib/types'
+import { DecartAvatarClient } from '../avatar/decart'
+import type { CompanionData, Message, ExpressionState, EmotionState, VisualFormat } from '../types'
 
 export type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
 
