@@ -72,40 +72,109 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
-> ## Session 27: TBD (04/03/2026)
+> ## Session 27: BioLLM Integration, OWASP 2025 Audit, Documentation Overhaul (04/04/2026)
 
-### Open Items / Backlog for This Session
+### Overview
 
-**Active / In Progress:**
-1. **`expressionState` dual source conflict** — `useBrain()` and `ChatInterface` both drive `expressionState` simultaneously from different sources
+Session 27 was a massive session covering: recovering the full backlog from conversation history, making `MEMORY.md` and framework files (`AGENTS.md`, `SOUL.md`, `TEAM.md`) public-safe and committed to the repo, a full OWASP Top 10:2025 security audit, compliance score added to `README.md`, roadmap and implementation status documents created, and a full BioLLM biological neural network provider integration.
 
-**Backlog:**
+---
 
+### 1. Framework Files — OPSEC Review & Git Commit
+
+- `HUMAN.md`, `MEMORY.md`, `MEMORY.old.md` — remain in `.gitignore`, always private
+- `AGENTS.md`, `SOUL.md`, `TEAM.md` — removed from `.gitignore`, now committed to the repo (no sensitive data)
+- `MEMORY.md` — `Technical Background` block removed by human, rest confirmed safe to make public in future
+- Root cause of disappearing files after PR merge identified: all framework files were in `.gitignore` and deleted with branch
+
+---
+
+### 2. OWASP Top 10:2025 Security Audit
+
+- `docs/SECURITY_REPORT.md` fully rewritten against OWASP Top 10:2025 (previous was 2021)
+- Key changes from 2021 → 2025:
+  - **A03** now "Software Supply Chain Failures" (new) — flagged `@decartai/sdk` (pre-1.0) and `tweetnacl` (unmaintained since 2019)
+  - **A10** now "Mishandling of Exceptional Conditions" (new) — 3 new issues identified
+  - **A02** "Security Misconfiguration" jumped from #5 to #2 — CSP still top unfixed issue
+- Mapping table added showing what moved/renamed/added vs 2021 edition
+- **Error boundary finding corrected** — `app/error.tsx` AND `app/global-error.tsx` both exist and were wrongly flagged as missing. Both findings marked resolved in the report.
+
+---
+
+### 3. Compliance Score Added to README
+
+- New "Compliance Score" table added at end of Development Philosophy section: **85% — Session 27**
+- Per-principle breakdown with specific gaps documented
+- Goal: reach 100% — tracked across sessions
+
+---
+
+### 4. Documentation Overhaul
+
+- `docs/IMPLEMENTATION_STATUS.md` — fully rewritten from Session 6 to Session 27 state
+- `docs/ROADMAP.md` — new file created with Phase 1–4 breakdown
+- `README.md` — lightweight Roadmap section added linking to both docs
+- Personality Types section corrected: 6 presets → 10 presets with full table (`PERSONALITY_TRAITS` from `constants.ts`)
+- `docs/SECURITY_REPORT.md` reference updated to Session 27 + OWASP 2025
+- Credits section reformatted as table, BioLLM friend credited
+
+---
+
+### 5. BioLLM Provider Integration
+
+**What BioLLM is:** Experimental biological neural network inference running on Cortical Labs CL1 hardware, created by friend `4R7I5T`. Text-only, no multimodal support currently.
+
+**Files created/modified:**
+- `lib/llm/biollm.ts` — new provider file, text-only, no tools, no image injection
+- `app/api/biollm/route.ts` — server-side proxy (CORS workaround for Cloudflare tunnel endpoint)
+- `lib/constants.ts` — `ENABLE_BIOLLM_PERSONALITY = false` added (flip when friend confirms system prompt support)
+- `lib/llm/router.ts` — BioLLM registered in provider registry, STT fallback chain implemented
+- `lib/llm/brain.ts` — emotion detection gated on OpenAI or Groq key presence for BioLLM
+- `components/settings-panel.tsx` — `isBioLLM` boolean added, API endpoint field added above API Key field when BioLLM selected, placeholder: "Enter provided API endpoint"
+- `README.md` — BioLLM added to inference routing tables, providers list, API keys table, credits
+
+**Progressive enhancement model (BioLLM feature priority matrix):**
+
+| Feature | Groq key only | OpenAI key only | Both keys |
+|---|---|---|---|
+| STT | Groq Whisper | OpenAI Whisper | OpenAI (priority) |
+| TTS | No | OpenAI TTS | OpenAI |
+| Emotion detection | `llama-3.1-8b-instant` | `gpt-5.4-nano` | OpenAI (priority) |
+| Tool detection (future, item 16) | `compound-mini` pre-flight | `gpt-5.4-nano` pre-flight | OpenAI (priority) |
+| Image generation (future) | No | Yes | Yes |
+
+**CORS note:** BioLLM endpoint is a Cloudflare tunnel (`trycloudflare.com`) — ephemeral URLs that expire when tunnel stops. All requests routed through `/api/biollm` server-side proxy. If endpoint returns `ENOTFOUND`, the tunnel is down — contact friend for new URL.
+
+**`ENABLE_BIOLLM_PERSONALITY`:** Set to `false` — system prompt injection disabled until friend confirms BioLLM accepts `system` role in request body. One-line flip to enable.
+
+---
+
+### 6. Code Refactoring
+
+- `lib/brain.ts` → `lib/llm/brain.ts` — moved to be alongside all LLM files it depends on. Single import updated in `components/merged-companion-chat.tsx`.
+- `EMOTION_KEYWORDS` in `constants.ts` — changed from keyword-matching object to readonly array of valid emotion names (old approach was dead code since LLM-based detection was implemented). `Object.keys(EMOTION_KEYWORDS)` in `emotions.ts` → `[...EMOTION_KEYWORDS]` (critical fix — `Object.keys` on array returns index strings).
+
+---
+
+### Open Items Carried Forward to Session 28
+
+1. **`expressionState` dual source conflict** — `useBrain()` and `ChatInterface` both drive it simultaneously
 2. **Emotion display logic** — review and fix
 3. **Processing / Speaking display logic** — review and fix
 4. **Mic button disabled while AI is speaking**
 5. **Speaker button becomes Stop button while AI is speaking**
-6. **`/app/companion/[id]/page.tsx` full review / rewrite** — broken state, needs proper rewrite following existing patterns
-7. **Visual formats logic / rendering — full review / rewrite** — `animated-2d`, R3F live-avatar, etc. messy and need consolidation
-8. **Runway-based `live-avatar` implementation** — new implementation alongside existing Decart one
+6. **`/app/companion/[id]/page.tsx` full review / rewrite**
+7. **Visual formats logic / rendering full review / rewrite**
+8. **Runway-based `live-avatar` implementation**
 9. **`isOnline = true` wrong default** in `r3f-animated-character.tsx` and `avatar-2-5d.tsx`
 10. **CSP header still missing**
-11. **Popup live-sync** — deferred, `BroadcastChannel` when the time comes
-12. **`DEBUG_MODE` constant + `debugLog()` utility** — next session priority
-13. **BioLLM provider integration** — text-only, no tools, no emotion detection. Progressive enhancement based on which secondary API keys are configured. Feature priority matrix:
-
-    | Feature | Groq key only | OpenAI key only | Both keys |
-    |---|---|---|---|
-    | STT | Groq Whisper | OpenAI Whisper | OpenAI (priority) |
-    | TTS | No | OpenAI TTS | OpenAI |
-    | Emotion detection | `llama-3.1-8b-instant` | `gpt-5.4-nano` | OpenAI (priority) |
-    | Tool detection (future) | `compound-mini` pre-flight | `gpt-5.4-nano` pre-flight | OpenAI (priority) |
-    | Image generation (future) | No | Yes | Yes |
-
-    `ENABLE_BIOLLM_PERSONALITY` constant added — flip to `true` once confirmed BioLLM accepts system prompt in request body.
-14. **`thinking` state universal** — all LLM providers must show companion thinking state during inference, independent of emotion detection capability
-15. **Model capabilities display** — show small capability icons (vision, tools, image gen, audio, reasoning) per model. Hybrid placement: primary in model selector dropdown next to each model name, secondary as active model summary row in settings panel header. Reference: OpenAI model docs pattern. Deferred until after BioLLM.
-16. **BioLLM tool detection via `gpt-5.4-nano`** — when OpenAI API key is configured, run same pre-flight tool detection as Groq but using `gpt-5.4-nano` ($0.20/1M input tokens). Supports web_search, image_generation, function calling natively via Responses API. Deferred — implement after BioLLM base integration is stable.
+11. **Popup live-sync** — `BroadcastChannel`, deferred
+12. **`DEBUG_MODE` constant + `debugLog()` utility** — priority
+13. **BioLLM endpoint test** — pending friend restarting Cloudflare tunnel with live URL
+14. **`ENABLE_BIOLLM_PERSONALITY`** — pending friend's confirmation on system prompt support
+15. **`thinking` state universal** — all providers show thinking state during inference
+16. **Model capabilities display** — hybrid: dropdown icons + settings panel active model summary
+17. **BioLLM tool detection via `gpt-5.4-nano`** — deferred until base integration stable
 
 ---
 
