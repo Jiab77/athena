@@ -78,13 +78,13 @@ export async function callBioLLMAPI(
       })),
     })
 
-    const response = await fetch(endpointUrl, {
+    // Route through server-side proxy to avoid CORS restrictions
+    const response = await fetch('/api/biollm', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(reqBody),
+      body: JSON.stringify({ endpointUrl, apiKey, messages: bioMessages }),
     })
 
     console.log('[Athena] callBioLLMAPI: HTTP response status', response.status, response.ok)
