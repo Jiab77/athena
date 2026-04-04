@@ -463,6 +463,6 @@ This is a single-developer project with AI agent collaboration. Ideas are welcom
 |---|---|
 | [Jiab77](https://github.com/Jiab77) | Project creator and lead developer |
 | [v0](https://v0.dev) | AI pair programmer |
-| [4R7I5T](https://biollm.com) | Creator of the [BioLLM](https://biollm.com) project and gracious support for its integration into Athena |
+| [4R7I5T](https://github.com/4R7I5T) | Creator of the [BioLLM](https://biollm.com) project and gracious support for its integration into Athena |
 
 ---
