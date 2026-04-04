@@ -519,13 +519,13 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="fixed bottom-0 inset-x-0 pb-2 flex items-center justify-center pointer-events-none">
+      <footer className="w-full py-6 flex items-center justify-center">
         <p className="text-xs text-muted-foreground/50">
           <a
             href="https://github.com/Jiab77/athena"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-muted-foreground transition-colors pointer-events-auto"
+            className="hover:text-muted-foreground transition-colors"
           >
             Athena
           </a>
@@ -534,9 +534,18 @@ export default function Home() {
             href="https://github.com/Jiab77"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-muted-foreground transition-colors pointer-events-auto"
+            className="hover:text-muted-foreground transition-colors"
           >
             Jiab77
+          </a>
+          {' '}and{' '}
+          <a
+            href="https://v0.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-muted-foreground transition-colors"
+          >
+            v0
           </a>
         </p>
       </footer>
