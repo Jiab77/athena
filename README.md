@@ -141,6 +141,9 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 │   ├── global-error.tsx               # Global error boundary
 │   ├── loading.tsx                    # Route-level loading state
 │   ├── not-found.tsx                  # 404 page
+│   ├── api/
+│   │   └── biollm/
+│   │       └── route.ts               # Server-side proxy for BioLLM (avoids CORS)
 │   ├── companion/[id]/
 │   │   └── page.tsx                   # Detachable companion popup route
 │   └── chat/[id]/
@@ -167,14 +170,12 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 │   └── ui/                            # shadcn/ui component library
 │
 ├── hooks/
-│   ├── use-brain.ts                   # Central AI orchestration hook (LLM + tools + emotion)
 │   ├── use-connection-status.ts       # Online/offline detection
 │   ├── use-mobile.ts                  # Mobile breakpoint detection
 │   ├── use-settings.ts                # Settings read hook
 │   └── use-toast.ts                   # Toast notification hook
 │
 ├── lib/
-│   ├── brain.ts                       # Central orchestration (LLM + tools + emotion)
 │   ├── db.ts                          # IndexedDB schema + encrypted settings
 │   ├── db-context.tsx                 # React context for DB access
 │   ├── crypto.ts                      # AES-GCM encryption (PBKDF2 600k iterations)
@@ -186,9 +187,11 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 │   ├── export.ts                      # Export pipeline + SHA-256 integrity
 │   ├── mock-data.ts                   # Avatar presets (30 cyberpunk characters)
 │   ├── llm/
+│   │   ├── brain.ts                   # Central orchestration hook (LLM + tools + emotion)
 │   │   ├── router.ts                  # Provider registry + model routing
 │   │   ├── groq.ts                    # Groq provider (compound, llama-4-scout, etc.)
 │   │   ├── openai.ts                  # OpenAI Responses API provider
+│   │   ├── biollm.ts                  # BioLLM biological neural network provider
 │   │   ├── custom.ts                  # Custom OpenAI-compatible provider
 │   │   ├── emotions.ts                # Post-response emotion classification
 │   │   └── tools.ts                   # Tool definitions + execution
@@ -208,7 +211,7 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 │   └── images/                        # Background illustrations
 │
 └── docs/
-    ├── SECURITY_REPORT.md             # OWASP Top 10 security review (Session 23)
+    ├── SECURITY_REPORT.md             # OWASP Top 10:2025 security review (Session 27)
     ├── IMPLEMENTATION_PLAN.md         # Phase breakdown
     ├── IMPLEMENTATION_NOTES.md        # System prompt framework + anti-parasocial design
     └── IMPLEMENTATION_STATUS.md       # Historical completion tracker
@@ -256,6 +259,15 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 |---|---|---|
 | Live Avatar | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
 
+#### BioLLM
+
+| Role | Model | When Used |
+|---|---|---|
+| Main inference | `biollm-4b-shadow` | BioLLM provider selected — routes through living cortical culture on Cortical Labs CL1 hardware |
+| STT (Speech To Text) | OpenAI Whisper (priority) or Groq Whisper | When OpenAI or Groq API key is configured |
+| TTS (Text To Speech) | OpenAI TTS | When OpenAI API key is configured |
+| Emotion classification | `gpt-5.4-nano` (priority) or `llama-3.1-8b-instant` | When OpenAI or Groq API key is configured |
+
 #### Custom
 
 | Role | Model | When Used |
@@ -267,6 +279,7 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 **Tier 1 — Cloud (Fast, Trust-based)**
 - **[Groq](https://groq.com/)** (Primary) — Ultra-fast inference, explicit no-training-on-data policy
 - **[OpenAI](https://openai.com/)** — GPT-5.4 and GPT-5.4-mini via Responses API
+- **[BioLLM](https://biollm.com)** — Experimental biological neural network inference on Cortical Labs CL1 hardware; text-only; STT/TTS/emotion via OpenAI or Groq fallback
 - **Custom** — Any OpenAI-compatible API (LM Studio, vLLM, Kobold, etc.); requires `https://` for external hosts
 
 **Tier 2 — Hybrid (planned)**
@@ -281,6 +294,7 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 |---|---|
 | `GROQ_API_KEY` | Groq LLM + STT (Whisper) + emotion detection |
 | `OPENAI_API_KEY` | OpenAI LLM + STT (Whisper) + TTS |
+| `BIOLLM_API_KEY` | BioLLM biological neural network inference (endpoint configured in Settings) |
 | `RESEMBLEAI_API_KEY` | ResembleAI Chatterbox TTS |
 | `DECART_API_KEY` | Decart live avatar (WebRTC) |
 
@@ -445,7 +459,10 @@ This is a single-developer project with AI agent collaboration. Ideas are welcom
 
 ## Credits
 
-* __Jiab77__
-* __v0__
+| Name | Contribution |
+|---|---|
+| [Jiab77](https://github.com/Jiab77) | Project creator and lead developer |
+| [v0](https://v0.dev) | AI pair programmer |
+| [4R7I5T](https://biollm.com) | Creator of the [BioLLM](https://biollm.com) project and gracious support for its integration into Athena |
 
 ---
