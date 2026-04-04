@@ -18,7 +18,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { transcribeAudio, callLLM } from '@/lib/llm/router'
+import { transcribeAudio, callLLM } from './router'
 import { generateAndPlayTTS, generateTTSBlob, playAudio } from '@/lib/utils'
 import { useDB } from '@/lib/db-context'
 import { encryptData, decryptData } from '@/lib/crypto'
@@ -28,7 +28,7 @@ import {
   LIVE_AVATAR_IDLE_TIMEOUT,
   LIVE_AVATAR_CONNECTION_TIMEOUT,
 } from '@/lib/constants'
-import { detectEmotion } from '@/lib/llm/emotions'
+import { detectEmotion } from './emotions'
 import { DecartAvatarClient } from '@/lib/avatar/decart'
 import type { CompanionData, Message, ExpressionState, EmotionState, VisualFormat } from '@/lib/types'
 
@@ -373,7 +373,7 @@ export function useBrain({
       }
 
       await saveConversation([...allMessages, companionMessage])
-      await handleTTS(result.response, () => {})
+      await handleTTS(result.response, () => { })
     } catch (error) {
       console.error('[Brain] Error in handleSendMessage:', error)
       setExpressionState('idle')
