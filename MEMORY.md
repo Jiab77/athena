@@ -156,6 +156,33 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 
 ---
 
+### 7. Late-Session Additions
+
+**Footer credit added to landing page (`app/page.tsx`):**
+- Non-fixed, relative footer at the very bottom of page content
+- Text: "Athena is made with ❤️ by Jiab77 and v0"
+- Athena links to `https://github.com/Jiab77/athena`
+- Jiab77 links to `https://github.com/Jiab77`
+- v0 links to `https://v0.dev`
+- `relative` Tailwind class required for visibility (position: relative)
+
+**`hooks/use-connection-status.ts` — debug log cleanup:**
+- Removed `console.log` that was firing outside `useEffect` (was causing `[SERVER]` log and router initialization error during SSR/hot reload)
+- Removed remaining `[v0]` debug logs inside `useEffect`
+- `catch (error)` simplified to `catch` since error variable was only used in removed log
+
+**OPSEC reminder for `MEMORY.md`:**
+- File is now public — never document implementation details of third-party integrations (tunnel type, infrastructure specifics, etc.)
+- Only document our own implementation (proxy pattern, feature flags, API shape)
+- Kerckhoffs applies to our code, not to our friends' business logic
+
+**`Router action dispatched before initialization` error:**
+- This error fires on EVERY hot reload in the v0 preview environment — it is an environment artifact, not a code bug
+- Confirmed by: error fires immediately after `Reload env: .env.development.local`, app still works (`GET / 200`), no `[SERVER]` log in latest builds
+- Do NOT touch code when this error appears — always read the debug logs first and check if it is a stale cache/hot reload artifact
+
+---
+
 ### Open Items Carried Forward to Session 28
 
 1. **`expressionState` dual source conflict** — `useBrain()` and `ChatInterface` both drive it simultaneously
