@@ -1,4 +1,4 @@
-# Athena — Privacy-First AI Companion
+<h1 align="center">Athena<br>Privacy-First AI Companion</h1>
 
 A visually charming, personality-driven AI companion designed with privacy, user agency, and emotional safety as core principles. Combines the **fun, playful spirit of VirtuaGirl** with the **functional personality selection of Project AVA**, while actively avoiding the **parasocial dependency risks of GateBox and ChatGPT-4o**.
 
