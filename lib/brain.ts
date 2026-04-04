@@ -350,11 +350,15 @@ export function useBrain({
       const result = await callLLM(allMessages, selectedProvider)
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
-      // Fire-and-forget emotion detection — pass provider so correct API key is used
-      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
-        console.log('[Brain] Detected emotion:', emotion)
-        if (emotion) setLastDetectedEmotion(emotion)
-      })
+      // Fire-and-forget emotion detection
+      // BioLLM: only run if OpenAI API key is configured (uses gpt-5.4-nano post-response)
+      const shouldDetectEmotion = selectedProvider !== 'biollm' || !!(await db?.getSettings().then(s => s?.openaiApiKeyEncrypted).catch(() => null))
+      if (shouldDetectEmotion) {
+        detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
+          console.log('[Brain] Detected emotion:', emotion)
+          if (emotion) setLastDetectedEmotion(emotion)
+        })
+      }
 
       const companionMessage: Message = {
         id: `msg-${Date.now() + 1}`,

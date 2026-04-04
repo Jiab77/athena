@@ -6,6 +6,7 @@ import { getDB } from '@/lib/db'
 import { callGroqAPI, transcribeAudio as transcribeGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
+import { callBioLLMAPI } from './biollm'
 import { detectTools } from './tools'
 
 /**
@@ -36,6 +37,10 @@ const providers: Record<string, LLMProvider> = {
   custom: {
     callAPI: callCustomAPI,
     transcribeAudio: transcribeCustom,
+  },
+  biollm: {
+    callAPI: callBioLLMAPI,
+    // No native STT/TTS — falls back to OpenAI Whisper/TTS if OpenAI API key is configured
   },
   // wormgpt: {
   //   callAPI: callWormGPTAPI,
@@ -122,7 +127,12 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
       throw new Error('Custom provider STT not enabled in settings')
     }
   }
-  
+
+  // BioLLM — no native STT, fall back to OpenAI Whisper if OpenAI API key is configured
+  if (providerID === 'biollm') {
+    return transcribeOpenAI(audioBlob)
+  }
+
   if (!provider.transcribeAudio) {
     throw new Error(`Provider '${providerID}' does not support Speech-to-Text`)
   }
@@ -145,7 +155,18 @@ export async function supportsSTT(): Promise<boolean> {
       const settings = await db.getSettings()
       return settings?.hasSTTSupport ?? false
     }
-    
+
+    // BioLLM — STT supported only if OpenAI API key is configured
+    if (providerID === 'biollm') {
+      try {
+        const db = await getDB()
+        const settings = await db.getSettings()
+        return !!(settings?.openaiApiKeyEncrypted)
+      } catch {
+        return false
+      }
+    }
+
     // Built-in provider check
     const provider = providers[providerID]
     if (provider && provider.transcribeAudio) {
