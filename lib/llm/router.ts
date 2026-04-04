@@ -1,8 +1,8 @@
 'use client'
 
-import type { Message, LLMResponse } from '@/lib/types'
-import { DEFAULT_MODEL_PROVIDER } from '@/lib/constants'
-import { getDB } from '@/lib/db'
+import type { Message, LLMResponse } from '../types'
+import { DEFAULT_MODEL_PROVIDER } from '../constants'
+import { getDB } from '../db'
 import { callGroqAPI, transcribeAudio as transcribeGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
@@ -114,11 +114,11 @@ export async function callLLM(messages: Message[], selectedProvider?: string): P
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   const providerID = await getCurrentProvider()
   const provider = providers[providerID]
-  
+
   if (!provider) {
     throw new Error(`Provider '${providerID}' not found in registry`)
   }
-  
+
   // Custom provider - check hasSTTSupport setting before attempting
   if (providerID === 'custom') {
     const db = await getDB()
@@ -146,7 +146,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   if (!provider.transcribeAudio) {
     throw new Error(`Provider '${providerID}' does not support Speech-to-Text`)
   }
-  
+
   return provider.transcribeAudio(audioBlob)
 }
 
@@ -158,7 +158,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 export async function supportsSTT(): Promise<boolean> {
   try {
     const providerID = await getCurrentProvider()
-    
+
     // Custom provider check - look at database setting
     if (providerID === 'custom') {
       const db = await getDB()
@@ -182,7 +182,7 @@ export async function supportsSTT(): Promise<boolean> {
     if (provider && provider.transcribeAudio) {
       return true
     }
-    
+
     return false
   } catch (error) {
     return false
