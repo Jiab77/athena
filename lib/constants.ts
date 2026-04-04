@@ -19,7 +19,19 @@ export const DEFAULT_AVATAR_CATEGORY = 'cyberpunk'
 export const DEFAULT_MODEL_PROVIDER = 'openai'
 export const DEFAULT_MODEL_ID = 'gpt-5.4-mini'
 export const DEFAULT_MODEL_NAME = 'gpt-5.4-mini'
+
+/**
+ * Default Memory Config
+ */
 export const DEFAULT_MEMORY_SIZE = 10
+export const MIN_MEMORY_SIZE = 4
+export const MAX_MEMORY_SIZE = 50
+
+/**
+ * Maximum number of messages to render in the chat UI
+ * Older messages are kept in memory and storage but not rendered to prevent lag
+ */
+export const MAX_DISPLAY_MESSAGES = 30
 
 /**
  * Default LLM Config
@@ -436,34 +448,6 @@ export const TTS_VOICES = {
 } as const
 
 /**
- * Emotion keyword dictionaries for sentiment analysis
- * Supports English and French
- * Each emotion has weighted keyword lists - more specific/strong words score higher
- */
-export const EMOTION_KEYWORDS = {
-  happy: {
-    en: ['happy', 'joy', 'joyful', 'great', 'wonderful', 'amazing', 'fantastic', 'excellent', 'love', 'perfect', 'awesome', 'glad', 'delighted', 'excited', 'cheerful', 'celebrate', 'thrilled', 'laugh', 'fun', 'brilliant', 'congratulations', 'hooray', 'smile', 'pleased', 'enjoy'],
-    fr: ['heureux', 'heureuse', 'joie', 'super', 'merveilleux', 'merveilleuse', 'fantastique', 'excellent', 'excellente', 'parfait', 'parfaite', 'incroyable', 'génial', 'géniale', 'ravie', 'ravi', 'enchanté', 'enchantée', 'content', 'contente', 'célébrer', 'bravo', 'félicitations', 'sourire', 'adore', 'aimer'],
-  },
-  sad: {
-    en: ['sad', 'sorry', 'unfortunately', 'regret', 'disappoint', 'disappointed', 'miss', 'loss', 'lost', 'grief', 'grieve', 'mourn', 'unfortunate', 'difficult', 'struggle', 'pain', 'hurt', 'cry', 'tears', 'lonely', 'alone', 'heartbreak', 'broken', 'failed', 'failure'],
-    fr: ['triste', 'tristesse', 'désolé', 'désolée', 'malheureusement', 'regret', 'regrette', 'dommage', 'perdu', 'perdue', 'perte', 'deuil', 'difficile', 'souffrance', 'douleur', 'pleurer', 'larmes', 'seul', 'seule', 'solitaire', 'brisé', 'brisée', 'échoué', 'échec'],
-  },
-  angry: {
-    en: ['angry', 'anger', 'frustrated', 'frustrating', 'annoying', 'annoyed', 'ridiculous', 'outrageous', 'unacceptable', 'terrible', 'awful', 'wrong', 'stupid', 'absurd', 'disgusting', 'furious', 'rage', 'hate', 'unfair', 'offensive'],
-    fr: ['en colère', 'fâché', 'fâchée', 'frustré', 'frustrée', 'frustrant', 'énervant', 'énervé', 'énervée', 'ridicule', 'inacceptable', 'terrible', 'affreux', 'affreuse', 'mauvais', 'stupide', 'absurde', 'dégoûtant', 'furieux', 'furieuse', 'haine', 'injuste'],
-  },
-  surprised: {
-    en: ['surprised', 'surprising', 'unexpected', 'unbelievable', 'incredible', 'astonishing', 'wow', 'really', 'seriously', 'shocking', 'shocked', 'remarkable', 'extraordinary', 'whoa', 'never expected', 'suddenly', 'actually', 'turns out'],
-    fr: ['surpris', 'surprise', 'surprenant', 'inattendu', 'inattendue', 'incroyable', 'extraordinaire', 'choquant', 'choquante', 'remarquable', 'vraiment', 'sérieusement', 'soudainement', 'en fait', 'finalement', 'étonnant', 'étonnante'],
-  },
-  thoughtful: {
-    en: ['interesting', 'consider', 'perhaps', 'however', 'although', 'complex', 'nuanced', 'perspective', 'reflect', 'wonder', 'ponder', 'think', 'analyze', 'question', 'deeper', 'examine', 'explore', 'philosophical', 'meaningful', 'significant'],
-    fr: ['intéressant', 'intéressante', 'considérer', 'peut-être', 'cependant', 'bien que', 'complexe', 'nuancé', 'nuancée', 'perspective', 'réfléchir', 'penser', 'analyser', 'question', 'explorer', 'philosophique', 'significatif', 'significative', 'profond', 'profonde'],
-  },
-} as const
-
-/**
  * Emotion emojis for sentiment analysis
  */
 export const EMOTION_EMOJIS = {
@@ -483,18 +467,6 @@ export const DEFAULT_IDLE_EMOJI = '😌'
  * Duration in ms to hold an emotion state before reverting to idle
  */
 export const EMOTION_DISPLAY_DURATION = 4000
-
-/**
- * Maximum number of messages to render in the chat UI
- * Older messages are kept in memory and storage but not rendered to prevent lag
- */
-export const MAX_DISPLAY_MESSAGES = 30
-
-/**
- * Memory window slider bounds — min/max number of messages kept in context for the LLM
- */
-export const MIN_MEMORY_SIZE = 4
-export const MAX_MEMORY_SIZE = 50
 
 /**
  * Mobile swipping threshold
