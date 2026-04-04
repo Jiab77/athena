@@ -1,11 +1,12 @@
 'use client'
 
-import type { Message, LLMResponse } from '@/lib/types'
-import { DEFAULT_MODEL_PROVIDER } from '@/lib/constants'
-import { getDB } from '@/lib/db'
+import type { Message, LLMResponse } from '../types'
+import { DEFAULT_MODEL_PROVIDER } from '../constants'
+import { getDB } from '../db'
 import { callGroqAPI, transcribeAudio as transcribeGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
+import { callBioLLMAPI } from './biollm'
 import { detectTools } from './tools'
 
 /**
@@ -36,6 +37,10 @@ const providers: Record<string, LLMProvider> = {
   custom: {
     callAPI: callCustomAPI,
     transcribeAudio: transcribeCustom,
+  },
+  biollm: {
+    callAPI: callBioLLMAPI,
+    // No native STT/TTS — falls back to OpenAI Whisper/TTS if OpenAI API key is configured
   },
   // wormgpt: {
   //   callAPI: callWormGPTAPI,
@@ -109,11 +114,11 @@ export async function callLLM(messages: Message[], selectedProvider?: string): P
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   const providerID = await getCurrentProvider()
   const provider = providers[providerID]
-  
+
   if (!provider) {
     throw new Error(`Provider '${providerID}' not found in registry`)
   }
-  
+
   // Custom provider - check hasSTTSupport setting before attempting
   if (providerID === 'custom') {
     const db = await getDB()
@@ -122,11 +127,26 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
       throw new Error('Custom provider STT not enabled in settings')
     }
   }
-  
+
+  // BioLLM — no native STT, fall back to OpenAI Whisper (priority) or Groq Whisper
+  if (providerID === 'biollm') {
+    const db = await getDB()
+    const settings = await db.getSettings()
+    if (settings?.openaiApiKeyEncrypted) {
+      console.log('[Router] BioLLM STT — falling back to OpenAI Whisper')
+      return transcribeOpenAI(audioBlob)
+    }
+    if (settings?.groqApiKeyEncrypted) {
+      console.log('[Router] BioLLM STT — falling back to Groq Whisper')
+      return transcribeGroq(audioBlob)
+    }
+    throw new Error('BioLLM STT requires an OpenAI or Groq API key to be configured')
+  }
+
   if (!provider.transcribeAudio) {
     throw new Error(`Provider '${providerID}' does not support Speech-to-Text`)
   }
-  
+
   return provider.transcribeAudio(audioBlob)
 }
 
@@ -138,20 +158,31 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 export async function supportsSTT(): Promise<boolean> {
   try {
     const providerID = await getCurrentProvider()
-    
+
     // Custom provider check - look at database setting
     if (providerID === 'custom') {
       const db = await getDB()
       const settings = await db.getSettings()
       return settings?.hasSTTSupport ?? false
     }
-    
+
+    // BioLLM — STT supported if OpenAI (priority) or Groq API key is configured
+    if (providerID === 'biollm') {
+      try {
+        const db = await getDB()
+        const settings = await db.getSettings()
+        return !!(settings?.openaiApiKeyEncrypted || settings?.groqApiKeyEncrypted)
+      } catch {
+        return false
+      }
+    }
+
     // Built-in provider check
     const provider = providers[providerID]
     if (provider && provider.transcribeAudio) {
       return true
     }
-    
+
     return false
   } catch (error) {
     return false

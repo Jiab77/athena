@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * lib/brain.ts — Shared companion brain logic
+ * lib/llm/brain.ts — Shared companion brain logic
  *
  * Centralizes all stateful logic that drives the companion experience:
  * - LLM call pipeline (text + voice input)
@@ -18,19 +18,19 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { transcribeAudio, callLLM } from '@/lib/llm/router'
-import { generateAndPlayTTS, generateTTSBlob, playAudio } from '@/lib/utils'
-import { useDB } from '@/lib/db-context'
-import { encryptData, decryptData } from '@/lib/crypto'
+import { transcribeAudio, callLLM } from './router'
+import { generateAndPlayTTS, generateTTSBlob, playAudio } from '../utils'
+import { useDB } from '../db-context'
+import { encryptData, decryptData } from '../crypto'
 import {
   DEFAULT_COMPANION_ID,
   DEFAULT_AUDIO_TYPE,
   LIVE_AVATAR_IDLE_TIMEOUT,
   LIVE_AVATAR_CONNECTION_TIMEOUT,
-} from '@/lib/constants'
-import { detectEmotion } from '@/lib/llm/emotions'
-import { DecartAvatarClient } from '@/lib/avatar/decart'
-import type { CompanionData, Message, ExpressionState, EmotionState, VisualFormat } from '@/lib/types'
+} from '../constants'
+import { detectEmotion } from './emotions'
+import { DecartAvatarClient } from '../avatar/decart'
+import type { CompanionData, Message, ExpressionState, EmotionState, VisualFormat } from '../types'
 
 export type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
 
@@ -350,11 +350,20 @@ export function useBrain({
       const result = await callLLM(allMessages, selectedProvider)
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
-      // Fire-and-forget emotion detection — pass provider so correct API key is used
-      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
-        console.log('[Brain] Detected emotion:', emotion)
-        if (emotion) setLastDetectedEmotion(emotion)
-      })
+      // Fire-and-forget emotion detection
+      // BioLLM: only run if OpenAI (priority, gpt-5.4-nano) or Groq (llama-3.1-8b-instant) API key is configured
+      let shouldDetectEmotion = selectedProvider !== 'biollm'
+      if (!shouldDetectEmotion) {
+        const bioSettings = await db?.getSettings().catch(() => null)
+        shouldDetectEmotion = !!(bioSettings?.openaiApiKeyEncrypted || bioSettings?.groqApiKeyEncrypted)
+        console.log('[Brain] BioLLM emotion detection:', { shouldDetectEmotion, hasOpenAI: !!bioSettings?.openaiApiKeyEncrypted, hasGroq: !!bioSettings?.groqApiKeyEncrypted })
+      }
+      if (shouldDetectEmotion) {
+        detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
+          console.log('[Brain] Detected emotion:', emotion)
+          if (emotion) setLastDetectedEmotion(emotion)
+        })
+      }
 
       const companionMessage: Message = {
         id: `msg-${Date.now() + 1}`,
@@ -364,7 +373,7 @@ export function useBrain({
       }
 
       await saveConversation([...allMessages, companionMessage])
-      await handleTTS(result.response, () => {})
+      await handleTTS(result.response, () => { })
     } catch (error) {
       console.error('[Brain] Error in handleSendMessage:', error)
       setExpressionState('idle')

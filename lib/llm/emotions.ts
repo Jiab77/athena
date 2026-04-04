@@ -4,10 +4,10 @@ import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType 
 import {
   DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
   DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
-  EMOTION_KEYWORDS,
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
+  EMOTION_KEYWORDS,
 } from '../constants'
 import { getDB } from '../db'
 import { getAPIKey } from '../utils'
@@ -18,7 +18,7 @@ const OPENAI_CHAT_API_URL = 'https://api.openai.com/v1/chat/completions'
 /**
  * Valid emotion states derived from EMOTION_KEYWORDS — single source of truth
  */
-const VALID_EMOTIONS = Object.keys(EMOTION_KEYWORDS) as EmotionState[]
+const VALID_EMOTIONS = [...EMOTION_KEYWORDS] as EmotionState[]
 
 /**
  * Build a personality-aware emotion classification system prompt
