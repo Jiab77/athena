@@ -351,8 +351,13 @@ export function useBrain({
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
       // Fire-and-forget emotion detection
-      // BioLLM: only run if OpenAI API key is configured (uses gpt-5.4-nano post-response)
-      const shouldDetectEmotion = selectedProvider !== 'biollm' || !!(await db?.getSettings().then(s => s?.openaiApiKeyEncrypted).catch(() => null))
+      // BioLLM: only run if OpenAI (priority, gpt-5.4-nano) or Groq (llama-3.1-8b-instant) API key is configured
+      let shouldDetectEmotion = selectedProvider !== 'biollm'
+      if (!shouldDetectEmotion) {
+        const bioSettings = await db?.getSettings().catch(() => null)
+        shouldDetectEmotion = !!(bioSettings?.openaiApiKeyEncrypted || bioSettings?.groqApiKeyEncrypted)
+        console.log('[Brain] BioLLM emotion detection:', { shouldDetectEmotion, hasOpenAI: !!bioSettings?.openaiApiKeyEncrypted, hasGroq: !!bioSettings?.groqApiKeyEncrypted })
+      }
       if (shouldDetectEmotion) {
         detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
           console.log('[Brain] Detected emotion:', emotion)

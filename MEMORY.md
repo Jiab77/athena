@@ -92,7 +92,17 @@ Read `MEMORY.md` for **EVERY** session.
 10. **CSP header still missing**
 11. **Popup live-sync** — deferred, `BroadcastChannel` when the time comes
 12. **`DEBUG_MODE` constant + `debugLog()` utility** — next session priority
-13. **BioLLM provider integration** — text-only, no tools, no emotion detection. STT/TTS preserved if OpenAI API key configured. `thinking` state universal across all providers. Minimal clean integration first. Waiting for friend's GitHub page + approval before touching code.
+13. **BioLLM provider integration** — text-only, no tools, no emotion detection. Progressive enhancement based on which secondary API keys are configured. Feature priority matrix:
+
+    | Feature | Groq key only | OpenAI key only | Both keys |
+    |---|---|---|---|
+    | STT | Groq Whisper | OpenAI Whisper | OpenAI (priority) |
+    | TTS | No | OpenAI TTS | OpenAI |
+    | Emotion detection | `llama-3.1-8b-instant` | `gpt-5.4-nano` | OpenAI (priority) |
+    | Tool detection (future) | `compound-mini` pre-flight | `gpt-5.4-nano` pre-flight | OpenAI (priority) |
+    | Image generation (future) | No | Yes | Yes |
+
+    `ENABLE_BIOLLM_PERSONALITY` constant added — flip to `true` once confirmed BioLLM accepts system prompt in request body.
 14. **`thinking` state universal** — all LLM providers must show companion thinking state during inference, independent of emotion detection capability
 15. **Model capabilities display** — show small capability icons (vision, tools, image gen, audio, reasoning) per model. Hybrid placement: primary in model selector dropdown next to each model name, secondary as active model summary row in settings panel header. Reference: OpenAI model docs pattern. Deferred until after BioLLM.
 16. **BioLLM tool detection via `gpt-5.4-nano`** — when OpenAI API key is configured, run same pre-flight tool detection as Groq but using `gpt-5.4-nano` ($0.20/1M input tokens). Supports web_search, image_generation, function calling natively via Responses API. Deferred — implement after BioLLM base integration is stable.

@@ -128,9 +128,19 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     }
   }
 
-  // BioLLM — no native STT, fall back to OpenAI Whisper if OpenAI API key is configured
+  // BioLLM — no native STT, fall back to OpenAI Whisper (priority) or Groq Whisper
   if (providerID === 'biollm') {
-    return transcribeOpenAI(audioBlob)
+    const db = await getDB()
+    const settings = await db.getSettings()
+    if (settings?.openaiApiKeyEncrypted) {
+      console.log('[Router] BioLLM STT — falling back to OpenAI Whisper')
+      return transcribeOpenAI(audioBlob)
+    }
+    if (settings?.groqApiKeyEncrypted) {
+      console.log('[Router] BioLLM STT — falling back to Groq Whisper')
+      return transcribeGroq(audioBlob)
+    }
+    throw new Error('BioLLM STT requires an OpenAI or Groq API key to be configured')
   }
 
   if (!provider.transcribeAudio) {
@@ -156,12 +166,12 @@ export async function supportsSTT(): Promise<boolean> {
       return settings?.hasSTTSupport ?? false
     }
 
-    // BioLLM — STT supported only if OpenAI API key is configured
+    // BioLLM — STT supported if OpenAI (priority) or Groq API key is configured
     if (providerID === 'biollm') {
       try {
         const db = await getDB()
         const settings = await db.getSettings()
-        return !!(settings?.openaiApiKeyEncrypted)
+        return !!(settings?.openaiApiKeyEncrypted || settings?.groqApiKeyEncrypted)
       } catch {
         return false
       }
