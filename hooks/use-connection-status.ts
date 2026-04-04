@@ -31,6 +31,5 @@ export function useConnectionStatus() {
 
   const refresh = () => setRefreshTrigger(prev => prev + 1)
 
-  console.log('[v0] useConnectionStatus — current isOnline state:', isOnline)
   return { isOnline, refresh }
 }
