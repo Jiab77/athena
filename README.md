@@ -247,6 +247,15 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 | STT (Speech To Text) | `whisper-1` | To convert user speech to text |
 | TTS (Text To Speech) | `gpt-4o-mini-tts` | To convert companion text to speech |
 
+#### BioLLM
+
+| Role | Model | When Used |
+|---|---|---|
+| Main inference | `biollm-4b-shadow` | BioLLM provider selected — routes through living cortical culture on Cortical Labs CL1 hardware |
+| STT (Speech To Text) | OpenAI Whisper (priority) or Groq Whisper | When OpenAI or Groq API key is configured |
+| TTS (Text To Speech) | OpenAI TTS | When OpenAI API key is configured |
+| Emotion classification | `gpt-5.4-nano` (priority) or `llama-3.1-8b-instant` | When OpenAI or Groq API key is configured |
+
 #### ResembleAI
 
 | Role | Model | When Used |
@@ -258,15 +267,6 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 | Role | Model | When Used |
 |---|---|---|
 | Live Avatar | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
-
-#### BioLLM
-
-| Role | Model | When Used |
-|---|---|---|
-| Main inference | `biollm-4b-shadow` | BioLLM provider selected — routes through living cortical culture on Cortical Labs CL1 hardware |
-| STT (Speech To Text) | OpenAI Whisper (priority) or Groq Whisper | When OpenAI or Groq API key is configured |
-| TTS (Text To Speech) | OpenAI TTS | When OpenAI API key is configured |
-| Emotion classification | `gpt-5.4-nano` (priority) or `llama-3.1-8b-instant` | When OpenAI or Groq API key is configured |
 
 #### Custom
 
@@ -423,7 +423,7 @@ See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) ("Athena Comp
 [Character.ai](https://character.ai/) | [Replika](https://replika.com/) | [FlowGPT](https://flowgpt.com/)
 
 **LLM Providers:**
-[Groq API](https://groq.com/) | [OpenAI API](https://openai.com/) | [Ollama](https://ollama.ai/)
+[Groq API](https://groq.com/) | [OpenAI API](https://openai.com/) | [BioLLM](https://biollm.com) | [Ollama](https://ollama.ai/)
 
 **Voice:**
 [OpenAI TTS](https://platform.openai.com/docs/guides/text-to-speech) | [ResembleAI Chatterbox](https://www.resemble.ai/) | [Groq Whisper](https://groq.com/)
