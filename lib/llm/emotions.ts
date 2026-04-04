@@ -18,7 +18,7 @@ const OPENAI_CHAT_API_URL = 'https://api.openai.com/v1/chat/completions'
 /**
  * Valid emotion states derived from EMOTION_KEYWORDS — single source of truth
  */
-const VALID_EMOTIONS = Object.keys(EMOTION_KEYWORDS) as EmotionState[]
+const VALID_EMOTIONS = [...EMOTION_KEYWORDS] as EmotionState[]
 
 /**
  * Build a personality-aware emotion classification system prompt
