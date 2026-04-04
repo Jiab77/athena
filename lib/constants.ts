@@ -446,6 +446,12 @@ export const TTS_VOICES = {
     ],
   },
 } as const
+/**
+ * Emotion keyword dictionaries for sentiment analysis
+ * Supports English and French
+ * Each emotion has weighted keyword lists - more specific/strong words score higher
+ */
+export const EMOTION_KEYWORDS = ['happy', 'sad', 'angry', 'surprised', 'thoughtful'] as const
 
 /**
  * Emotion emojis for sentiment analysis

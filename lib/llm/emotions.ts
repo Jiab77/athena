@@ -4,10 +4,10 @@ import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType 
 import {
   DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
   DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
-  EMOTION_KEYWORDS,
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
+  EMOTION_KEYWORDS,
 } from '../constants'
 import { getDB } from '../db'
 import { getAPIKey } from '../utils'
