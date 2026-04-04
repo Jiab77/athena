@@ -10,7 +10,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable'
-import { useBrain } from '@/lib/brain'
+import { useBrain } from '@/lib/llm/brain'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useEffect, useRef, useState } from 'react'
 import { ExternalLink, Keyboard, Mic2, X } from 'lucide-react'

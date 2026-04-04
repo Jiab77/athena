@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * lib/brain.ts — Shared companion brain logic
+ * lib/llm/brain.ts — Shared companion brain logic
  *
  * Centralizes all stateful logic that drives the companion experience:
  * - LLM call pipeline (text + voice input)
