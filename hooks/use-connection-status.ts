@@ -18,10 +18,8 @@ export function useConnectionStatus() {
         
         // Online only if settings exist AND API key is configured
         const result = !!settings && !!apiKey
-        console.log('[v0] useConnectionStatus — dbReady:', dbReady, '| settings:', !!settings, '| apiKey:', !!apiKey, '| result:', result)
         setIsOnline(result)
-      } catch (error) {
-        console.log('[v0] useConnectionStatus — error:', error)
+      } catch {
         setIsOnline(false)
       }
     }
