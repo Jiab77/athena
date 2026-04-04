@@ -517,6 +517,29 @@ export default function Home() {
           />
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="fixed bottom-0 inset-x-0 pb-2 flex items-center justify-center pointer-events-none">
+        <p className="text-xs text-muted-foreground/50">
+          <a
+            href="https://github.com/Jiab77/athena"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-muted-foreground transition-colors pointer-events-auto"
+          >
+            Athena
+          </a>
+          {' '}is made with ❤️ by{' '}
+          <a
+            href="https://github.com/Jiab77"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-muted-foreground transition-colors pointer-events-auto"
+          >
+            Jiab77
+          </a>
+        </p>
+      </footer>
     </main>
   )
 }
