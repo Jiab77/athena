@@ -58,7 +58,7 @@ export const SECONDARY_AUDIO_FILE = 'audio.mp3'
 export const ENABLE_VOICE_OUTPUT = false
 
 /** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
-export const ENABLE_BIOLLM_PERSONALITY = false
+export const ENABLE_BIOLLM_PERSONALITY = true
 
 /** Milliseconds of inactivity before Decart live avatar disconnects to stop consuming credits */
 export const LIVE_AVATAR_IDLE_TIMEOUT = 10000
@@ -249,9 +249,9 @@ export const LLM_PROVIDERS: LLMProvider[] = [
     name: 'BioLLM',
     models: [
       {
-        id: 'shadow',
-        name: 'Shadow',
-        model: 'biollm-4b-shadow',
+        id: 'v2',
+        name: 'BioLLM 4B v2',
+        model: 'biollm-4b-v2',
         description: 'Experimental 4B biological neural network model. Inference runs through a living cortical culture on Cortical Labs CL1 hardware.',
         url: 'https://biollm.com/about',
         visible: true,
