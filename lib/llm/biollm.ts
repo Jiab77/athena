@@ -73,8 +73,8 @@ export async function callBioLLMAPI(
       messages: bioMessages,
     }
 
+    console.log('[Athena] callBioLLMAPI: endpoint', CHAT_API_URL)
     console.log('[Athena] callBioLLMAPI: request body', { ...reqBody })
-
     console.log('[Athena] callBioLLMAPI: enabled proxy?', useProxy)
 
     // Route through server-side proxy to avoid CORS restrictions
