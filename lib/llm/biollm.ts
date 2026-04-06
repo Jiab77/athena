@@ -71,13 +71,7 @@ export async function callBioLLMAPI(
       messages: bioMessages,
     }
 
-    console.log('[Athena] callBioLLMAPI: request body', {
-      ...reqBody,
-      messages: reqBody.messages.map((msg) => ({
-        role: msg.role,
-        contentLength: msg.content,
-      })),
-    })
+    console.log('[Athena] callBioLLMAPI: request body', { ...reqBody })
 
     console.log('[Athena] callBioLLMAPI: enabled proxy?', useProxy)
 
