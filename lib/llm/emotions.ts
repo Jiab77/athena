@@ -2,6 +2,7 @@
 
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
 import {
+  DEFAULT_EMOTION_DETECTION_PROVIDER,
   DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
   DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
   DEFAULT_COMPANION_NAME,
@@ -50,15 +51,45 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
  * Only sends the AI response text - no conversation history needed
  * 
  * @param aiResponse - The AI response text to analyze
- * @param provider   - The selected LLM provider ('groq' | 'openai' | other). Defaults to 'groq'.
+ * @param provider   - The selected LLM provider ('groq' | 'openai' | other). Defaults to 'openai'.
  * @returns EmotionDetectionResult with detected emotion or null
  */
-export async function detectEmotion(aiResponse: string, provider = 'groq'): Promise<EmotionDetectionResult> {
+export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_DETECTION_PROVIDER): Promise<EmotionDetectionResult> {
   try {
-    const isOpenAI = provider === 'openai'
-    const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
+    console.log('[Athena] Received model provider:', provider)
+
+    // TODO: Add required code for handling key selection when 'biollm' provider is selected.
+    // GOAL: Avoids printing error message when 'openai' key is being used for the TTS feature
+    // NEED: 1. Detect if 'biollm' provider is selected AND 'openai' key is defined,
+    //       2. If 'openai' key not defined, look at 'groq' api key,
+    //       3. If no 'openai' or 'groq' api keys found when 'biollm' provider is selected:
+    //       4. Simply show a warning in the console but not an error.
+
+    // FIXME: In the meantime, I'll check which API key is defined between 'openai' and 'groq'
+    //        If none of them has been defined, then raise an error.
+    // const isOpenAI = provider === 'openai'
+    // const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
+
     const db = await getDB()
     const settings = await db.getSettings()
+
+    // TEST: Get API keys from the database like '/hooks/use-connection-status.ts' to avoid raising errors
+    // FIXME: Dirty code that should fallback to 'openai' or 'groq' when using 'biollm' provider.
+    // TODO: Simply disable emotion detection WHEN no 'openai' or 'groq' defined so that we don't raise an error for nothing?
+    const apiKeyOpenAI = await db.getAPIKey('openai')
+    const apiKeyGroq = await db.getAPIKey('groq')
+
+    let isOpenAI, apiKey
+    if (apiKeyOpenAI !== null) {
+      isOpenAI = true
+      apiKey = apiKeyOpenAI
+    } else if (apiKeyGroq !== null) {
+      isOpenAI = false
+      apiKey = apiKeyGroq
+    } else {
+      isOpenAI = false
+      apiKey = null
+    }
 
     const companion = settings?.selectedCompanion || DEFAULT_COMPANION_NAME
     const personality = (settings?.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY

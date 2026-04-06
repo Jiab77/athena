@@ -72,7 +72,41 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
-> ## Session 27: BioLLM Integration, OWASP 2025 Audit, Documentation Overhaul (04/04/2026)
+> ## Session 28: BioLLM Fixes, Emotion detection dirty fix, Structured format debugging (04/06/2026)
+
+### Overview
+
+The human fixed some BioLLM related implementation bugs + updated model settings and finally made it working.
+
+But several issues has been detected that needs to be fixed urgently:
+
+1. The emotion detection model routing must be rewriten to avoid raison errors when no model keys has been defined, simply raise a warning instead of remain silent?
+2. Forcing all models to follow our JSON structured output creates more issues than it solves.
+3. We must remove the forced JSON structure output or make it optional with a booleanm.
+4. The dedicated API route for BioLLM can be removed, it's totally useless as I could make it work without using it.
+
+---
+
+### 1. BioLLM fixes
+
+- `/lib/llm/biollm.ts` — Disabled API route/proxy, fixed response handling
+
+### 2. Emotion detection dirty fix
+
+- `/lib/llm/emotions.ts` — Dirty fix of the model selection mess
+- `/lib/constants.ts` — Added missing `DEFAULT_EMOTION_DETECTION_PROVIDER` constant
+
+### 3. Structured format debugging
+
+- `/lib/utils.ts` — Simply added a `TODO` note about making the forced JSON output optional in the `buildSystemPrompt` function
+
+### Additional Open Items For Session 29
+
+Check all `TODO:`, `FIXME:` and `TEST:` lines in the whole codebase.
+
+---
+
+## Session 27: BioLLM Integration, OWASP 2025 Audit, Documentation Overhaul (04/04/2026)
 
 ### Overview
 
@@ -183,7 +217,7 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 
 ---
 
-### Open Items Carried Forward to Session 28
+### Open Items Carried Forward to Session 29
 
 1. **`expressionState` dual source conflict** — `useBrain()` and `ChatInterface` both drive it simultaneously
 2. **Emotion display logic** — review and fix

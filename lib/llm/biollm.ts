@@ -32,6 +32,7 @@ export async function callBioLLMAPI(
     const apiKey = await getAPIKey('biollm')
     const db = await getDB()
     const settings = await db.getSettings()
+    const useProxy = false
 
     if (!settings) {
       throw new Error('No settings found in database')
@@ -48,6 +49,8 @@ export async function callBioLLMAPI(
     const avatarGender = (settings.avatarGender as GenderType) || DEFAULT_GENDER
     const customPersonalityTraits = settings.customPersonalityTraits
     const endpointUrl = settings.customProviderUrl
+
+    const CHAT_API_URL = `${endpointUrl}/v1/chat/completions`
 
     console.log('[Athena] callBioLLMAPI: settings resolved', { personality, companion, memoryWindowSize, avatarGender, endpointUrl })
 
@@ -70,24 +73,32 @@ export async function callBioLLMAPI(
       messages: bioMessages,
     }
 
-    console.log('[Athena] callBioLLMAPI: request body', {
-      ...reqBody,
-      messages: reqBody.messages.map((msg) => ({
-        role: msg.role,
-        contentLength: msg.content.length,
-      })),
-    })
+    console.log('[Athena] callBioLLMAPI: endpoint', CHAT_API_URL)
+    console.log('[Athena] callBioLLMAPI: request body', { ...reqBody })
+    console.log('[Athena] callBioLLMAPI: enabled proxy?', useProxy)
 
     // Route through server-side proxy to avoid CORS restrictions
-    const response = await fetch('/api/biollm', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ endpointUrl, apiKey, messages: bioMessages }),
-    })
+    let response
+    if (useProxy) {
+      response = await fetch('/api/biollm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ CHAT_API_URL, apiKey, messages: bioMessages }),
+      })
+    } else {
+      response = await fetch(CHAT_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reqBody),
+      })
+    }
 
-    console.log('[Athena] callBioLLMAPI: HTTP response status', response.status, response.ok)
+    console.log('[Athena] callBioLLMAPI: HTTP response', { status: response.status, ok: response.ok })
 
     if (!response.ok) {
       const error = await response.json()
@@ -102,30 +113,42 @@ export async function callBioLLMAPI(
 
     const data = await response.json()
 
-    // Log brain activity data — the unique BioLLM neural signature
-    console.log('[Athena] callBioLLMAPI: brain activity', data.brain)
-    console.log('[Athena] callBioLLMAPI: response data', {
-      id: data.id,
-      model: data.model,
-      usage: data.usage,
-      finish_reason: data.choices?.[0]?.finish_reason,
-    })
+    // Log full response data
+    console.log('[Athena] callBioLLMAPI: response data', JSON.stringify(data))
+
+    // Parse JSON response from Responses API
+    let parsedResponse: { response: string; reasoning?: string }
 
     const content = data.choices?.[0]?.message?.content
+    const brain = data.brain || null
+    const usage = data.usage || null
+
+    // Log brain activity data — the unique BioLLM neural signature
+    console.log('[Athena] callBioLLMAPI: brain activity', brain)
+
+    // Log usage data
+    console.log('[Athena] callBioLLMAPI: usage data', usage)
 
     if (!content) {
       throw new Error('No response content from BioLLM API')
     }
 
-    console.log('[Athena] callBioLLMAPI: raw content before parse', content.slice(0, 200))
+    // FIXME: BioLLM does not always returns JSON formatted responses as requested
 
-    const parsedResponse = parseCompanionJSON(content)
+    console.log('[Athena] callBioLLMAPI: raw content before parse', content.slice(0, 200))
+    // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
+    // Only fall back to wrapping as plain prose if parsing fails.
+    try {
+      parsedResponse = parseCompanionJSON(content)
+      console.log('[Athena] callBioLLMAPI: parsedResponse keys', Object.keys(parsedResponse))
+    } catch {
+      console.log('[Athena] callBioLLMAPI: JSON parse failed — wrapping plain prose as response')
+      parsedResponse = { response: content }
+    }
 
     if (!parsedResponse.response) {
       throw new Error('No response field in parsed content')
     }
-
-    const usage = data.usage || null
 
     console.log('[Athena] callBioLLMAPI: success', { responseLength: parsedResponse.response.length, usage })
 
