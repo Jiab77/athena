@@ -123,6 +123,7 @@ export async function callBioLLMAPI(
     })
 
     const content = data.choices?.[0]?.message?.content
+    const usage = data.usage || null
 
     if (!content) {
       throw new Error('No response content from BioLLM API')
@@ -137,8 +138,6 @@ export async function callBioLLMAPI(
     if (!parsedResponse.response) {
       throw new Error('No response field in parsed content')
     }
-
-    const usage = data.usage || null
 
     console.log('[Athena] callBioLLMAPI: success', { responseLength: parsedResponse.response.length, usage })
 
