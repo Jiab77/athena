@@ -150,6 +150,7 @@ export function parseCompanionJSON(jsonString: string): { response: string; reas
  * Build system prompt based on personality and companion data
  * Shared across all LLM providers (Groq, OpenAI, etc.)
  */
+// TODO: Make forced JSON output as a boolean
 export function buildSystemPrompt(
   companionName: string,
   personality: PersonalityType,
