@@ -128,10 +128,12 @@ export async function callBioLLMAPI(
       throw new Error('No response content from BioLLM API')
     }
 
-    console.log('[Athena] callBioLLMAPI: raw content before parse', content.slice(0, 200))
+    console.log('[Athena] callBioLLMAPI: raw content before parse', { ...content })
 
-    const parsedResponse = parseCompanionJSON(content)
-
+    // FIXME: BioLLM does not support JSON formatted response,
+    // faking the response to avoid breaking the rest of the code
+    // const parsedResponse = parseCompanionJSON(content)
+    const parsedResponse = { response: content }
     if (!parsedResponse.response) {
       throw new Error('No response field in parsed content')
     }
