@@ -100,6 +100,12 @@ But several issues has been detected that needs to be fixed urgently:
 
 - `/lib/utils.ts` — Simply added a `TODO` note about making the forced JSON output optional in the `buildSystemPrompt` function
 
+### Additional Open Items For Session 29
+
+Check all `TODO:`, `FIXME:` and `TEST:` lines in the whole codebase.
+
+---
+
 ## Session 27: BioLLM Integration, OWASP 2025 Audit, Documentation Overhaul (04/04/2026)
 
 ### Overview
@@ -211,7 +217,7 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 
 ---
 
-### Open Items Carried Forward to Session 28
+### Open Items Carried Forward to Session 29
 
 1. **`expressionState` dual source conflict** — `useBrain()` and `ChatInterface` both drive it simultaneously
 2. **Emotion display logic** — review and fix
