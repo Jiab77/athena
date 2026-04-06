@@ -2,6 +2,7 @@
 
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
 import {
+  DEFAULT_EMOTION_PROVIDER,
   DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
   DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
   DEFAULT_COMPANION_NAME,
@@ -50,11 +51,13 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
  * Only sends the AI response text - no conversation history needed
  * 
  * @param aiResponse - The AI response text to analyze
- * @param provider   - The selected LLM provider ('groq' | 'openai' | other). Defaults to 'groq'.
+ * @param provider   - The selected LLM provider ('groq' | 'openai' | other). Defaults to 'openai'.
  * @returns EmotionDetectionResult with detected emotion or null
  */
-export async function detectEmotion(aiResponse: string, provider = 'groq'): Promise<EmotionDetectionResult> {
+export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_PROVIDER): Promise<EmotionDetectionResult> {
   try {
+    console.log('[Athena] Emotion detection provider:', provider)
+
     const isOpenAI = provider === 'openai'
     const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
     const db = await getDB()
