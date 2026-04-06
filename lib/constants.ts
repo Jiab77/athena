@@ -16,7 +16,6 @@ export const DEFAULT_VISUAL_FORMAT: VisualFormat = 'static-2d'
 export const DEFAULT_GENDER = 'F'
 export const DEFAULT_COLOR_SCHEME = 'vibrant'
 export const DEFAULT_AVATAR_CATEGORY = 'cyberpunk'
-export const DEFAULT_EMOTION_PROVIDER = 'openai'
 export const DEFAULT_MODEL_PROVIDER = 'openai'
 export const DEFAULT_MODEL_ID = 'gpt-5.4-mini'
 export const DEFAULT_MODEL_NAME = 'gpt-5.4-mini'
@@ -38,6 +37,7 @@ export const MAX_DISPLAY_MESSAGES = 30
  * Default LLM Config
  * Single source of truth for LLM services
  */
+export const DEFAULT_EMOTION_DETECTION_PROVIDER = 'openai'
 export const DEFAULT_GROQ_EMOTION_DETECTION_MODEL = 'llama-3.1-8b-instant'
 export const DEFAULT_OPENAI_EMOTION_DETECTION_MODEL = 'gpt-5.4-nano'
 export const DEFAULT_GROQ_STT_MODEL = 'whisper-large-v3-turbo'

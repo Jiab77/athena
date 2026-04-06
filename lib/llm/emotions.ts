@@ -2,7 +2,7 @@
 
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
 import {
-  DEFAULT_EMOTION_PROVIDER,
+  DEFAULT_EMOTION_DETECTION_PROVIDER,
   DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
   DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
   DEFAULT_COMPANION_NAME,
@@ -54,12 +54,37 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
  * @param provider   - The selected LLM provider ('groq' | 'openai' | other). Defaults to 'openai'.
  * @returns EmotionDetectionResult with detected emotion or null
  */
-export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_PROVIDER): Promise<EmotionDetectionResult> {
+export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_DETECTION_PROVIDER): Promise<EmotionDetectionResult> {
   try {
     console.log('[Athena] Emotion detection provider:', provider)
 
-    const isOpenAI = provider === 'openai'
-    const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
+    // TODO: Add required code for handling key selection when 'biollm' provider is selected.
+    // GOAL: Avoids printing error message when 'openai' key is being used for the TTS feature
+    // NEED: 1. Detect if 'biollm' provider is selected AND 'openai' key is defined,
+    //       2. If 'openai' key not defined, look at 'groq' api key,
+    //       3. If no 'openai' or 'groq' api keys found when 'biollm' provider is selected:
+    //       4. Simply show a warning in the console but not an error.
+
+    // FIXME: In the meantime, I'll check which API key is defined between 'openai' and 'groq'
+    //        If none of them has been defined, then raise an error.
+    // const isOpenAI = provider === 'openai'
+    // const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
+    const apiKeyOpenAI = await getAPIKey('openai')
+    const apiKeyGroq = await getAPIKey('groq')
+
+    // FIXME: Dirty code that should fallback to 'openai' or 'groq' when using 'biollm' provider.
+    let isOpenAI, apiKey
+    if (apiKeyOpenAI !== null) {
+      isOpenAI = true
+      apiKey = apiKeyOpenAI
+    } else if (apiKeyGroq !== null) {
+      isOpenAI = false
+      apiKey = apiKeyGroq
+    } else {
+      isOpenAI = false
+      apiKey = null
+    }
+
     const db = await getDB()
     const settings = await db.getSettings()
 
