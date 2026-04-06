@@ -114,27 +114,38 @@ export async function callBioLLMAPI(
     const data = await response.json()
 
     // Log brain activity data — the unique BioLLM neural signature
-    console.log('[Athena] callBioLLMAPI: brain activity', data.brain)
+    // console.log('[Athena] callBioLLMAPI: brain activity', data.brain)
+    {/*
     console.log('[Athena] callBioLLMAPI: response data', {
       id: data.id,
       model: data.model,
       usage: data.usage,
       finish_reason: data.choices?.[0]?.finish_reason,
     })
+    */}
+    console.log('[Athena] callBioLLMAPI: response data', JSON.stringify(data))
 
     const content = data.choices?.[0]?.message?.content
+    const brain = data.brain || null
     const usage = data.usage || null
 
     if (!content) {
       throw new Error('No response content from BioLLM API')
     }
 
-    console.log('[Athena] callBioLLMAPI: raw content before parse', { ...content })
+    console.log('[Athena] callBioLLMAPI: raw content before parse', JSON.stringify(content))
 
-    // FIXME: BioLLM does not support JSON formatted response,
-    // faking the response to avoid breaking the rest of the code
-    // const parsedResponse = parseCompanionJSON(content)
-    const parsedResponse = { response: content }
+    // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
+    // Only fall back to wrapping as plain prose if parsing fails.
+    let parsedResponse: { response: string }
+    try {
+      parsedResponse = parseCompanionJSON(content)
+      console.log('[Athena] callBioLLMAPI: parsedResponse keys', Object.keys(parsedResponse))
+    } catch {
+      console.log('[Athena] callBioLLMAPI: JSON parse failed — wrapping plain prose as response')
+      parsedResponse = { response: content }
+    }
+
     if (!parsedResponse.response) {
       throw new Error('No response field in parsed content')
     }
