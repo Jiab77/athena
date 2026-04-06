@@ -98,7 +98,7 @@ export async function callBioLLMAPI(
       })
     }
 
-    console.log('[Athena] callBioLLMAPI: HTTP response status', response.status, response.ok)
+    console.log('[Athena] callBioLLMAPI: HTTP response', { status: response.status, ok: response.ok })
 
     if (!response.ok) {
       const error = await response.json()
@@ -113,31 +113,29 @@ export async function callBioLLMAPI(
 
     const data = await response.json()
 
-    // Log brain activity data — the unique BioLLM neural signature
-    // console.log('[Athena] callBioLLMAPI: brain activity', data.brain)
-    {/*
-    console.log('[Athena] callBioLLMAPI: response data', {
-      id: data.id,
-      model: data.model,
-      usage: data.usage,
-      finish_reason: data.choices?.[0]?.finish_reason,
-    })
-    */}
+    // Log full response data
     console.log('[Athena] callBioLLMAPI: response data', JSON.stringify(data))
+
+    // Parse JSON response from Responses API
+    let parsedResponse: { response: string; reasoning?: string }
 
     const content = data.choices?.[0]?.message?.content
     const brain = data.brain || null
     const usage = data.usage || null
 
+    // Log brain activity data — the unique BioLLM neural signature
+    console.log('[Athena] callBioLLMAPI: brain activity', brain)
+
+    // Log usage data
+    console.log('[Athena] callBioLLMAPI: usage data', usage)
+
     if (!content) {
       throw new Error('No response content from BioLLM API')
     }
 
-    console.log('[Athena] callBioLLMAPI: raw content before parse', JSON.stringify(content))
-
+    console.log('[Athena] callBioLLMAPI: raw content before parse', content.slice(0, 200))
     // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
     // Only fall back to wrapping as plain prose if parsing fails.
-    let parsedResponse: { response: string }
     try {
       parsedResponse = parseCompanionJSON(content)
       console.log('[Athena] callBioLLMAPI: parsedResponse keys', Object.keys(parsedResponse))
