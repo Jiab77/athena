@@ -79,6 +79,8 @@ export async function callBioLLMAPI(
       })),
     })
 
+    console.log('[Athena] callBioLLMAPI: enabled proxy?', useProxy)
+
     // Route through server-side proxy to avoid CORS restrictions
     let response
     if (useProxy) {
