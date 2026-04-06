@@ -69,10 +69,15 @@ export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTI
     //        If none of them has been defined, then raise an error.
     // const isOpenAI = provider === 'openai'
     // const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
-    const apiKeyOpenAI = await getAPIKey('openai')
-    const apiKeyGroq = await getAPIKey('groq')
 
+    const db = await getDB()
+    const settings = await db.getSettings()
+
+    // TEST: Get API keys from the database like '/hooks/use-connection-status.ts' to avoid raising errors
     // FIXME: Dirty code that should fallback to 'openai' or 'groq' when using 'biollm' provider.
+    const apiKeyOpenAI = await db.getAPIKey('openai')
+    const apiKeyGroq = await db.getAPIKey('groq')
+
     let isOpenAI, apiKey
     if (apiKeyOpenAI !== null) {
       isOpenAI = true
@@ -84,9 +89,6 @@ export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTI
       isOpenAI = false
       apiKey = null
     }
-
-    const db = await getDB()
-    const settings = await db.getSettings()
 
     const companion = settings?.selectedCompanion || DEFAULT_COMPANION_NAME
     const personality = (settings?.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
