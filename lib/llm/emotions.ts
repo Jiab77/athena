@@ -75,6 +75,7 @@ export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTI
 
     // TEST: Get API keys from the database like '/hooks/use-connection-status.ts' to avoid raising errors
     // FIXME: Dirty code that should fallback to 'openai' or 'groq' when using 'biollm' provider.
+    // TODO: Simply disable emotion detection WHEN no 'openai' or 'groq' defined so that we don't raise an error for nothing?
     const apiKeyOpenAI = await db.getAPIKey('openai')
     const apiKeyGroq = await db.getAPIKey('groq')
 
