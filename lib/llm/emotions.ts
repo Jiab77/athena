@@ -56,7 +56,7 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
  */
 export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_DETECTION_PROVIDER): Promise<EmotionDetectionResult> {
   try {
-    console.log('[Athena] Emotion detection provider:', provider)
+    console.log('[Athena] Received model provider:', provider)
 
     // TODO: Add required code for handling key selection when 'biollm' provider is selected.
     // GOAL: Avoids printing error message when 'openai' key is being used for the TTS feature
