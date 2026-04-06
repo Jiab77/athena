@@ -50,6 +50,8 @@ export async function callBioLLMAPI(
     const customPersonalityTraits = settings.customPersonalityTraits
     const endpointUrl = settings.customProviderUrl
 
+    const CHAT_API_URL = `${endpointUrl}/v1/chat/completions`
+
     console.log('[Athena] callBioLLMAPI: settings resolved', { personality, companion, memoryWindowSize, avatarGender, endpointUrl })
 
     const windowedMessages = messages.slice(-memoryWindowSize)
@@ -83,10 +85,10 @@ export async function callBioLLMAPI(
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ endpointUrl, apiKey, messages: bioMessages }),
+        body: JSON.stringify({ CHAT_API_URL, apiKey, messages: bioMessages }),
       })
     } else {
-      response = await fetch(endpointUrl, {
+      response = await fetch(CHAT_API_URL, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
