@@ -181,6 +181,9 @@ export function ChatInterface({
     checkSTT()
 
     // Listen for settings changes (dispatched from settings-panel)
+    // TODO: Fix this part that does not work.
+    // It simply leaves the microphone disabled even if OpenAI key is being defined later
+    // This means that the `settings-changed` event does not work as expected.
     const handleSettingsChange = () => {
       checkSTT()
     }
