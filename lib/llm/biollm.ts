@@ -114,7 +114,7 @@ export async function callBioLLMAPI(
     const data = await response.json()
 
     // Log full response data
-    console.log('[Athena] callBioLLMAPI: response data', JSON.stringify(data))
+    console.log('[Athena] callBioLLMAPI: response data', data)
 
     // Parse JSON response from Responses API
     let parsedResponse: { response: string; reasoning?: string }
