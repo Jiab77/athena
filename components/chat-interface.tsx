@@ -54,6 +54,7 @@ const CheckIcon = () => (
   </svg>
 )
 
+// TODO: Move all the logic to '/lib/chat.ts` to leave only the required JSX code here
 interface ChatInterfaceProps {
   isChatVisible: boolean
   setIsChatVisible: (visible: boolean) => void
