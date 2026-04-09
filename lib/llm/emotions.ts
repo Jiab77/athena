@@ -56,7 +56,7 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
  */
 export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_DETECTION_PROVIDER): Promise<EmotionDetectionResult> {
   try {
-    console.log('[Athena] Received model provider:', provider)
+    console.log('[Athena] Caller model provider:', provider)
 
     // TODO: Add required code for handling key selection when 'biollm' provider is selected.
     // GOAL: Avoids printing error message when 'openai' key is being used for the TTS feature
@@ -82,24 +82,28 @@ export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTI
     // TODO: Simply disable emotion detection WHEN no 'openai' or 'groq' defined so that we don't raise an error for nothing?
     const apiKeyOpenAI = await db.getAPIKey('openai')
     const apiKeyGroq = await db.getAPIKey('groq')
+    let emotionProvider
 
     let isOpenAI, apiKey
     if (apiKeyOpenAI !== null) {
       isOpenAI = true
       apiKey = apiKeyOpenAI
+      emotionProvider = 'openai'
     } else if (apiKeyGroq !== null) {
       isOpenAI = false
       apiKey = apiKeyGroq
+      emotionProvider = 'groq'
     } else {
       isOpenAI = false
       apiKey = null
+      emotionProvider = null
     }
 
     const companion = settings?.selectedCompanion || DEFAULT_COMPANION_NAME
     const personality = (settings?.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const emotionSystemPrompt = buildEmotionSystemPrompt(companion, personality)
 
-    console.log('[Athena] Emotion detection - provider:', provider, 'companion:', companion, 'personality:', personality)
+    console.log('[Athena] Emotion detection - provider:', emotionProvider, 'companion:', companion, 'personality:', personality)
 
     const reqBody = {
       model: isOpenAI ? DEFAULT_OPENAI_EMOTION_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
