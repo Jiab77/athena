@@ -129,6 +129,8 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   }
 
   // BioLLM — no native STT, fall back to OpenAI Whisper (priority) or Groq Whisper
+  // TODO: Make sure that '*ApiKeyEncrypted' exists because I think it does not
+  // FIXME: Read API keys from 'db.getAPIKey()' like in '/hooks/use-connection-status.ts'
   if (providerID === 'biollm') {
     const db = await getDB()
     const settings = await db.getSettings()
@@ -167,6 +169,8 @@ export async function supportsSTT(): Promise<boolean> {
     }
 
     // BioLLM — STT supported if OpenAI (priority) or Groq API key is configured
+    // TODO: Make sure that '*ApiKeyEncrypted' exists because I think it does not
+    // FIXME: Read API keys from 'db.getAPIKey()' like in '/hooks/use-connection-status.ts'
     if (providerID === 'biollm') {
       try {
         const db = await getDB()
