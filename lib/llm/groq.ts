@@ -39,11 +39,11 @@ export async function callGroqAPI(
     const apiKey = await getAPIKey('groq')
     const db = await getDB()
     const settings = await db.getSettings()
-    
+
     if (!settings) {
       throw new Error('No settings found in database')
     }
-    
+
     // Extract settings with defaults
     const model = settings.selectedModel || DEFAULT_MODEL_NAME
     const personality = (settings.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
@@ -64,7 +64,7 @@ export async function callGroqAPI(
     const hasUrls = lastUserMessage?.content ? urlRegex.test(lastUserMessage.content) : false
 
     // Detect if any message contains an actual image (base64 encoded)
-    const hasImage = windowedMessages.some(msg => 
+    const hasImage = windowedMessages.some(msg =>
       msg.imageBase64 !== undefined && msg.imageBase64 !== null && msg.imageBase64.length > 0
     )
 
@@ -107,7 +107,7 @@ export async function callGroqAPI(
             ],
           }
         }
-        
+
         // If message has document content, inject it into the message text
         if (msg.documentContent) {
           const safeContent = escapeDocumentContent(msg.documentContent)
@@ -207,7 +207,7 @@ export async function callGroqAPI(
       if (!content) {
         throw new Error('No response content from Groq API')
       }
-      console.log('[Athena] callGroqAPI: raw content before parse', content.slice(0, 200))
+      console.log('[Athena] callGroqAPI: raw content before parse --', content.slice(0, 200))
       parsedResponse = parseCompanionJSON(content)
       console.log('[Athena] callGroqAPI: parsedResponse keys', Object.keys(parsedResponse))
     } catch {
@@ -241,7 +241,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     // Create FormData for multipart file upload
     const formData = new FormData()
     formData.append('file', audioBlob, DEFAULT_AUDIO_FILE)
-    
+
     // Get STT model from constants (Groq provider's first model)
     const providers = STT_PROVIDERS.find(p => p.id === 'groq')
     const sttModel = providers?.models[0]?.model || DEFAULT_GROQ_STT_MODEL
