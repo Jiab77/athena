@@ -14,7 +14,8 @@ import { detectTools } from './tools'
  * Unified interface for routing API calls to the correct provider
  * Supports dynamic provider selection based on database settings
  */
-
+// TODO: Make sure we don't have any other duplicated interfaces / types
+// FIXME: Rename this interface to avoid conflicts with the one defined in '/lib/types.ts'
 export interface LLMProvider {
   callAPI: (messages: Message[]) => Promise<LLMResponse>
   transcribeAudio?: (audioBlob: Blob) => Promise<string>
