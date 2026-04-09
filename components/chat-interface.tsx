@@ -44,16 +44,17 @@ import { TTSPlayback } from './tts-playback'
 // Inline SVGs — avoids adding new lucide-react icon modules which can cause cache issues
 const CopyIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
   </svg>
 )
 const CheckIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 6 9 17l-5-5"/>
+    <path d="M20 6 9 17l-5-5" />
   </svg>
 )
 
+// TODO: Move all the logic to '/lib/chat.ts` to leave only the required JSX code here
 interface ChatInterfaceProps {
   isChatVisible: boolean
   setIsChatVisible: (visible: boolean) => void
@@ -115,7 +116,7 @@ export function ChatInterface({
   // Load conversation history on mount and when updated externally (voice chat)
   useEffect(() => {
     if (!dbReady || !db) return
-    
+
     const loadConversation = async () => {
       try {
         // Get companion ID from settings to use as conversation ID
@@ -133,7 +134,7 @@ export function ChatInterface({
         if (settings?.memoryWindowSize) {
           setMemoryWindowSize(settings.memoryWindowSize)
         }
-        
+
         // Load and decrypt conversation for this companion
         const stored = await db.getConversation(companionId)
         if (stored) {
@@ -179,8 +180,11 @@ export function ChatInterface({
       }
     }
     checkSTT()
-    
+
     // Listen for settings changes (dispatched from settings-panel)
+    // TODO: Fix this part that does not work.
+    // It simply leaves the microphone disabled even if OpenAI key is being defined later
+    // This means that the `settings-changed` event does not work as expected.
     const handleSettingsChange = () => {
       checkSTT()
     }
@@ -219,7 +223,7 @@ export function ChatInterface({
   // Derive and notify expression state changes
   useEffect(() => {
     let newState: ExpressionState = 'idle'
-    
+
     if (isRecording) {
       newState = 'listening'
     } else if (isTranscribing) {
@@ -229,7 +233,7 @@ export function ChatInterface({
     } else if (isLoading) {
       newState = 'thinking'
     }
-    
+
     onExpressionChange?.(newState)
   }, [isLoading, isRecording, isTranscribing, isSpeaking, onExpressionChange])
 
@@ -413,7 +417,7 @@ export function ChatInterface({
         console.log('[Athena] Skipping tool detection — proceeding to callLLM')
         result = await callLLM(allMessages, selectedProvider)
       }
-      
+
       // Update token usage for display
       if (result.usage) {
         setTokenUsage(result.usage)
@@ -446,7 +450,7 @@ export function ChatInterface({
         timestamp: new Date().toISOString(),
         ...(result.imageBase64 ? { imageBase64: result.imageBase64, imageFormat: result.imageFormat || 'png' } : {}),
       }
-      
+
       // Strip document content from history after AI has processed it
       // The AI's response already contains any relevant summary/info from the document
       const messagesWithoutBulkyData = updatedMessages.map(msg => ({
@@ -454,7 +458,7 @@ export function ChatInterface({
         documentContent: undefined,
         // Keep documentName for display purposes
       }))
-      
+
       const finalMessages = [...messagesWithoutBulkyData, companionMessage]
       setDisplayMessages(finalMessages)
 
@@ -526,10 +530,10 @@ export function ChatInterface({
         }
       }
     } catch (error) {
-      
+
       // Generate specific error message based on status code
       let userFriendlyMessage = 'Sorry, I encountered an error. Please try again.'
-      
+
       if (error && typeof error === 'object' && 'status' in error) {
         const apiError = error as { status: number; message: string }
         if (apiError.status === 413) {
@@ -547,7 +551,7 @@ export function ChatInterface({
           userFriendlyMessage = 'Authentication error. Please check your API key.'
         }
       }
-      
+
       const errorMessage: Message = {
         id: `msg-${Date.now() + 1}`,
         role: 'companion',
@@ -692,16 +696,16 @@ export function ChatInterface({
 
   const handleEmojiSelect = (emoji: string) => {
     if (!textareaRef.current) return
-    
+
     const textarea = textareaRef.current
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const before = input.substring(0, start)
     const after = input.substring(end)
     const newInput = before + emoji + after
-    
+
     setInput(newInput)
-    
+
     // Move cursor after the emoji
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = start + emoji.length
@@ -797,102 +801,101 @@ export function ChatInterface({
                   }
 
                   return (
-                  <div
-                    key={message.id}
-                    className={`flex group ${isUser ? 'justify-end' : 'justify-start'}`}
-                  >
-                    {/* Copy button — left side for user messages */}
-                    {isUser && (
-                      <button
-                        onClick={handleCopy}
-                        className="self-start mt-1 mr-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
-                        aria-label="Copy message"
-                      >
-                        {isCopied
-                          ? <span className="text-green-500"><CheckIcon /></span>
-                          : <CopyIcon />
-                        }
-                      </button>
-                    )}
-
                     <div
-                      className={`max-w-xs px-4 py-2 rounded-lg ${
-                        isUser
+                      key={message.id}
+                      className={`flex group ${isUser ? 'justify-end' : 'justify-start'}`}
+                    >
+                      {/* Copy button — left side for user messages */}
+                      {isUser && (
+                        <button
+                          onClick={handleCopy}
+                          className="self-start mt-1 mr-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
+                          aria-label="Copy message"
+                        >
+                          {isCopied
+                            ? <span className="text-green-500"><CheckIcon /></span>
+                            : <CopyIcon />
+                          }
+                        </button>
+                      )}
+
+                      <div
+                        className={`max-w-xs px-4 py-2 rounded-lg ${isUser
                           ? 'bg-primary text-primary-foreground rounded-br-none'
                           : 'bg-secondary text-secondary-foreground rounded-bl-none'
-                      }`}
-                    >
-                      {message.imageBase64 && message.imageFormat && (
-                        <div className={`relative mb-2 group/img ${!isUser ? 'inline-block' : ''}`}>
-                          <img
-                            src={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
-                            alt={isUser ? 'Chat image' : 'Generated image'}
-                            className="max-w-xs rounded max-h-64 object-cover"
-                          />
-                          {!isUser && (
-                            <a
-                              href={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
-                              download={`athena-image-${message.id}.${message.imageFormat}`}
-                              className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity rounded"
-                              aria-label="Download generated image"
+                          }`}
+                      >
+                        {message.imageBase64 && message.imageFormat && (
+                          <div className={`relative mb-2 group/img ${!isUser ? 'inline-block' : ''}`}>
+                            <img
+                              src={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
+                              alt={isUser ? 'Chat image' : 'Generated image'}
+                              className="max-w-xs rounded max-h-64 object-cover"
+                            />
+                            {!isUser && (
+                              <a
+                                href={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
+                                download={`athena-image-${message.id}.${message.imageFormat}`}
+                                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity rounded"
+                                aria-label="Download generated image"
+                              >
+                                <Download className="h-6 w-6 text-white" />
+                              </a>
+                            )}
+                          </div>
+                        )}
+                        {message.documentName && (
+                          <div className="flex items-center gap-1 mb-2 text-xs opacity-70">
+                            <FileText className="h-3 w-3" />
+                            <span>{message.documentName}</span>
+                          </div>
+                        )}
+                        <div className="text-sm break-words">
+                          <MarkdownMessage content={message.content} />
+                        </div>
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-xs opacity-70">
+                            {new Date(message.timestamp).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                          {message.role === 'companion' && (voiceOutputEnabled || onTTSReady) && (
+                            <button
+                              onClick={() => handleReplayTTS(message.id, message.content)}
+                              className="ml-2 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
+                              aria-label={replayingMessageId === message.id ? 'Stop replay' : 'Replay message'}
                             >
-                              <Download className="h-6 w-6 text-white" />
-                            </a>
+                              {replayingMessageId === message.id
+                                ? <Square className="h-3 w-3" />
+                                : <Play className="h-3 w-3" />
+                              }
+                            </button>
                           )}
                         </div>
-                      )}
-                      {message.documentName && (
-                        <div className="flex items-center gap-1 mb-2 text-xs opacity-70">
-                          <FileText className="h-3 w-3" />
-                          <span>{message.documentName}</span>
-                        </div>
-                      )}
-                      <div className="text-sm break-words">
-                        <MarkdownMessage content={message.content} />
                       </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-xs opacity-70">
-                          {new Date(message.timestamp).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                        {message.role === 'companion' && (voiceOutputEnabled || onTTSReady) && (
-                          <button
-                            onClick={() => handleReplayTTS(message.id, message.content)}
-                            className="ml-2 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
-                            aria-label={replayingMessageId === message.id ? 'Stop replay' : 'Replay message'}
-                          >
-                            {replayingMessageId === message.id
-                              ? <Square className="h-3 w-3" />
-                              : <Play className="h-3 w-3" />
-                            }
-                          </button>
-                        )}
-                      </div>
-                    </div>
 
-                    {/* Copy button — right side for companion messages */}
-                    {!isUser && (
-                      <button
-                        onClick={handleCopy}
-                        className="self-start mt-1 ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
-                        aria-label="Copy message"
-                      >
-                        {isCopied
-                          ? <span className="text-green-500"><CheckIcon /></span>
-                          : <CopyIcon />
-                        }
-                      </button>
-                    )}
-                  </div>
+                      {/* Copy button — right side for companion messages */}
+                      {!isUser && (
+                        <button
+                          onClick={handleCopy}
+                          className="self-start mt-1 ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
+                          aria-label="Copy message"
+                        >
+                          {isCopied
+                            ? <span className="text-green-500"><CheckIcon /></span>
+                            : <CopyIcon />
+                          }
+                        </button>
+                      )}
+                    </div>
                   )
                 })}
                 {isLoading && <TypingIndicator message="Thinking..." />}
                 {isTranscribing && <TypingIndicator message="Transcribing..." />}
-              <div ref={scrollRef} />
-            </>
-          )}
+                <div ref={scrollRef} />
+              </>
+            )}
           </div>
         </ScrollArea>
       </div>
@@ -902,7 +905,7 @@ export function ChatInterface({
         {/* Attachment preview */}
         {selectedImage && (
           <div className="mb-3 flex items-center gap-2">
-            <img 
+            <img
               src={`data:image/${selectedImage.format};base64,${selectedImage.base64}`}
               alt="Selected"
               className="h-12 w-12 rounded object-cover"
@@ -938,7 +941,7 @@ export function ChatInterface({
           </div>
         )}
 
-        {/* Main input container - WormGPT style */}
+        {/* Main input container */}
         <div className="rounded-xl border border-border bg-background overflow-hidden">
           {/* Top row: Recording bar OR TTS playback OR textarea with token circle */}
           <div className="flex items-center gap-2 p-3 min-h-[56px]">
@@ -967,7 +970,7 @@ export function ChatInterface({
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onPaste={handlePaste}
-                  onKeyPress={(e) => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault()
                       handleSendMessage()
@@ -990,7 +993,7 @@ export function ChatInterface({
               onChange={handleFileSelect}
               className="hidden"
             />
-            
+
             {/* File upload */}
             <TooltipProvider>
               <Tooltip>

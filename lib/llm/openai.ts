@@ -257,7 +257,7 @@ export async function callOpenAIAPI(
         throw new Error('No text found in OpenAI response output')
       }
 
-      console.log('[Athena] callOpenAIAPI: raw content before parse', content.slice(0, 200))
+      console.log('[Athena] callOpenAIAPI: raw content before parse --', content.slice(0, 200))
       // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
       // Only fall back to wrapping as plain prose if parsing fails.
       try {

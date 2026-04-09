@@ -14,7 +14,8 @@ import { detectTools } from './tools'
  * Unified interface for routing API calls to the correct provider
  * Supports dynamic provider selection based on database settings
  */
-
+// TODO: Make sure we don't have any other duplicated interfaces / types
+// FIXME: Rename this interface to avoid conflicts with the one defined in '/lib/types.ts'
 export interface LLMProvider {
   callAPI: (messages: Message[]) => Promise<LLMResponse>
   transcribeAudio?: (audioBlob: Blob) => Promise<string>
@@ -42,10 +43,6 @@ const providers: Record<string, LLMProvider> = {
     callAPI: callBioLLMAPI,
     // No native STT/TTS — falls back to OpenAI Whisper/TTS if OpenAI API key is configured
   },
-  // wormgpt: {
-  //   callAPI: callWormGPTAPI,
-  //   // No transcribeAudio - doesn't support STT
-  // },
 }
 
 /**
@@ -131,16 +128,20 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   // BioLLM — no native STT, fall back to OpenAI Whisper (priority) or Groq Whisper
   if (providerID === 'biollm') {
     const db = await getDB()
-    const settings = await db.getSettings()
-    if (settings?.openaiApiKeyEncrypted) {
+    const openaiKey = await db.getAPIKey('openai')
+    const groqKey = await db.getAPIKey('groq')
+
+    if (openaiKey) {
       console.log('[Router] BioLLM STT — falling back to OpenAI Whisper')
       return transcribeOpenAI(audioBlob)
     }
-    if (settings?.groqApiKeyEncrypted) {
+    if (groqKey) {
       console.log('[Router] BioLLM STT — falling back to Groq Whisper')
       return transcribeGroq(audioBlob)
     }
-    throw new Error('BioLLM STT requires an OpenAI or Groq API key to be configured')
+
+    console.warn('[Router] BioLLM STT not available — no OpenAI or Groq API key configured')
+    return Promise.reject(new Error('STT not available'))
   }
 
   if (!provider.transcribeAudio) {
@@ -168,13 +169,10 @@ export async function supportsSTT(): Promise<boolean> {
 
     // BioLLM — STT supported if OpenAI (priority) or Groq API key is configured
     if (providerID === 'biollm') {
-      try {
-        const db = await getDB()
-        const settings = await db.getSettings()
-        return !!(settings?.openaiApiKeyEncrypted || settings?.groqApiKeyEncrypted)
-      } catch {
-        return false
-      }
+      const db = await getDB()
+      const openaiKey = await db.getAPIKey('openai')
+      const groqKey = await db.getAPIKey('groq')
+      return !!(openaiKey || groqKey)
     }
 
     // Built-in provider check

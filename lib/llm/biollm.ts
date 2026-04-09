@@ -114,7 +114,7 @@ export async function callBioLLMAPI(
     const data = await response.json()
 
     // Log full response data
-    console.log('[Athena] callBioLLMAPI: response data', JSON.stringify(data))
+    console.log('[Athena] callBioLLMAPI: response data', data)
 
     // Parse JSON response from Responses API
     let parsedResponse: { response: string; reasoning?: string }
@@ -135,7 +135,7 @@ export async function callBioLLMAPI(
 
     // FIXME: BioLLM does not always returns JSON formatted responses as requested
 
-    console.log('[Athena] callBioLLMAPI: raw content before parse', content.slice(0, 200))
+    console.log('[Athena] callBioLLMAPI: raw content before parse --', content.slice(0, 200))
     // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
     // Only fall back to wrapping as plain prose if parsing fails.
     try {
