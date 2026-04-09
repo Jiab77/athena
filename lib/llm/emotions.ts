@@ -67,6 +67,10 @@ export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTI
 
     // FIXME: In the meantime, I'll check which API key is defined between 'openai' and 'groq'
     //        If none of them has been defined, then raise an error.
+
+    // Fallback logic: Try OpenAI first (if defined), then if fails, try Groq (if defined), then simply print a warning in the console
+
+    // Old broken code:
     // const isOpenAI = provider === 'openai'
     // const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
 
