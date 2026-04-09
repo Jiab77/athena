@@ -94,6 +94,17 @@ export interface LLMProvider {
   models: LLMModel[]
 }
 
+/**
+ * Unified LLM API response with usage metrics
+ * Works with all providers (Groq, OpenAI, Custom)
+ */
+export interface LLMResponse {
+  response: string
+  usage: TokenUsage | null
+  imageBase64?: string
+  imageFormat?: string
+}
+
 export interface STTModel {
   id: string
   name: string
@@ -127,17 +138,6 @@ export interface TokenUsage {
   output_tokens?: number
   // Common across all providers
   total_tokens: number
-}
-
-/**
- * Unified LLM API response with usage metrics
- * Works with all providers (Groq, OpenAI, Custom)
- */
-export interface LLMResponse {
-  response: string
-  usage: TokenUsage | null
-  imageBase64?: string
-  imageFormat?: string
 }
 
 export interface TTSModel {
