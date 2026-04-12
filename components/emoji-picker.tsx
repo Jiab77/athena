@@ -36,15 +36,9 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
 
     import('@emoji-mart/data').then((mod) => {
       if (cancelled) return
-      const EmojiMart = (window as any).EmojiMart
-      if (EmojiMart?.init) {
-        EmojiMart.init({ data: mod.default })
-      } else {
-        // Fallback: use the bundled init from the CDN-less path
-        import('emoji-mart').then((em) => {
-          if (!cancelled) em.init({ data: mod.default })
-        }).catch(() => {/* web component self-initialises */})
-      }
+      import('emoji-mart').then((em) => {
+        if (!cancelled) em.init({ data: mod.default })
+      })
     })
 
     return () => { cancelled = true }
