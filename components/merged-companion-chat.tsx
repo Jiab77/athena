@@ -305,6 +305,7 @@ export function MergedCompanionChat({
                 onExpressionChange={handleExpressionChange}
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
+                sttSupported={sttSupported}
               />
             </div>
           )}
@@ -338,6 +339,7 @@ export function MergedCompanionChat({
                 onExpressionChange={handleExpressionChange}
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
+                sttSupported={sttSupported}
               />
             </Card>
           </ResizablePanel>

@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import type { Message, ImageFormat, DocumentFormat, ConversationData, ExpressionState, EmotionState, AudioControls } from '@/lib/types'
-import { callLLM, transcribeAudio, supportsSTT } from '@/lib/llm/router'
+import { callLLM, transcribeAudio } from '@/lib/llm/router'
 import { detectTools } from '@/lib/llm/tools'
 import type { LLMResponse } from '@/lib/types'
 import { detectEmotion } from '@/lib/llm/emotions'
@@ -71,6 +71,8 @@ interface ChatInterfaceProps {
   onTTSReady?: (blob: Blob) => Promise<void>
   /** When true, renders in full-screen popup mode — hides pop-out button, closes window on X */
   isPopup?: boolean
+  /** STT availability — determined by brain.ts, passed down as prop */
+  sttSupported?: boolean
 }
 
 export function ChatInterface({
@@ -84,6 +86,7 @@ export function ChatInterface({
   onEmotionDetected,
   onTTSReady,
   isPopup = false,
+  sttSupported: sttSupportedProp = false,
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const [displayMessages, setDisplayMessages] = useState<Message[]>([])
@@ -101,7 +104,7 @@ export function ChatInterface({
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null)
   const [memorySize, setMemorySize] = useState(0)
   const [memoryWindowSize, setMemoryWindowSize] = useState(DEFAULT_MEMORY_SIZE)
-  const [sttSupported, setSTTSupported] = useState(true)
+  const sttSupported = sttSupportedProp
   const [companionName, setCompanionName] = useState<string>('')
   const [companionImageUrl, setCompanionImageUrl] = useState<string>('')
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
@@ -169,28 +172,7 @@ export function ChatInterface({
     return () => window.removeEventListener('conversation-updated', handleConversationUpdate)
   }, [db, dbReady])
 
-  // Check STT support when component mounts or settings change
-  useEffect(() => {
-    const checkSTT = async () => {
-      try {
-        const supported = await supportsSTT()
-        setSTTSupported(supported)
-      } catch (error) {
-        setSTTSupported(false)
-      }
-    }
-    checkSTT()
 
-    // Listen for settings changes (dispatched from settings-panel)
-    // TODO: Fix this part that does not work.
-    // It simply leaves the microphone disabled even if OpenAI key is being defined later
-    // This means that the `settings-changed` event does not work as expected.
-    const handleSettingsChange = () => {
-      checkSTT()
-    }
-    window.addEventListener('settings-changed', handleSettingsChange)
-    return () => window.removeEventListener('settings-changed', handleSettingsChange)
-  }, [])
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {

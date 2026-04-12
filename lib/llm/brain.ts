@@ -18,7 +18,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { transcribeAudio, callLLM } from './router'
+import { transcribeAudio, callLLM, supportsSTT } from './router'
 import { generateAndPlayTTS, generateTTSBlob, playAudio } from '../utils'
 import { useDB } from '../db-context'
 import { encryptData, decryptData } from '../crypto'
@@ -30,9 +30,7 @@ import {
 } from '../constants'
 import { detectEmotion } from './emotions'
 import { DecartAvatarClient } from '../avatar/decart'
-import type { CompanionData, Message, ExpressionState, EmotionState, VisualFormat } from '../types'
-
-export type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
+import type { CompanionData, Message, ExpressionState, EmotionState, VoiceState, VisualFormat } from '../types'
 
 export interface BrainOptions {
   companion: CompanionData
@@ -69,7 +67,7 @@ export function useBrain({
   const [expressionState, setExpressionState] = useState<ExpressionState>('idle')
   const [lastDetectedEmotion, setLastDetectedEmotion] = useState<EmotionState | null>(null)
   const [voiceState, setVoiceState] = useState<VoiceState>('idle')
-  const [sttSupported, setSttSupported] = useState(true)
+  const [sttSupported, setSttSupported] = useState(false)
   const [decartStream, setDecartStream] = useState<MediaStream | null>(null)
   const [decartReady, setDecartReady] = useState(false)
   const [decartError, setDecartError] = useState<string | null>(null)
@@ -104,6 +102,22 @@ export function useBrain({
       setDecartReady(false)
     }, LIVE_AVATAR_IDLE_TIMEOUT)
   }, [clearIdleTimer])
+
+  // ─── STT support check ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    const checkSTT = async () => {
+      try {
+        const supported = await supportsSTT()
+        setSttSupported(supported)
+      } catch {
+        setSttSupported(false)
+      }
+    }
+    checkSTT()
+    window.addEventListener('settings-changed', checkSTT)
+    return () => window.removeEventListener('settings-changed', checkSTT)
+  }, [])
 
   // ─── Decart mount / unmount lifecycle ───────────────────────────────────────
 
@@ -350,20 +364,12 @@ export function useBrain({
       const result = await callLLM(allMessages, selectedProvider)
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
-      // Fire-and-forget emotion detection
-      // BioLLM: only run if OpenAI (priority, gpt-5.4-nano) or Groq (llama-3.1-8b-instant) API key is configured
-      let shouldDetectEmotion = selectedProvider !== 'biollm'
-      if (!shouldDetectEmotion) {
-        const bioSettings = await db?.getSettings().catch(() => null)
-        shouldDetectEmotion = !!(bioSettings?.openaiApiKeyEncrypted || bioSettings?.groqApiKeyEncrypted)
-        console.log('[Brain] BioLLM emotion detection:', { shouldDetectEmotion, hasOpenAI: !!bioSettings?.openaiApiKeyEncrypted, hasGroq: !!bioSettings?.groqApiKeyEncrypted })
-      }
-      if (shouldDetectEmotion) {
-        detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
-          console.log('[Brain] Detected emotion:', emotion)
-          if (emotion) setLastDetectedEmotion(emotion)
-        })
-      }
+      // Fire-and-forget emotion detection — emotions.ts handles graceful degradation
+      // when no OpenAI or Groq key is configured, returning { emotion: null } with a console.warn
+      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
+        console.log('[Brain] Detected emotion:', emotion)
+        if (emotion) setLastDetectedEmotion(emotion)
+      })
 
       const companionMessage: Message = {
         id: `msg-${Date.now() + 1}`,

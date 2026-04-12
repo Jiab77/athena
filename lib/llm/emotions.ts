@@ -9,6 +9,7 @@ import {
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
   EMOTION_KEYWORDS,
+  GENDER_MAPPING,
 } from '../constants'
 import { getDB } from '../db'
 import { getAPIKey } from '../utils'
@@ -26,10 +27,11 @@ const VALID_EMOTIONS = [...EMOTION_KEYWORDS] as EmotionState[]
  * Takes companion name and personality into account so the classifier
  * understands the emotional delivery style rather than just semantic content
  */
-function buildEmotionSystemPrompt(companion: string, personality: PersonalityType): string {
-  return `You are an emotion classifier for ${companion}, an AI companion with a ${personality} personality.
+function buildEmotionSystemPrompt(companion: string, personality: PersonalityType, avatarGender: GenderType): string {
+  const gender = GENDER_MAPPING[avatarGender].gender
+  return `You are an emotion classifier for ${companion}, an AI companion with a ${personality} personality and ${gender} gender expression.
 
-Analyze the emotional tone of ${companion}'s response, taking into account their ${personality} personality style.
+Analyze the emotional tone of ${companion}'s response, taking into account their ${personality} personality style and ${gender} gender expression.
 For example, a Sarcastic companion may express happiness through wit and irony rather than explicit joy.
 A Cheerful companion may express thoughtfulness with an upbeat tone rather than a neutral one.
 
@@ -56,54 +58,28 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
  */
 export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_DETECTION_PROVIDER): Promise<EmotionDetectionResult> {
   try {
-    console.log('[Athena] Caller model provider:', provider)
-
-    // TODO: Add required code for handling key selection when 'biollm' provider is selected.
-    // GOAL: Avoids printing error message when 'openai' key is being used for the TTS feature
-    // NEED: 1. Detect if 'biollm' provider is selected AND 'openai' key is defined,
-    //       2. If 'openai' key not defined, look at 'groq' api key,
-    //       3. If no 'openai' or 'groq' api keys found when 'biollm' provider is selected:
-    //       4. Simply show a warning in the console but not an error.
-
-    // FIXME: In the meantime, I'll check which API key is defined between 'openai' and 'groq'
-    //        If none of them has been defined, then raise an error.
-
-    // Fallback logic: Try OpenAI first (if defined), then if fails, try Groq (if defined), then if also failing, simply print a warning in the console
-
-    // Old broken code:
-    // const isOpenAI = provider === 'openai'
-    // const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
-
     const db = await getDB()
     const settings = await db.getSettings()
 
-    // TEST: Get API keys from the database like '/hooks/use-connection-status.ts' to avoid raising errors
-    // FIXME: Dirty code that should fallback to 'openai' or 'groq' when using 'biollm' provider.
-    // TODO: Simply disable emotion detection WHEN no 'openai' or 'groq' defined so that we don't raise an error for nothing?
-    const apiKeyOpenAI = await db.getAPIKey('openai')
-    const apiKeyGroq = await db.getAPIKey('groq')
-    let emotionProvider
+    // Resolve emotion detection provider — OpenAI (priority) or Groq fallback
+    // Works regardless of the main LLM provider (including BioLLM which has no native emotion detection)
+    const hasOpenAI = !!(await db.checkAPIKey('openai'))
+    const hasGroq = !!(await db.checkAPIKey('groq'))
 
-    let isOpenAI, apiKey
-    if (apiKeyOpenAI !== null) {
-      isOpenAI = true
-      apiKey = apiKeyOpenAI
-      emotionProvider = 'openai'
-    } else if (apiKeyGroq !== null) {
-      isOpenAI = false
-      apiKey = apiKeyGroq
-      emotionProvider = 'groq'
-    } else {
-      isOpenAI = false
-      apiKey = null
-      emotionProvider = null
+    if (!hasOpenAI && !hasGroq) {
+      console.warn('[Athena] Emotion detection disabled — no OpenAI or Groq API key configured')
+      return { emotion: null }
     }
+
+    const isOpenAI = hasOpenAI
+    const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
 
     const companion = settings?.selectedCompanion || DEFAULT_COMPANION_NAME
     const personality = (settings?.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
-    const emotionSystemPrompt = buildEmotionSystemPrompt(companion, personality)
+    const avatarGender = (settings?.avatarGender as GenderType) || DEFAULT_GENDER
+    const emotionSystemPrompt = buildEmotionSystemPrompt(companion, personality, avatarGender)
 
-    console.log('[Athena] Emotion detection - provider:', emotionProvider, 'companion:', companion, 'personality:', personality)
+    console.log('[Athena] Emotion detection - provider:', isOpenAI ? 'openai' : 'groq', 'companion:', companion, 'personality:', personality)
 
     const reqBody = {
       model: isOpenAI ? DEFAULT_OPENAI_EMOTION_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,

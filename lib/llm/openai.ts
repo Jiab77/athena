@@ -4,14 +4,13 @@ import type { Message, PersonalityType, GenderType, LLMResponse } from '../types
 import {
   DEFAULT_GENDER,
   DEFAULT_COMPANION_NAME,
-  DEFAULT_MODEL_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_AUDIO_FILE,
   STT_PROVIDERS
 } from '../constants'
 import { getDB } from '../db'
-import { parseCompanionJSON, buildSystemPrompt, getAPIKey } from '../utils'
+import { buildSystemPrompt, getAPIKey } from '../utils'
 
 const CHAT_API_URL = 'https://api.openai.com/v1/responses'
 const STT_API_URL = 'https://api.openai.com/v1/audio/transcriptions'
@@ -36,7 +35,7 @@ export async function callOpenAIAPI(
     }
 
     // Extract settings with defaults
-    const model = settings.selectedModel || DEFAULT_MODEL_NAME
+    const model = settings.selectedModel
     const personality = (settings.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const companion = settings.selectedCompanion || DEFAULT_COMPANION_NAME
     const memoryWindowSize = settings.memoryWindowSize || DEFAULT_MEMORY_SIZE
@@ -134,17 +133,12 @@ export async function callOpenAIAPI(
       }
     })
 
-    const inputBase = [
-      { role: 'system' as const, content: 'Always respond with valid JSON format.' },
-      ...userMessages,
-    ]
-
     // TODO: Implement 'file_search' feature
     // SEE: https://developers.openai.com/api/docs/guides/tools-file-search
     const reqBody: any = {
       model: model,
       instructions: systemPrompt,
-      input: inputBase,
+      input: userMessages,
       temperature: 1,
       max_output_tokens: 2048,
       reasoning: { effort: 'low' },
@@ -195,92 +189,76 @@ export async function callOpenAIAPI(
 
     const usage = data.usage || null
 
-    // Parse JSON response from Responses API
-    let parsedResponse: { response: string; reasoning?: string, image_generation_call?: string }
     let imageOutput: any = null
-    try {
-      // Check response status first
-      if (data.status !== 'completed') {
-        if (data.status === 'incomplete') {
-          const reason = data.incomplete_details?.reason
-          console.log('[Athena] callOpenAIAPI: response incomplete', { reason })
-          if (reason === 'max_output_tokens') {
-            throw new Error('Response cut off due to max_output_tokens limit')
-          } else if (reason === 'content_filter') {
-            throw new Error('Response blocked by content filter')
-          }
-          throw new Error(`Response incomplete: ${reason}`)
+
+    // Check response status first
+    if (data.status !== 'completed') {
+      if (data.status === 'incomplete') {
+        const reason = data.incomplete_details?.reason
+        console.log('[Athena] callOpenAIAPI: response incomplete', { reason })
+        if (reason === 'max_output_tokens') {
+          throw new Error('Response cut off due to max_output_tokens limit')
+        } else if (reason === 'content_filter') {
+          throw new Error('Response blocked by content filter')
         }
-        console.log('[Athena] callOpenAIAPI: unexpected status', data.status)
-        throw new Error(`Unexpected response status: ${data.status}`)
+        throw new Error(`Response incomplete: ${reason}`)
       }
-
-      // Extract image output first — model may return image-only (no message item)
-      imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call') ?? null
-      if (imageOutput) {
-        console.log('[Athena] callOpenAIAPI: image received', { format: imageOutput.output_format, quality: imageOutput.quality })
-      }
-
-      // Extract text from Responses API output structure
-      // The output array can have multiple items (reasoning, message, web_search_call, image_generation_call)
-      // When image_generation fires as primary output, there may be no message item
-      const messageOutput = data.output?.find((item: any) => item.type === 'message')
-      console.log('[Athena] callOpenAIAPI: messageOutput', {
-        found: !!messageOutput,
-        contentType: messageOutput?.content?.[0]?.type,
-        textLength: messageOutput?.content?.[0]?.text?.length,
-      })
-
-      // Check for model refusal
-      if (messageOutput?.content?.[0]?.type === 'refusal') {
-        const refusalReason = messageOutput.content[0].refusal
-        console.log('[Athena] callOpenAIAPI: model refusal', refusalReason)
-        throw new Error(`Model refused: ${refusalReason}`)
-      }
-
-      const content = messageOutput?.content?.[0]?.text
-
-      // Image-only response — no message item, or message item has empty text
-      // Model returns image with no accompanying text — return image directly
-      if ((!messageOutput || !content) && imageOutput) {
-        console.log('[Athena] callOpenAIAPI: image-only response — no text content alongside image')
-        return {
-          response: '',
-          usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
-          imageBase64: imageOutput.result,
-          imageFormat: imageOutput.output_format || 'png',
-        }
-      }
-
-      if (!content) {
-        console.log('[Athena] callOpenAIAPI: no text content found in output')
-        throw new Error('No text found in OpenAI response output')
-      }
-
-      console.log('[Athena] callOpenAIAPI: raw content before parse --', content.slice(0, 200))
-      // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
-      // Only fall back to wrapping as plain prose if parsing fails.
-      try {
-        parsedResponse = parseCompanionJSON(content)
-        console.log('[Athena] callOpenAIAPI: parsedResponse keys', Object.keys(parsedResponse))
-      } catch {
-        console.log('[Athena] callOpenAIAPI: JSON parse failed — wrapping plain prose as response')
-        parsedResponse = { response: content }
-      }
-    } catch (parseError) {
-      console.log('[Athena] callOpenAIAPI: parse error', parseError)
-      throw new Error('Invalid response from OpenAI Responses API')
+      console.log('[Athena] callOpenAIAPI: unexpected status', data.status)
+      throw new Error(`Unexpected response status: ${data.status}`)
     }
 
-    if (!parsedResponse.response) {
-      console.log('[Athena] callOpenAIAPI: missing response field in parsed JSON', parsedResponse)
-      throw new Error('No response field in parsed JSON')
+    // Extract image output first — model may return image-only (no message item)
+    imageOutput = data.output?.find((item: any) => item.type === 'image_generation_call') ?? null
+    if (imageOutput) {
+      console.log('[Athena] callOpenAIAPI: image received', { format: imageOutput.output_format, quality: imageOutput.quality })
     }
 
-    console.log('[Athena] callOpenAIAPI: success', { responseLength: parsedResponse.response.length, usage, hasImage: !!imageOutput })
+    // Extract text from Responses API output structure
+    // The output array can have multiple items (reasoning, message, web_search_call, image_generation_call)
+    // When image_generation fires as primary output, there may be no message item
+    const messageOutput = data.output?.find((item: any) => item.type === 'message')
+    console.log('[Athena] callOpenAIAPI: messageOutput', {
+      found: !!messageOutput,
+      contentType: messageOutput?.content?.[0]?.type,
+      textLength: messageOutput?.content?.[0]?.text?.length,
+    })
+
+    // Check for model refusal
+    if (messageOutput?.content?.[0]?.type === 'refusal') {
+      const refusalReason = messageOutput.content[0].refusal
+      console.log('[Athena] callOpenAIAPI: model refusal', refusalReason)
+      throw new Error(`Model refused: ${refusalReason}`)
+    }
+
+    // Log reasoning when present — will be surfaced in UI in a future session
+    const reasoning = data.output?.find((item: any) => item.type === 'reasoning')?.summary?.[0]?.text || null
+    if (reasoning) {
+      console.log('[Athena] callOpenAIAPI: reasoning', reasoning)
+    }
+
+    const content = messageOutput?.content?.[0]?.text
+
+    // Image-only response — no message item, or message item has empty text
+    // Model returns image with no accompanying text — return image directly
+    if ((!messageOutput || !content) && imageOutput) {
+      console.log('[Athena] callOpenAIAPI: image-only response — no text content alongside image')
+      return {
+        response: '',
+        usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
+        imageBase64: imageOutput.result,
+        imageFormat: imageOutput.output_format || 'png',
+      }
+    }
+
+    if (!content) {
+      console.log('[Athena] callOpenAIAPI: no text content found in output')
+      throw new Error('No text found in OpenAI response output')
+    }
+
+    console.log('[Athena] callOpenAIAPI: success', { responseLength: content.length, usage, hasImage: !!imageOutput })
 
     return {
-      response: parsedResponse.response,
+      response: content,
       usage: usage as { input_tokens: number; output_tokens: number; total_tokens: number } | null,
       ...(imageOutput?.result ? { imageBase64: imageOutput.result, imageFormat: imageOutput.output_format || 'png' } : {}),
     }

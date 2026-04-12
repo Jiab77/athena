@@ -128,8 +128,8 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   // BioLLM — no native STT, fall back to OpenAI Whisper (priority) or Groq Whisper
   if (providerID === 'biollm') {
     const db = await getDB()
-    const openaiKey = await db.getAPIKey('openai')
-    const groqKey = await db.getAPIKey('groq')
+    const openaiKey = await db.checkAPIKey('openai')
+    const groqKey = await db.checkAPIKey('groq')
 
     if (openaiKey) {
       console.log('[Router] BioLLM STT — falling back to OpenAI Whisper')
@@ -170,8 +170,8 @@ export async function supportsSTT(): Promise<boolean> {
     // BioLLM — STT supported if OpenAI (priority) or Groq API key is configured
     if (providerID === 'biollm') {
       const db = await getDB()
-      const openaiKey = await db.getAPIKey('openai')
-      const groqKey = await db.getAPIKey('groq')
+      const openaiKey = await db.checkAPIKey('openai')
+      const groqKey = await db.checkAPIKey('groq')
       return !!(openaiKey || groqKey)
     }
 

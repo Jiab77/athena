@@ -290,7 +290,7 @@ export function Avatar25D({
   imageUrl,
   name,
   expressionState = 'idle',
-  isOnline = true,
+  isOnline = false,
   hideStatus = false,
   fullscreen = false,
 }: Avatar25DProps) {

@@ -155,14 +155,8 @@ function AvatarMesh({
   const timeRef = useRef(0)
   const texture = useLoader(TextureLoader, imageUrl)
 
-  useEffect(() => {
-    console.log('[R3FAvatar] AvatarMesh mounted — imageUrl:', imageUrl)
-    return () => console.log('[R3FAvatar] AvatarMesh unmounted — imageUrl:', imageUrl)
-  }, [imageUrl])
-
   // Ensure crisp texture — no mipmapping, max anisotropy
   useEffect(() => {
-    console.log('[R3FAvatar] Texture loaded — size:', texture.image?.width, 'x', texture.image?.height, 'url:', imageUrl)
     texture.minFilter = THREE.LinearFilter
     texture.magFilter = THREE.LinearFilter
     texture.generateMipmaps = false
@@ -189,7 +183,6 @@ function AvatarMesh({
 
   // Update lerp targets when expression state changes
   useEffect(() => {
-    console.log('[R3FAvatar] Expression changed:', expressionState)
     const c = EMOTION_CONFIG[expressionState] ?? EMOTION_CONFIG.idle
     lerpRef.current.tint.set(...c.tint)
     lerpRef.current.tintStrength = c.tintStrength
@@ -260,20 +253,10 @@ export function R3FAnimatedCharacter({
   imageUrl,
   name,
   expressionState = 'idle',
-  isOnline = true,
+  isOnline = false,
 }: R3FAnimatedCharacterProps) {
   const [pulseIntensity, setPulseIntensity] = useState(0)
   const config = EMOTION_CONFIG[expressionState] ?? EMOTION_CONFIG.idle
-
-  useEffect(() => {
-    console.log('[R3FAvatar] Component mounted — imageUrl:', imageUrl, 'expression:', expressionState, 'isOnline:', isOnline)
-    return () => console.log('[R3FAvatar] Component unmounted')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    console.log('[R3FAvatar] imageUrl changed to:', imageUrl)
-  }, [imageUrl])
 
   // Speaking pulse feeds into brightness shader uniform
   useEffect(() => {
@@ -281,14 +264,10 @@ export function R3FAnimatedCharacter({
       setPulseIntensity(0)
       return
     }
-    console.log('[R3FAvatar] Speaking pulse started')
     const interval = setInterval(() => {
       setPulseIntensity(0.3 + Math.random() * 0.7)
     }, 100)
-    return () => {
-      console.log('[R3FAvatar] Speaking pulse stopped')
-      clearInterval(interval)
-    }
+    return () => clearInterval(interval)
   }, [expressionState])
 
   return (

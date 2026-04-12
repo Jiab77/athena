@@ -36,7 +36,7 @@ export function CompanionPopupView({
   decartError = null,
   voiceState = 'idle',
   voiceOutputEnabled = true,
-  sttSupported = true,
+  sttSupported = false,
   onMicClick,
   onVoiceOutputToggle,
   onOpenChat,
@@ -48,8 +48,6 @@ export function CompanionPopupView({
       videoRef.current.srcObject = decartStream
     }
   }, [decartStream])
-
-  console.log('[v0] CompanionPopupView — isOnline prop received:', isOnline, '| visualFormat:', visualFormat)
 
   const statusLabel = visualFormat === 'live-avatar'
     ? decartStream ? 'Live' : decartError ? 'Connection failed' : 'Connecting...'

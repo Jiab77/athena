@@ -14,7 +14,7 @@ export function useConnectionStatus() {
     const checkStatus = async () => {
       try {
         const settings = await db.getSettings()
-        const apiKey = await db.getAPIKey('groq') || await db.getAPIKey('openai') || await db.getAPIKey('biollm')
+        const apiKey = await db.checkAPIKey('groq') || await db.checkAPIKey('openai') || await db.checkAPIKey('biollm')
 
         // Online only if settings exist AND API key is configured
         const result = !!settings && !!apiKey

@@ -4,7 +4,6 @@ import type { Message, PersonalityType, GenderType, LLMResponse } from '../types
 import {
   DEFAULT_GENDER,
   DEFAULT_COMPANION_NAME,
-  DEFAULT_MODEL_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_AUDIO_FILE,
@@ -14,18 +13,10 @@ import {
   STT_PROVIDERS
 } from '../constants'
 import { getDB } from '../db'
-import { parseCompanionJSON, buildSystemPrompt, getAPIKey } from '../utils'
+import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey } from '../utils'
 
 const CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const STT_API_URL = 'https://api.groq.com/openai/v1/audio/transcriptions'
-
-/**
- * Escape triple-backtick sequences in document content to prevent
- * prompt injection via crafted documents breaking out of the fenced block.
- */
-function escapeDocumentContent(content: string): string {
-  return content.replace(/`{3,}/g, (match) => match.replace(/`/g, '` ').trimEnd())
-}
 
 /**
  * Call Groq API with conversation history using fetch
@@ -45,7 +36,7 @@ export async function callGroqAPI(
     }
 
     // Extract settings with defaults
-    const model = settings.selectedModel || DEFAULT_MODEL_NAME
+    const model = settings.selectedModel
     const personality = (settings.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const companion = settings.selectedCompanion || DEFAULT_COMPANION_NAME
     const memoryWindowSize = settings.memoryWindowSize || DEFAULT_MEMORY_SIZE
@@ -54,7 +45,7 @@ export async function callGroqAPI(
 
     console.log('[Athena] callGroqAPI: settings resolved', { model, personality, companion, memoryWindowSize, avatarGender })
 
-    const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
+    const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits, true)
 
     const windowedMessages = messages.slice(-memoryWindowSize)
 
