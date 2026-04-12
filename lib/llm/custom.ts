@@ -108,7 +108,6 @@ export async function callCustomAPI(
       messages: apiMessages,
       temperature: 1,
       max_tokens: 1024,
-      response_format: { type: 'json_object' }
     }
 
     console.log('[Athena] callCustomAPI: request body', reqBody)
@@ -141,29 +140,16 @@ export async function callCustomAPI(
 
     const usage = data.usage || null
 
-    // Parse response - try JSON first, then plain text
-    let responseText: string
     const content = data.choices?.[0]?.message?.content
 
     if (!content) {
       throw new Error('No response content from Custom API')
     }
 
-    console.log('[Athena] callCustomAPI: raw content before parse', content.slice(0, 200))
-
-    try {
-      // Try to parse as JSON (for providers that support structured output)
-      const parsed = JSON.parse(content)
-      responseText = parsed.response || content
-    } catch {
-      // Fall back to plain text
-      responseText = content
-    }
-
-    console.log('[Athena] callCustomAPI: success', { responseLength: responseText.length, usage })
+    console.log('[Athena] callCustomAPI: success', { responseLength: content.length, usage })
 
     return {
-      response: responseText,
+      response: content,
       usage: usage as { prompt_tokens: number; completion_tokens: number; total_tokens: number } | null
     }
   } catch (error) {
