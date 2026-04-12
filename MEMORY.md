@@ -72,6 +72,127 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
+> ## Session 29: JSON parsing cleanup, API key pattern fix, emotions.ts rewrite, component architecture audit (04/12/2026)
+
+### Overview
+
+Session 29 was a focused code quality and architecture session. Main themes: removing unnecessary JSON parsing from all non-Groq providers, fixing a critical API key reading pattern bug across the codebase, rewriting `emotions.ts` properly, adding gender to emotion detection, standardising `sttSupported` as a single source of truth in `brain.ts`, and a full component architecture audit confirming Option A (props-driven) as the official pattern.
+
+---
+
+### 1. JSON Parsing Removed from Non-Groq Providers
+
+**Root cause:** JSON parsing (`parseCompanionJSON`) was added for Groq (which needs `response_format: json_object`) and incorrectly applied to all providers.
+
+**Files changed:**
+- `lib/llm/biollm.ts` — `parseCompanionJSON` removed, `content` returned directly from `choices[0].message.content`. `useProxy` flag and dead `if/else` fetch block removed. `app/api/biollm/route.ts` deleted (proxy no longer needed)
+- `lib/llm/openai.ts` — `inputBase` with forced JSON system message removed (`input` now points directly to `userMessages`). `parseCompanionJSON` try/catch replaced with direct `content` return. `reasoning` extracted from `output` array and logged for future UI use
+- `lib/llm/custom.ts` — `response_format: { type: 'json_object' }` removed. JSON parse try/catch removed, `content` returned directly
+- `lib/llm/groq.ts` — unchanged, still uses JSON mode correctly
+
+**`buildSystemPrompt` in `lib/utils.ts`:**
+- `useNewPrompt` boolean replaced with `forceJSON = false` parameter
+- `oldPrompt` (with JSON instructions) returned when `forceJSON = true`, `newPrompt` (plain prose) when `false`
+- `groq.ts` explicitly passes `true`, all other providers use default `false`
+- TODO comment removed
+
+---
+
+### 2. API Key Reading Pattern — Critical Fix
+
+**The bug:** `db.getAPIKey()` returns `StoredAPIKey | null` (an encrypted object), NOT the decrypted string. Code in `router.ts` and `emotions.ts` was passing this object directly to `Authorization: Bearer ${apiKey}` — producing `Bearer [object Object]`.
+
+**The correct pattern (already used in all LLM provider files):**
+- `db.checkAPIKey(provider)` — existence check only, returns `StoredAPIKey | null` (renamed from `db.getAPIKey()` via editor refactor)
+- `getAPIKey(provider)` from `utils.ts` — returns the actual decrypted string for use in `fetch()` calls
+
+**Files fixed:**
+- `lib/llm/router.ts` — `transcribeAudio()` and `supportsSTT()` now use `db.checkAPIKey()` for existence, `transcribeOpenAI`/`transcribeGroq` handle their own key reading internally. `throw new Error` replaced with `console.warn` + `Promise.reject` for graceful STT degradation
+- `lib/llm/emotions.ts` — fully rewritten (see below)
+- `db.ts` — `getAPIKey()` renamed to `checkAPIKey()` across all call sites via editor refactor
+
+---
+
+### 3. `emotions.ts` — Full Rewrite
+
+**All TODO/FIXME/TEST comments and dead code removed.**
+
+**Key fixes:**
+- `db.checkAPIKey('openai')` / `db.checkAPIKey('groq')` for existence checks only
+- `getAPIKey(isOpenAI ? 'openai' : 'groq')` from `utils.ts` for the decrypted key used in `Authorization: Bearer`
+- Early `console.warn` + `return { emotion: null }` when neither key is configured — no error thrown, no broken fetch call
+- OpenAI always takes priority over Groq for emotion detection
+
+**Gender added to emotion detection:**
+- `buildEmotionSystemPrompt()` now accepts `avatarGender: GenderType` as third parameter
+- `GENDER_MAPPING` imported from `constants.ts`
+- Gender included in both the identity line and the analysis instruction of the emotion prompt
+- Caller reads `settings?.avatarGender` with `DEFAULT_GENDER` fallback
+
+---
+
+### 4. `sttSupported` — Single Source of Truth in `brain.ts`
+
+**Problem:** `chat-interface.tsx` was managing its own duplicate `sttSupported` state and calling `supportsSTT()` independently — inconsistent with `companion-window.tsx` and `companion-popup-view.tsx` which received it from `brain.ts`.
+
+**Fix:**
+- `brain.ts` — `supportsSTT` imported from `router.ts`, `useState(true)` → `useState(false)` (safe default), new `useEffect` calls `supportsSTT()` on mount and re-checks on `settings-changed` events
+- `chat-interface.tsx` — own `sttSupported` state removed, own `useEffect` removed, `supportsSTT` import removed, `sttSupported` added to props interface, consumed from prop
+- `merged-companion-chat.tsx` — `sttSupported={sttSupported}` added to both mobile and desktop `ChatInterface` instances
+
+---
+
+### 5. Component Architecture Audit — Option A Confirmed
+
+**Decision:** Props-driven (Option A) is the official pattern. `brain.ts` owns all business logic state. UI components are dumb — they only receive props and render.
+
+**Findings from audit:**
+- No component was fetching its own data autonomously — architecture was already mostly correct
+- Wrong default values fixed:
+  - `companion-window.tsx` — `sttSupported = true` → `false`
+  - `companion-popup-view.tsx` — `sttSupported = true` → `false`
+  - `r3f-animated-character.tsx` — `isOnline = true` → `false` (backlog #9 resolved)
+  - `avatar-2-5d.tsx` — `isOnline = true` → `false` (backlog #9 resolved)
+- Debug logs removed from `companion-popup-view.tsx` and `r3f-animated-character.tsx`
+- `EMOTION_CONFIG` duplicated in both avatar components — noted as tech debt, not yet moved to `constants.ts`
+
+---
+
+### 6. `chat-interface.tsx` Refactor — Scoped Plan
+
+`chat-interface.tsx` is 1091 lines because it mixes business logic (LLM calls, DB reads/writes, file processing) with JSX. Agreed plan:
+- **Next session:** Extract business logic to `lib/chat.ts` only — `sendMessage()`, `loadConversation()`, `newConversation()`, `processFile()`
+- **Follow-up session:** Move business state (`isLoading`, `isSpeaking`, `tokenUsage`, etc.) from `chat-interface.tsx` to `brain.ts`
+- JSX left completely untouched until both extractions are done and tested
+
+**Key design decision for `lib/chat.ts`:** exported async functions (not hooks), accept a `db` instance, return data. Component stays in charge of its own state.
+
+---
+
+### Open Items Carried Forward to Session 30
+
+1. **`lib/chat.ts` creation** — extract `sendMessage()`, `loadConversation()`, `newConversation()`, `processFile()` from `chat-interface.tsx`
+2. **`lib/llm/brain.ts` state extraction** — `isLoading`, `isSpeaking`, `isPlayingTTS`, `ttsAudioControls`, `replayingMessageId`, `tokenUsage`, `memorySize`, `memoryWindowSize`, `isTranscribing`, `isRecording`
+3. **`expressionState` dual source conflict** — `useBrain()` and `ChatInterface` both drive it simultaneously
+4. **Emotion display logic** — review and fix
+5. **Processing / Speaking display logic** — review and fix
+6. **Mic button disabled while AI is speaking**
+7. **Speaker button becomes Stop button while AI is speaking**
+8. **`/app/companion/[id]/page.tsx` full review / rewrite**
+9. **Visual formats logic / rendering full review / rewrite**
+10. **Runway-based `live-avatar` implementation**
+11. **CSP header still missing**
+12. **Popup live-sync** — `BroadcastChannel`, deferred
+13. **`DEBUG_MODE` constant + `debugLog()` utility** — priority
+14. **BioLLM endpoint test** — pending tunnel restart with live URL
+15. **`ENABLE_BIOLLM_PERSONALITY`** — pending friend confirmation on system prompt support
+16. **`thinking` state universal** — all providers show thinking state during inference
+17. **Model capabilities display** — hybrid: dropdown icons + settings panel active model summary
+18. **BioLLM tool detection via `gpt-5.4-nano`** — deferred until base integration stable
+19. **`EMOTION_CONFIG` duplication** — move from both avatar components to `constants.ts`
+
+---
+
 > ## Session 28: BioLLM Fixes, Emotion detection dirty fix, Structured format debugging (04/06/2026)
 
 ### Overview
