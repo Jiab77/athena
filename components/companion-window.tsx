@@ -263,43 +263,45 @@ export function CompanionWindow({
             )}
 
             {/* Mic button - bottom left */}
-            {sttSupported && onMicClick && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${voiceState === 'recording'
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${!sttSupported
+                      ? 'opacity-50 cursor-not-allowed'
+                      : voiceState === 'recording'
                         ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
                         : voiceState === 'transcribing' || voiceState === 'processing'
                           ? 'bg-amber-500/20 text-amber-500'
                           : 'bg-primary/20 text-primary hover:bg-primary/30'
-                        }`}
-                      onClick={onMicClick}
-                      disabled={voiceState === 'transcribing' || voiceState === 'processing'}
-                    >
-                      {voiceState === 'transcribing' || voiceState === 'processing' ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Mic className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>
-                      {voiceState === 'recording'
+                      }`}
+                    onClick={sttSupported ? onMicClick : undefined}
+                    disabled={!sttSupported || voiceState === 'transcribing' || voiceState === 'processing'}
+                  >
+                    {voiceState === 'transcribing' || voiceState === 'processing' ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Mic className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>
+                    {!sttSupported
+                      ? 'STT not available for this provider'
+                      : voiceState === 'recording'
                         ? 'Tap to stop'
                         : voiceState === 'transcribing'
                           ? 'Transcribing...'
                           : voiceState === 'processing'
                             ? 'Processing...'
                             : 'Tap to speak'}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
