@@ -4,7 +4,6 @@ import type { Message, PersonalityType, GenderType, LLMResponse } from '../types
 import {
   DEFAULT_GENDER,
   DEFAULT_COMPANION_NAME,
-  DEFAULT_MODEL_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_AUDIO_FILE,
@@ -36,7 +35,7 @@ export async function callOpenAIAPI(
     }
 
     // Extract settings with defaults
-    const model = settings.selectedModel || DEFAULT_MODEL_NAME
+    const model = settings.selectedModel
     const personality = (settings.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const companion = settings.selectedCompanion || DEFAULT_COMPANION_NAME
     const memoryWindowSize = settings.memoryWindowSize || DEFAULT_MEMORY_SIZE
