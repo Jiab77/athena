@@ -1046,7 +1046,7 @@ export function ChatInterface({
                     size="icon"
                     variant="ghost"
                     onClick={handleToggleVoiceOutput}
-                    disabled={isLoading || !voiceOutputEnabled}
+                    disabled={isLoading}
                     className={`cursor-pointer h-8 w-8 ${voiceOutputEnabled ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                   >
                     {voiceOutputEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
