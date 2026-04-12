@@ -42,6 +42,7 @@ export async function callBioLLMAPI(
     }
 
     // Extract settings with defaults
+    const model = settings.selectedModel
     const personality = (settings.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const companion = settings.selectedCompanion || DEFAULT_COMPANION_NAME
     const memoryWindowSize = settings.memoryWindowSize || DEFAULT_MEMORY_SIZE
@@ -51,7 +52,7 @@ export async function callBioLLMAPI(
 
     const CHAT_API_URL = `${endpointUrl}/v1/chat/completions`
 
-    console.log('[Athena] callBioLLMAPI: settings resolved', { personality, companion, memoryWindowSize, avatarGender, endpointUrl })
+    console.log('[Athena] callBioLLMAPI: settings resolved', { model, personality, companion, memoryWindowSize, avatarGender, endpointUrl })
 
     const windowedMessages = messages.slice(-memoryWindowSize)
 
@@ -69,6 +70,7 @@ export async function callBioLLMAPI(
     ]
 
     const reqBody = {
+      model: model,
       messages: bioMessages,
     }
 
