@@ -337,17 +337,103 @@ See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full 
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js 18+
+- `npm`, `pnpm`, `yarn`, or `bun`
+- At least one API key (Groq is the easiest free starting point)
+
+### Installation
+
 ```bash
+# Clone the repository
+git clone https://github.com/Jiab77/athena.git
+cd athena
+
 # Install dependencies
 npm install
 
-# Run development server
+# Start the development server
 npm run dev
 
 # Open http://localhost:3000
 ```
 
-Add your API keys in **Settings > Model** within the app — they are encrypted and stored locally, never sent to any server other than their respective providers.
+### Minimum Viable Setup
+
+1. Open the app at `http://localhost:3000`
+2. Click the settings icon (top right of the companion panel)
+3. Go to **Model** and select a provider (Groq recommended for first use)
+4. Paste your API key — it is encrypted and stored locally, never sent anywhere other than the provider
+5. Select a model from the dropdown
+6. Start chatting
+
+---
+
+## Usage
+
+### Configuring a Provider
+
+All API keys are configured inside the app under **Settings > Model**. They are encrypted with AES-GCM + PBKDF2 at 600,000 iterations before being stored in IndexedDB — they never leave the browser unencrypted.
+
+| Provider | Key needed | What it unlocks |
+|---|---|---|
+| Groq | `GROQ_API_KEY` | LLM inference + Whisper STT + emotion detection |
+| OpenAI | `OPENAI_API_KEY` | LLM inference + Whisper STT + TTS + image generation |
+| BioLLM | `BIOLLM_API_KEY` + endpoint URL | Biological neural network inference (experimental) |
+| ResembleAI | `RESEMBLEAI_API_KEY` | Chatterbox TTS (alternative to OpenAI TTS) |
+| Decart | `DECART_API_KEY` | Real-time WebRTC live avatar |
+| Custom | Endpoint URL (+ optional key) | Any OpenAI-compatible API (LM Studio, vLLM, Ollama, etc.) |
+
+### Creating a Companion
+
+1. Click **New Companion** on the landing page (or the FAB button)
+2. Choose a name, personality, and avatar from the 30+ presets
+3. Select avatar gender — affects the system prompt voice and emotion detection
+4. Optionally write custom personality traits to override the preset
+5. Save — your companion is stored locally, encrypted
+
+### Voice Input (STT)
+
+STT requires either a **Groq** or **OpenAI** API key. Once configured:
+- The microphone button appears active in the chat toolbar
+- Tap to record, tap again to stop and transcribe
+- BioLLM falls back to OpenAI Whisper (priority) or Groq Whisper for STT
+
+If neither key is configured, the microphone button is visible but disabled with a tooltip explanation.
+
+### Voice Output (TTS)
+
+TTS requires either an **OpenAI** or **ResembleAI** API key. Once configured:
+- Enable voice output via the speaker button in the chat toolbar
+- Select a voice in **Settings > Voice**
+- Each message can be replayed individually by clicking it
+
+### BioLLM Setup
+
+BioLLM routes inference through living cortical tissue on Cortical Labs CL1 hardware. To use it:
+1. Obtain a BioLLM API key and endpoint URL from [biollm.com](https://biollm.com)
+2. In **Settings > Model**, select **BioLLM** as the provider
+3. Enter the endpoint URL and API key
+4. BioLLM has no native STT, TTS, or emotion detection — configure an OpenAI or Groq key to enable those features as fallbacks
+
+### Custom Provider Setup
+
+Any OpenAI-compatible API (LM Studio, vLLM, Kobold, Ollama with `ollama serve`, etc.):
+1. In **Settings > Model**, select **Custom** as the provider
+2. Enter the base URL of your API (e.g. `http://localhost:11434/v1` for Ollama)
+3. Enter the model name and optional API key
+4. `https://` is required for external hosts — `http://` is only allowed for loopback addresses (`localhost`, `127.0.0.1`, `::1`)
+
+### Popup / Companion Window
+
+- Click the **pop-out icon** in the companion panel header to open a detached companion window (392x535px)
+- From the companion window, click **Open Chat** to open a standalone chat window (800x636px)
+- Re-clicking pop-out focuses the existing window instead of opening a duplicate
+
+### Memory Window
+
+Configure how many previous messages are included in each LLM request under **Settings > Memory**. A smaller window means less context but lower token cost. Full history is always persisted locally regardless of the window size.
 
 ---
 
@@ -381,10 +467,10 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for details and [`docs/IMPLEMENTATION_S
 |---|---|---|
 | Zero Trust | Partial | No input validation on user message content before LLM; device ID trusted from localStorage without re-verification |
 | DRY | Mostly | Message-windowing logic and content-type mapping slightly duplicated across provider files |
-| KISS | Mostly | `chat-interface.tsx` at 1100+ lines is doing too much; try/catch-as-control-flow in `parseCompanionJSON()` and `import.ts` |
+| KISS | Mostly | `chat-interface.tsx` at 1000+ lines is doing too much; business logic extraction to `lib/chat.ts` planned for Session 30 |
 | Kerckhoffs's Principle | Full | Encryption scheme fully documented, security posture publicly disclosed in `docs/SECURITY_REPORT.md` |
 | OWASP-first | Full | `SECURITY_REPORT.md` updated to OWASP Top 10:2025 |
-| No try/catch control flow | Partial | `export.ts` bare re-throw; `import.ts` and `parseCompanionJSON()` use try/catch for control flow |
+| No try/catch control flow | Partial | `export.ts` bare re-throw; `import.ts` uses try/catch for control flow |
 | Privacy by default | Full | IndexedDB only, `store: false`, no telemetry, full export/delete |
 
 > Goal: reach 100%. Each session moves the score forward.
