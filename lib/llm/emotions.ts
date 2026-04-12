@@ -9,6 +9,7 @@ import {
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
   EMOTION_KEYWORDS,
+  GENDER_MAPPING,
 } from '../constants'
 import { getDB } from '../db'
 import { getAPIKey } from '../utils'
@@ -26,10 +27,11 @@ const VALID_EMOTIONS = [...EMOTION_KEYWORDS] as EmotionState[]
  * Takes companion name and personality into account so the classifier
  * understands the emotional delivery style rather than just semantic content
  */
-function buildEmotionSystemPrompt(companion: string, personality: PersonalityType): string {
-  return `You are an emotion classifier for ${companion}, an AI companion with a ${personality} personality.
+function buildEmotionSystemPrompt(companion: string, personality: PersonalityType, avatarGender: GenderType): string {
+  const gender = GENDER_MAPPING[avatarGender].gender
+  return `You are an emotion classifier for ${companion}, an AI companion with a ${personality} personality and ${gender} gender expression.
 
-Analyze the emotional tone of ${companion}'s response, taking into account their ${personality} personality style.
+Analyze the emotional tone of ${companion}'s response, taking into account their ${personality} personality style and ${gender} gender expression.
 For example, a Sarcastic companion may express happiness through wit and irony rather than explicit joy.
 A Cheerful companion may express thoughtfulness with an upbeat tone rather than a neutral one.
 
@@ -74,7 +76,8 @@ export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTI
 
     const companion = settings?.selectedCompanion || DEFAULT_COMPANION_NAME
     const personality = (settings?.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
-    const emotionSystemPrompt = buildEmotionSystemPrompt(companion, personality)
+    const avatarGender = (settings?.avatarGender as GenderType) || DEFAULT_GENDER
+    const emotionSystemPrompt = buildEmotionSystemPrompt(companion, personality, avatarGender)
 
     console.log('[Athena] Emotion detection - provider:', isOpenAI ? 'openai' : 'groq', 'companion:', companion, 'personality:', personality)
 
