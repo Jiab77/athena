@@ -434,7 +434,7 @@ Any OpenAI-compatible API (LM Studio, vLLM, Kobold, Ollama with `ollama serve`, 
 
 ### Memory Window
 
-Configure how many previous messages are included in each LLM request under **Settings > Tunning**. A smaller window means less context but lower token cost. Full history is always persisted locally regardless of the window size.
+Configure how many previous messages are included in each LLM request under **Settings > Tuning**. A smaller window means less context but lower token cost. Full history is always persisted locally regardless of the window size.
 
 ---
 
