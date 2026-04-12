@@ -1025,7 +1025,7 @@ export function ChatInterface({
                     variant="ghost"
                     onClick={handleMicClick}
                     disabled={isTranscribing || isLoading || !sttSupported}
-                    className={`cursor-pointer h-8 w-8 ${!sttSupported ? 'opacity-50 cursor-not-allowed' : isRecording ? 'text-destructive' : 'text-muted-foreground hover:text-foreground'}`}
+                    className={`cursor-pointer h-8 w-8 disabled:opacity-50 ${isRecording ? 'text-destructive' : 'text-muted-foreground hover:text-foreground'}`}
                   >
                     <Mic className={`h-4 w-4 ${isRecording ? 'animate-pulse' : ''}`} />
                   </Button>
@@ -1044,7 +1044,7 @@ export function ChatInterface({
                     size="icon"
                     variant="ghost"
                     onClick={handleToggleVoiceOutput}
-                    disabled={isLoading}
+                    disabled={isLoading || !voiceOutputEnabled}
                     className={`cursor-pointer h-8 w-8 ${voiceOutputEnabled ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                   >
                     {voiceOutputEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}

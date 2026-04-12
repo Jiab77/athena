@@ -269,13 +269,11 @@ export function CompanionWindow({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors ${!sttSupported
-                      ? 'opacity-50 cursor-not-allowed'
-                      : voiceState === 'recording'
-                        ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
-                        : voiceState === 'transcribing' || voiceState === 'processing'
-                          ? 'bg-amber-500/20 text-amber-500'
-                          : 'bg-primary/20 text-primary hover:bg-primary/30'
+                    className={`absolute bottom-1 left-1 h-8 w-8 rounded-full cursor-pointer transition-colors disabled:opacity-50 ${voiceState === 'recording'
+                      ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30 animate-pulse'
+                      : voiceState === 'transcribing' || voiceState === 'processing'
+                        ? 'bg-amber-500/20 text-amber-500'
+                        : 'bg-primary/20 text-primary hover:bg-primary/30'
                       }`}
                     onClick={sttSupported ? onMicClick : undefined}
                     disabled={!sttSupported || voiceState === 'transcribing' || voiceState === 'processing'}
