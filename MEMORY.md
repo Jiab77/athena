@@ -196,6 +196,26 @@ Same root cause as `emotions.ts` — `StoredSettings` has no `*ApiKeyEncrypted` 
 
 ---
 
+### 10. Tooltip on Disabled Buttons — Radix UI Fix
+
+**Problem:** Disabled HTML elements do not fire pointer events — `onMouseEnter` never reaches `TooltipTrigger`, so tooltips never show on disabled buttons. Affected both mic buttons in `chat-interface.tsx` and `companion-window.tsx`.
+
+**Fix:** Wrapped the disabled `Button` in a `<span tabIndex={0}>` inside `TooltipTrigger asChild`. The span receives pointer events normally, triggering the tooltip. `pointer-events-none` added to the button to prevent click leaking. This is the standard Radix UI recommended pattern for tooltips on disabled elements.
+
+---
+
+### 11. Speaker Button Toggle Fixed
+
+`chat-interface.tsx` had `disabled={isLoading || !voiceOutputEnabled}` on the speaker button — disabling it when voice was OFF, making it impossible to turn voice back ON. Fixed by Jiab77 by removing `|| !voiceOutputEnabled` from the `disabled` prop. `companion-window.tsx` and `companion-popup-view.tsx` were not affected.
+
+---
+
+### 12. README.md — Getting Started and Usage Sections
+
+Added a proper `Getting Started` section (prerequisites, installation, minimum viable setup) and a full `Usage` section covering: provider configuration table, companion creation, STT/TTS setup, BioLLM setup, custom provider setup, popup/companion window, and memory window. Stale `parseCompanionJSON()` reference in the compliance table updated. Written collaboratively — Jiab77 corrected and improved the UI navigation descriptions to match the actual settings panel structure.
+
+---
+
 ### Open Items Carried Forward to Session 30
 
 1. **`lib/chat.ts` creation** — extract `sendMessage()`, `loadConversation()`, `newConversation()`, `processFile()` from `chat-interface.tsx`
