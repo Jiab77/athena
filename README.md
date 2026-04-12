@@ -362,11 +362,12 @@ npm run dev
 ### Minimum Viable Setup
 
 1. Open the app at `http://localhost:3000`
-2. Click the settings icon (top right of the companion panel)
-3. Go to **Model** and select a provider (Groq recommended for first use)
-4. Paste your API key — it is encrypted and stored locally, never sent anywhere other than the provider
-5. Select a model from the dropdown
-6. Start chatting
+2. Click on the FAB button (bottom right of the page)
+3. Click on **Settings** from the floating menu to open the settings panel
+4. Go to **Model** and select a provider (Groq recommended for first use)
+5. Paste your API key — it is encrypted and stored locally, never sent anywhere other than the provider
+6. Select a model from the dropdown
+7. Start chatting
 
 ---
 
@@ -374,12 +375,12 @@ npm run dev
 
 ### Configuring a Provider
 
-All API keys are configured inside the app under **Settings > Model**. They are encrypted with AES-GCM + PBKDF2 at 600,000 iterations before being stored in IndexedDB — they never leave the browser unencrypted.
+All API keys are configured inside the app under **Settings > Model**. They are encrypted with AES-GCM + PBKDF2 at 600,000 iterations before being stored in IndexedDB — they never leave the browser unencrypted except to the selected model provider.
 
 | Provider | Key needed | What it unlocks |
 |---|---|---|
 | Groq | `GROQ_API_KEY` | LLM inference + Whisper STT + emotion detection |
-| OpenAI | `OPENAI_API_KEY` | LLM inference + Whisper STT + TTS + image generation |
+| OpenAI | `OPENAI_API_KEY` | LLM inference + Whisper STT + TTS + emotion detection + image generation |
 | BioLLM | `BIOLLM_API_KEY` + endpoint URL | Biological neural network inference (experimental) |
 | ResembleAI | `RESEMBLEAI_API_KEY` | Chatterbox TTS (alternative to OpenAI TTS) |
 | Decart | `DECART_API_KEY` | Real-time WebRTC live avatar |
@@ -387,10 +388,10 @@ All API keys are configured inside the app under **Settings > Model**. They are 
 
 ### Creating a Companion
 
-1. Click **New Companion** on the landing page (or the FAB button)
-2. Choose a name, personality, and avatar from the 30+ presets
-3. Select avatar gender — affects the system prompt voice and emotion detection
-4. Optionally write custom personality traits to override the preset
+1. Click on the FAB button (bottom right of the page)
+2. Click on **Settings** from the floating menu to open the settings panel
+3. Go to **Companion** and select a category, gender, color scheme from the 30+ presets and choose a name
+4. Go to **Customize** and select a personality, or define a custom one then select the visual format
 5. Save — your companion is stored locally, encrypted
 
 ### Voice Input (STT)
@@ -433,7 +434,7 @@ Any OpenAI-compatible API (LM Studio, vLLM, Kobold, Ollama with `ollama serve`, 
 
 ### Memory Window
 
-Configure how many previous messages are included in each LLM request under **Settings > Memory**. A smaller window means less context but lower token cost. Full history is always persisted locally regardless of the window size.
+Configure how many previous messages are included in each LLM request under **Settings > Tunning**. A smaller window means less context but lower token cost. Full history is always persisted locally regardless of the window size.
 
 ---
 
