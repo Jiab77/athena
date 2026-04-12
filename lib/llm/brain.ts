@@ -364,20 +364,12 @@ export function useBrain({
       const result = await callLLM(allMessages, selectedProvider)
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
-      // Fire-and-forget emotion detection
-      // BioLLM: only run if OpenAI (priority, gpt-5.4-nano) or Groq (llama-3.1-8b-instant) API key is configured
-      let shouldDetectEmotion = selectedProvider !== 'biollm'
-      if (!shouldDetectEmotion) {
-        const bioSettings = await db?.getSettings().catch(() => null)
-        shouldDetectEmotion = !!(bioSettings?.openaiApiKeyEncrypted || bioSettings?.groqApiKeyEncrypted)
-        console.log('[Brain] BioLLM emotion detection:', { shouldDetectEmotion, hasOpenAI: !!bioSettings?.openaiApiKeyEncrypted, hasGroq: !!bioSettings?.groqApiKeyEncrypted })
-      }
-      if (shouldDetectEmotion) {
-        detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
-          console.log('[Brain] Detected emotion:', emotion)
-          if (emotion) setLastDetectedEmotion(emotion)
-        })
-      }
+      // Fire-and-forget emotion detection — emotions.ts handles graceful degradation
+      // when no OpenAI or Groq key is configured, returning { emotion: null } with a console.warn
+      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
+        console.log('[Brain] Detected emotion:', emotion)
+        if (emotion) setLastDetectedEmotion(emotion)
+      })
 
       const companionMessage: Message = {
         id: `msg-${Date.now() + 1}`,
