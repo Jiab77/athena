@@ -89,7 +89,7 @@ export function CompanionWindow({
   onMicClick,
   voiceOutputEnabled = true,
   onVoiceOutputToggle,
-  sttSupported = true,
+  sttSupported = false,
   tabbed = false,
 }: CompanionWindowProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
