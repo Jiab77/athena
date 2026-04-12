@@ -145,9 +145,6 @@ Massive prompt library with zero curation. Includes jailbreak, toxic, and submis
 │   ├── global-error.tsx               # Global error boundary
 │   ├── loading.tsx                    # Route-level loading state
 │   ├── not-found.tsx                  # 404 page
-│   ├── api/
-│   │   └── biollm/
-│   │       └── route.ts               # Server-side proxy for BioLLM (avoids CORS)
 │   ├── companion/[id]/
 │   │   └── page.tsx                   # Detachable companion popup route
 │   └── chat/[id]/
