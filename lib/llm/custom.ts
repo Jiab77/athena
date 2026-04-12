@@ -9,7 +9,7 @@ import {
   DEFAULT_AUDIO_FILE,
 } from '../constants'
 import { getDB } from '../db'
-import { buildSystemPrompt, getAPIKey } from '../utils'
+import { buildSystemPrompt, escapeDocumentContent, getAPIKey } from '../utils'
 
 /**
  * Validate a custom provider URL.
@@ -39,14 +39,6 @@ function validateProviderUrl(url: string): void {
 }
 
 /**
- * Escape triple-backtick sequences in document content to prevent
- * prompt injection via crafted documents breaking out of the fenced block.
- */
-function escapeDocumentContent(content: string): string {
-  return content.replace(/`{3,}/g, (match) => match.replace(/`/g, '` ').trimEnd())
-}
-
-/**
  * Call Custom Provider API with conversation history
  * Uses user-configured URL, model name, and API key from database
  */
@@ -58,11 +50,11 @@ export async function callCustomAPI(
     const apiKey = await getAPIKey('custom')
     const db = await getDB()
     const settings = await db.getSettings()
-    
+
     if (!settings) {
       throw new Error('No settings found in database')
     }
-    
+
     // Extract custom provider settings
     const customProviderUrl = settings.customProviderUrl
     const customModelName = settings.customModelName
@@ -189,14 +181,14 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     const apiKey = await getAPIKey('custom')
     const db = await getDB()
     const settings = await db.getSettings()
-    
+
     if (!settings) {
       throw new Error('No settings found in database')
     }
-    
+
     const customSTTUrl = settings.customSTTUrl
     const customSTTModelName = settings.customSTTModelName
-    
+
     if (!customSTTUrl) {
       throw new Error('Custom STT URL not configured')
     }
