@@ -235,9 +235,9 @@ export class AthenaDB {
   }
 
   /**
-   * Get API key by provider
+   * Check API key by provider
    */
-  async getAPIKey(provider: string): Promise<StoredAPIKey | null> {
+  async checkAPIKey(provider: string): Promise<StoredAPIKey | null> {
     if (!this.db) throw new Error('Database not initialized')
 
     return new Promise((resolve, reject) => {

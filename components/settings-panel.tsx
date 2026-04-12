@@ -89,22 +89,22 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
   const isBioLLM = provider === 'biollm'
   const selectedProvider = LLM_PROVIDERS.find((p) => p.id === provider)
   const availableModels = selectedProvider?.models.filter(m => m.visible) || []
-  
+
   // Voice settings logic
   const selectedTTSProvider = TTS_PROVIDERS.find((p) => p.id === voiceProvider)
   const isOpenAIVoice = voiceProvider === 'openai'
   const isOpenAIGlobal = provider === 'openai'
   const shouldAutoPopulateVoiceKey = isOpenAIVoice && isOpenAIGlobal
   const displayVoiceApiKey = shouldAutoPopulateVoiceKey ? apiKey : voiceApiKey
-  
+
   // Get available voices based on selected provider and gender
   const availableVoices = (TTS_VOICES[voiceProvider as keyof typeof TTS_VOICES]?.[avatarGender as keyof (typeof TTS_VOICES)['openai']] as unknown as { id: string; name: string; isDefault?: boolean }[]) || []
   const defaultVoice = availableVoices.find(v => v.isDefault)?.id || availableVoices[0]?.id || ''
-  
+
   // Load settings once on mount
   useEffect(() => {
     if (!dbReady || !db) return
-    
+
     const loadSettings = async () => {
       try {
         // Load saved settings from IndexedDB
@@ -114,26 +114,26 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           if (storedSettings.avatarCategory) setAvatarCategory(storedSettings.avatarCategory)
           if (storedSettings.avatarGender) setAvatarGender(storedSettings.avatarGender)
           if (storedSettings.avatarColorScheme) setAvatarColorScheme(storedSettings.avatarColorScheme)
-          
+
           // Load companion settings
           if (storedSettings.selectedCompanion) setCompanion(storedSettings.selectedCompanion)
           if (storedSettings.selectedCompanionName) setCompanionName(storedSettings.selectedCompanionName)
-          
+
           // Load personality settings
           if (storedSettings.selectedPersonality) setPersonalityType(storedSettings.selectedPersonality as PersonalityType)
           if (storedSettings.customPersonalityTraits) setPersonalityTraits(storedSettings.customPersonalityTraits)
-          
+
           // Load visual format
           if (storedSettings.visualFormat) setVisualFormat(storedSettings.visualFormat)
-          
+
           // Load memory window
           if (storedSettings.memoryWindowSize) setMemoryWindowSize(storedSettings.memoryWindowSize)
-          
+
           // Load voice settings
           if (storedSettings.voiceProvider) setVoiceProvider(storedSettings.voiceProvider)
           if (storedSettings.selectedVoice) setSelectedVoice(storedSettings.selectedVoice)
           if (typeof storedSettings.voiceOutputEnabled === 'boolean') setVoiceOutputEnabled(storedSettings.voiceOutputEnabled)
-          
+
           // Load custom provider settings
           if (storedSettings.customProviderName) setCustomProviderName(storedSettings.customProviderName)
           if (storedSettings.customProviderUrl) setCustomProviderUrl(storedSettings.customProviderUrl)
@@ -141,16 +141,16 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           if (typeof storedSettings.hasSTTSupport === 'boolean') setHasSTTSupport(storedSettings.hasSTTSupport)
           if (storedSettings.customSTTModelName) setCustomSTTModelName(storedSettings.customSTTModelName)
           if (storedSettings.customSTTUrl) setCustomSTTUrl(storedSettings.customSTTUrl)
-          
+
           // Load privacy mode (default to true for privacy-first)
           if (typeof storedSettings.privacyMode === 'boolean') setPrivacyMode(storedSettings.privacyMode)
-          
+
           // Load model: find the model id by looking up the full model string in LLM_PROVIDERS
           if (storedSettings.selectedModel) {
             const modelString = storedSettings.selectedModel
             let foundModelId = DEFAULT_MODEL_ID
             let foundProvider = DEFAULT_MODEL_PROVIDER
-            
+
             for (const llmProvider of LLM_PROVIDERS) {
               const foundModel = llmProvider.models.find(m => m.model === modelString)
               if (foundModel) {
@@ -162,7 +162,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
             setModel(foundModelId)
             setProvider(foundProvider)
           }
-          
+
         }
       } catch (error) {
         // ignore
@@ -174,10 +174,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
   // Load API key when provider changes
   useEffect(() => {
     if (!dbReady || !db) return
-    
+
     const loadApiKey = async () => {
       try {
-        const stored = await db.getAPIKey(provider)
+        const stored = await db.checkAPIKey(provider)
         if (stored) {
           const encrypted = JSON.parse(stored.keyEncrypted)
           const decrypted = await decryptData(encrypted, `api-key:${provider}`)
@@ -198,10 +198,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
   // Load voice API key when voice provider changes
   useEffect(() => {
     if (!dbReady || !db) return
-    
+
     const loadDecartApiKey = async () => {
       try {
-        const stored = await db.getAPIKey('decart')
+        const stored = await db.checkAPIKey('decart')
         if (stored) {
           const encrypted = JSON.parse(stored.keyEncrypted)
           const decrypted = await decryptData(encrypted, 'api-key:decart')
@@ -219,8 +219,8 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           setVoiceApiKey('')
           return
         }
-        
-        const stored = await db.getAPIKey(voiceProvider)
+
+        const stored = await db.checkAPIKey(voiceProvider)
         if (stored) {
           const encrypted = JSON.parse(stored.keyEncrypted)
           const decrypted = await decryptData(encrypted, `api-key:${voiceProvider}`)
@@ -240,18 +240,18 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
   // Reset voice selection when voice provider changes
   useEffect(() => {
     if (!dbReady || !db) return
-    
+
     const resetVoiceSelection = async () => {
       try {
         // Clear old values immediately for clean UX transition
         setSelectedVoice('')
-        
+
         // Try to load saved voice for this provider from DB
         const settings = await db.getSettings()
-        
+
         // Get available voices for new provider and gender
         const newAvailableVoices = (TTS_VOICES[voiceProvider as keyof typeof TTS_VOICES]?.[avatarGender as keyof (typeof TTS_VOICES)['openai']] as unknown as { id: string; name: string; isDefault?: boolean }[]) || []
-        
+
         // If we have a saved voice and it exists in new provider's voices, use it
         if (settings?.selectedVoice && newAvailableVoices.some(v => v.id === settings.selectedVoice)) {
           setSelectedVoice(settings.selectedVoice)
@@ -263,7 +263,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
         // ignore
       }
     }
-    
+
     resetVoiceSelection()
   }, [db, dbReady, voiceProvider, avatarGender])
 
@@ -276,7 +276,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
 
   const handleSaveSettings = async () => {
     if (!db) return
-    
+
     try {
       // Save API key to IndexedDB encrypted
       if (apiKey) {
@@ -312,7 +312,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
       // Save all settings to IndexedDB
       const selectedProvider = LLM_PROVIDERS.find(p => p.id === provider)
       const selectedLLM = selectedProvider?.models.find(m => m.id === model)
-      
+
       await db.storeSettings({
         key: 'userSettings',
         selectedModel: selectedLLM?.model || model,
@@ -342,7 +342,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
         title: 'Settings Saved',
         description: 'Your settings and customizations have been saved.',
       })
-      
+
       // Dispatch event so other components can react to settings changes
       window.dispatchEvent(new CustomEvent('settings-changed'))
 
@@ -934,14 +934,12 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                     </div>
                     <button
                       onClick={() => setVoiceOutputEnabled(!voiceOutputEnabled)}
-                      className={`w-12 h-7 rounded-full transition-colors cursor-pointer ${
-                        voiceOutputEnabled ? 'bg-accent' : 'bg-muted'
-                      }`}
+                      className={`w-12 h-7 rounded-full transition-colors cursor-pointer ${voiceOutputEnabled ? 'bg-accent' : 'bg-muted'
+                        }`}
                     >
                       <div
-                        className={`w-6 h-6 bg-background rounded-full transition-transform ${
-                          voiceOutputEnabled ? 'translate-x-5' : 'translate-x-0'
-                        }`}
+                        className={`w-6 h-6 bg-background rounded-full transition-transform ${voiceOutputEnabled ? 'translate-x-5' : 'translate-x-0'
+                          }`}
                       />
                     </button>
                   </div>
@@ -969,14 +967,12 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                   </div>
                   <button
                     onClick={() => setPrivacyMode(!privacyMode)}
-                    className={`w-12 h-7 rounded-full transition-colors cursor-pointer ${
-                      privacyMode ? 'bg-primary' : 'bg-destructive'
-                    }`}
+                    className={`w-12 h-7 rounded-full transition-colors cursor-pointer ${privacyMode ? 'bg-primary' : 'bg-destructive'
+                      }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-full bg-foreground transition-transform ${
-                        privacyMode ? 'translate-x-5' : 'translate-x-0'
-                      }`}
+                      className={`w-6 h-6 rounded-full bg-foreground transition-transform ${privacyMode ? 'translate-x-5' : 'translate-x-0'
+                        }`}
                     />
                   </button>
                 </div>
@@ -1116,5 +1112,5 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
         </Button>
       </div>
     </Card>
-  )   
+  )
 }

@@ -116,7 +116,7 @@ export async function extractTextFromFile(file: File): Promise<string | null> {
 export async function getAPIKey(providerId: string): Promise<string> {
   try {
     const db = await getDB()
-    const stored = await db.getAPIKey(providerId)
+    const stored = await db.checkAPIKey(providerId)
     if (!stored) {
       throw new Error(`${providerId} API key not configured`)
     }
