@@ -9,7 +9,7 @@ import {
   ENABLE_BIOLLM_PERSONALITY,
 } from '../constants'
 import { getDB } from '../db'
-import { parseCompanionJSON, buildSystemPrompt, getAPIKey } from '../utils'
+import { buildSystemPrompt, getAPIKey } from '../utils'
 
 /**
  * Call BioLLM API with conversation history
@@ -102,9 +102,6 @@ export async function callBioLLMAPI(
     // Log full response data
     console.log('[Athena] callBioLLMAPI: response data', data)
 
-    // Parse JSON response from Responses API
-    let parsedResponse: { response: string; reasoning?: string }
-
     const content = data.choices?.[0]?.message?.content
     const brain = data.brain || null
     const usage = data.usage || null
@@ -119,27 +116,10 @@ export async function callBioLLMAPI(
       throw new Error('No response content from BioLLM API')
     }
 
-    // FIXME: BioLLM does not always returns JSON formatted responses as requested
-
-    console.log('[Athena] callBioLLMAPI: raw content before parse --', content.slice(0, 200))
-    // Always try parseCompanionJSON first — the model may return JSON even when tools are active.
-    // Only fall back to wrapping as plain prose if parsing fails.
-    try {
-      parsedResponse = parseCompanionJSON(content)
-      console.log('[Athena] callBioLLMAPI: parsedResponse keys', Object.keys(parsedResponse))
-    } catch {
-      console.log('[Athena] callBioLLMAPI: JSON parse failed — wrapping plain prose as response')
-      parsedResponse = { response: content }
-    }
-
-    if (!parsedResponse.response) {
-      throw new Error('No response field in parsed content')
-    }
-
-    console.log('[Athena] callBioLLMAPI: success', { responseLength: parsedResponse.response.length, usage })
+    console.log('[Athena] callBioLLMAPI: success', { responseLength: content.length, usage })
 
     return {
-      response: parsedResponse.response,
+      response: content,
       usage: usage as { prompt_tokens: number; completion_tokens: number; total_tokens: number } | null,
     }
   } catch (error) {
