@@ -184,16 +184,14 @@ Session 29 was a focused code quality and architecture session. Main themes: rem
 11. **CSP header still missing**
 12. **Popup live-sync** — `BroadcastChannel`, deferred
 13. **`DEBUG_MODE` constant + `debugLog()` utility** — priority
-14. **BioLLM endpoint test** — pending tunnel restart with live URL
-15. **`ENABLE_BIOLLM_PERSONALITY`** — pending friend confirmation on system prompt support
-16. **`thinking` state universal** — all providers show thinking state during inference
-17. **Model capabilities display** — hybrid: dropdown icons + settings panel active model summary
-18. **BioLLM tool detection via `gpt-5.4-nano`** — deferred until base integration stable
-19. **`EMOTION_CONFIG` duplication** — move from both avatar components to `constants.ts`
+14. **`thinking` state universal** — all providers show thinking state during inference
+15. **Model capabilities display** — hybrid: dropdown icons + settings panel active model summary
+16. **BioLLM tool detection via `gpt-5.4-nano`** — deferred until base integration stable
+17. **`EMOTION_CONFIG` duplication** — move from both avatar components to `constants.ts`
 
 ---
 
-> ## Session 28: BioLLM Fixes, Emotion detection dirty fix, Structured format debugging (04/06/2026)
+## Session 28: BioLLM Fixes, Emotion detection dirty fix, Structured format debugging (04/06/2026)
 
 ### Overview
 
