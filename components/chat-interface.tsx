@@ -1020,15 +1020,17 @@ export function ChatInterface({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={handleMicClick}
-                    disabled={isTranscribing || isLoading || !sttSupported}
-                    className={`cursor-pointer h-8 w-8 disabled:opacity-50 ${isRecording ? 'text-destructive' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    <Mic className={`h-4 w-4 ${isRecording ? 'animate-pulse' : ''}`} />
-                  </Button>
+                  <span className="inline-flex" tabIndex={0}>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={handleMicClick}
+                      disabled={isTranscribing || isLoading || !sttSupported}
+                      className={`cursor-pointer h-8 w-8 disabled:opacity-50 pointer-events-none ${isRecording ? 'text-destructive' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      <Mic className={`h-4 w-4 ${isRecording ? 'animate-pulse' : ''}`} />
+                    </Button>
+                  </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
                   <p>{!sttSupported ? 'STT not available for this provider' : isRecording ? 'Stop recording' : isTranscribing ? 'Transcribing...' : 'Record audio'}</p>
