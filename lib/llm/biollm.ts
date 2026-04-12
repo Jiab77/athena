@@ -32,7 +32,6 @@ export async function callBioLLMAPI(
     const apiKey = await getAPIKey('biollm')
     const db = await getDB()
     const settings = await db.getSettings()
-    const useProxy = false
 
     if (!settings) {
       throw new Error('No settings found in database')
@@ -75,28 +74,15 @@ export async function callBioLLMAPI(
 
     console.log('[Athena] callBioLLMAPI: endpoint', CHAT_API_URL)
     console.log('[Athena] callBioLLMAPI: request body', { ...reqBody })
-    console.log('[Athena] callBioLLMAPI: enabled proxy?', useProxy)
 
-    // Route through server-side proxy to avoid CORS restrictions
-    let response
-    if (useProxy) {
-      response = await fetch('/api/biollm', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ CHAT_API_URL, apiKey, messages: bioMessages }),
-      })
-    } else {
-      response = await fetch(CHAT_API_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reqBody),
-      })
-    }
+    const response = await fetch(CHAT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reqBody),
+    })
 
     console.log('[Athena] callBioLLMAPI: HTTP response', { status: response.status, ok: response.ok })
 
