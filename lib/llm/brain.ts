@@ -30,9 +30,7 @@ import {
 } from '../constants'
 import { detectEmotion } from './emotions'
 import { DecartAvatarClient } from '../avatar/decart'
-import type { CompanionData, Message, ExpressionState, EmotionState, VisualFormat } from '../types'
-
-export type VoiceState = 'idle' | 'recording' | 'transcribing' | 'processing'
+import type { CompanionData, Message, ExpressionState, EmotionState, VoiceState, VisualFormat } from '../types'
 
 export interface BrainOptions {
   companion: CompanionData
