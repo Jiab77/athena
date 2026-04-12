@@ -149,18 +149,17 @@ export function parseCompanionJSON(jsonString: string): { response: string; reas
 /**
  * Build system prompt based on personality and companion data
  * Shared across all LLM providers (Groq, OpenAI, etc.)
+ * @param forceJSON - When true, instructs the model to respond in JSON format (Groq only)
  */
-// TODO: Make forced JSON output as a boolean and replace the 'useNewPrompt' logic
 export function buildSystemPrompt(
   companionName: string,
   personality: PersonalityType,
   avatarGender: GenderType,
-  customPersonalityTraits?: string
+  customPersonalityTraits?: string,
+  forceJSON = false,
 ): string {
   const traits = customPersonalityTraits || PERSONALITY_TRAITS[personality] || PERSONALITY_TRAITS[DEFAULT_PERSONALITY]
   const gender = GENDER_MAPPING[avatarGender].gender
-
-  const useNewPrompt = true
 
   const oldPrompt = `You are ${companionName}, an AI companion.
 
@@ -195,7 +194,7 @@ Values: Be authentic, transparent about being AI, genuinely present, respectful,
 
 Critical: Respond naturally and conversationally, like a friend. Stay true to your ${personality} personality.`
 
-  return useNewPrompt ? newPrompt : oldPrompt
+  return forceJSON ? oldPrompt : newPrompt
 }
 
 /**

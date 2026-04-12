@@ -54,7 +54,7 @@ export async function callGroqAPI(
 
     console.log('[Athena] callGroqAPI: settings resolved', { model, personality, companion, memoryWindowSize, avatarGender })
 
-    const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
+    const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits, true)
 
     const windowedMessages = messages.slice(-memoryWindowSize)
 
