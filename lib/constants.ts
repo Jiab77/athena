@@ -255,7 +255,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         model: 'biollm-4b-shadow',
         description: 'Experimental 4B biological neural network model. Inference runs through a living cortical culture on Cortical Labs CL1 hardware.',
         url: 'https://biollm.com/about',
-        visible: true,
+        visible: false,
       },
       {
         id: 'v2',
@@ -263,7 +263,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         model: 'biollm-4b-v2',
         description: 'Experimental 4B biological neural network model. Inference runs through a living cortical culture on Cortical Labs CL1 hardware.',
         url: 'https://biollm.com/about',
-        visible: false,
+        visible: true,
       },
     ],
   },
