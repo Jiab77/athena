@@ -169,6 +169,33 @@ Session 29 was a focused code quality and architecture session. Main themes: rem
 
 ---
 
+### 7. Companion Window Mic Button — Always Visible
+
+`companion-window.tsx` was hiding the mic button entirely when `sttSupported` was `false`. Fixed to always render the button, matching `chat-interface.tsx` pattern — disabled with `opacity-50 cursor-not-allowed` and tooltip "STT not available for this provider" when STT is unavailable.
+
+---
+
+### 8. `brain.ts` — Broken `shouldDetectEmotion` Guard Removed
+
+**The bug — `brain.ts` LLM pipeline:**
+```ts
+const bioSettings = await db?.getSettings().catch(() => null)
+shouldDetectEmotion = !!(bioSettings?.openaiApiKeyEncrypted || bioSettings?.groqApiKeyEncrypted)
+```
+Same root cause as `emotions.ts` — `StoredSettings` has no `*ApiKeyEncrypted` fields, so both checks always returned `undefined` → `false`, silently disabling emotion detection for BioLLM always.
+
+**Fix:** Removed `shouldDetectEmotion` guard entirely. `detectEmotion()` is now called unconditionally for all providers — `emotions.ts` already returns `{ emotion: null }` with `console.warn` when no keys are configured, making the guard redundant.
+
+**Lesson learned:** This bug was introduced by guessing at field names instead of reading the existing DB schema and patterns first. Read before writing — no exceptions.
+
+---
+
+### 9. `VoiceState` Duplicate Removed
+
+`brain.ts` was exporting its own `export type VoiceState` while `lib/types.ts` already had the canonical definition. Duplicate removed from `brain.ts` by Jiab77 — `lib/types.ts` is the single source of truth.
+
+---
+
 ### Open Items Carried Forward to Session 30
 
 1. **`lib/chat.ts` creation** — extract `sendMessage()`, `loadConversation()`, `newConversation()`, `processFile()` from `chat-interface.tsx`
