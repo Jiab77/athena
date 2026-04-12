@@ -51,6 +51,14 @@ export function isImageMimeType(mimeType: string): boolean {
 }
 
 /**
+ * Escape triple-backtick sequences in document content to prevent
+ * prompt injection via crafted documents breaking out of the fenced block.
+ */
+export function escapeDocumentContent(content: string): string {
+  return content.replace(/`{3,}/g, (match) => match.replace(/`/g, '` ').trimEnd())
+}
+
+/**
  * Extract text content from a file
  * Handles text-based files directly, PDF requires special handling
  */

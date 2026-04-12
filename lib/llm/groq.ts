@@ -14,18 +14,10 @@ import {
   STT_PROVIDERS
 } from '../constants'
 import { getDB } from '../db'
-import { parseCompanionJSON, buildSystemPrompt, getAPIKey } from '../utils'
+import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey } from '../utils'
 
 const CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const STT_API_URL = 'https://api.groq.com/openai/v1/audio/transcriptions'
-
-/**
- * Escape triple-backtick sequences in document content to prevent
- * prompt injection via crafted documents breaking out of the fenced block.
- */
-function escapeDocumentContent(content: string): string {
-  return content.replace(/`{3,}/g, (match) => match.replace(/`/g, '` ').trimEnd())
-}
 
 /**
  * Call Groq API with conversation history using fetch
