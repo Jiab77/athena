@@ -65,12 +65,17 @@ export async function callBioLLMAPI(
         content: buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits),
       }] : []),
       ...windowedMessages.map((msg) => {
-        if (msg.documentContent && msg.documentName) {
+        // If message has document content, inject it into the message text
+        if (msg.documentContent) {
+          const safeContent = escapeDocumentContent(msg.documentContent)
+          const docContext = `\n\n---\nAttached Document (${msg.documentName || 'file'}):\n\`\`\`\n${safeContent}\n\`\`\`\n---`
           return {
             role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
-            content: `${msg.content}\n\n\`\`\`${msg.documentName}\n${escapeDocumentContent(msg.documentContent)}\n\`\`\``,
+            content: msg.content + docContext,
           }
         }
+
+        // Regular text-only message
         return {
           role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
           content: msg.content,
