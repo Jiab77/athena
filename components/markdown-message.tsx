@@ -1,10 +1,11 @@
 import ReactMarkdown from 'react-markdown'
 import remarkEmoji from 'remark-emoji'
+import remarkGfm from 'remark-gfm'
 
 export function MarkdownMessage({ content }: { content: string }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkEmoji]}
+      remarkPlugins={[remarkGfm, remarkEmoji]}
       components={{
         code({ inline, className, children }: any) {
           return inline ? (
@@ -39,6 +40,24 @@ export function MarkdownMessage({ content }: { content: string }) {
           <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
             {children}
           </a>
+        ),
+        table: ({ children }) => (
+          <div className="overflow-x-auto my-4">
+            <table className="min-w-full border border-border text-sm">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => (
+          <thead className="bg-muted text-muted-foreground">{children}</thead>
+        ),
+        tbody: ({ children }) => <tbody>{children}</tbody>,
+        tr: ({ children }) => (
+          <tr className="border-b border-border even:bg-muted/30">{children}</tr>
+        ),
+        th: ({ children }) => (
+          <th className="px-4 py-2 text-left font-semibold border-r border-border last:border-r-0">{children}</th>
+        ),
+        td: ({ children }) => (
+          <td className="px-4 py-2 border-r border-border last:border-r-0">{children}</td>
         ),
       }}
     >
