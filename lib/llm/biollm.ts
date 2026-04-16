@@ -9,7 +9,7 @@ import {
   ENABLE_BIOLLM_PERSONALITY,
 } from '../constants'
 import { getDB } from '../db'
-import { buildSystemPrompt, getAPIKey } from '../utils'
+import { buildSystemPrompt, getAPIKey, escapeDocumentContent } from '../utils'
 
 /**
  * Call BioLLM API with conversation history
@@ -17,7 +17,8 @@ import { buildSystemPrompt, getAPIKey } from '../utils'
  * running on Cortical Labs CL1 hardware.
  *
  * Constraints:
- * - Text only (no vision, no image generation, no document attachments)
+ * - Text only (no vision, no image generation)
+ * - Document attachments supported via plain text injection
  * - No tool detection (no web search, no pre-flight)
  * - No emotion detection (unless OpenAI API key is configured — handled by router)
  * - thinking state is always available (pure UI state, no API dependency)
@@ -63,10 +64,18 @@ export async function callBioLLMAPI(
         role: 'system' as const,
         content: buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits),
       }] : []),
-      ...windowedMessages.map((msg) => ({
-        role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
-        content: msg.content,
-      })),
+      ...windowedMessages.map((msg) => {
+        if (msg.documentContent && msg.documentName) {
+          return {
+            role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
+            content: `${msg.content}\n\n\`\`\`${msg.documentName}\n${escapeDocumentContent(msg.documentContent)}\n\`\`\``,
+          }
+        }
+        return {
+          role: msg.role === 'user' ? ('user' as const) : ('assistant' as const),
+          content: msg.content,
+        }
+      }),
     ]
 
     const reqBody = {
