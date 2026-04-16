@@ -30,6 +30,7 @@ import {
   DEFAULT_MEMORY_SIZE,
   DEFAULT_MODEL_PROVIDER,
   DOCUMENT_FORMAT_MIME_TYPES,
+  DOCUMENT_FORMAT_EXTENSIONS,
   EMOTION_DISPLAY_DURATION,
   MAX_DISPLAY_MESSAGES,
 } from '@/lib/constants'
@@ -971,7 +972,7 @@ export function ChatInterface({
             <input
               ref={fileInputRef}
               type="file"
-              accept={`image/*,${DOCUMENT_FORMAT_MIME_TYPES.join(',')}`}
+              accept={`image/*,${DOCUMENT_FORMAT_MIME_TYPES.join(',')},${DOCUMENT_FORMAT_EXTENSIONS.join(',')}`}
               onChange={handleFileSelect}
               className="hidden"
             />

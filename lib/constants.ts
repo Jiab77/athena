@@ -189,6 +189,19 @@ export const DOCUMENT_FORMAT_MIME_TYPES = [
 ] as const
 
 /**
+ * Document format file extensions
+ * Used alongside DOCUMENT_FORMAT_MIME_TYPES in file input accept attribute
+ * to ensure consistent file picker behavior across browsers and platforms
+ * where MIME type associations are unreliable (e.g. .md, .sh, .ts on Linux/Windows)
+ */
+export const DOCUMENT_FORMAT_EXTENSIONS = [
+  '.txt', '.md', '.markdown', '.json', '.csv', '.pdf',
+  '.sh', '.bash', '.py', '.ts', '.tsx', '.js', '.jsx',
+  '.html', '.css', '.xml', '.rs', '.c', '.cpp', '.java',
+  '.go', '.rb', '.php', '.swift', '.kt',
+] as const
+
+/**
  * Personality types definitions
  */
 export const PERSONALITIES = [
