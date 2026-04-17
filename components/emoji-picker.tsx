@@ -26,23 +26,26 @@ interface EmojiPickerProps {
 
 export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [dataReady, setDataReady] = useState(false)
   const pickerRef = useRef<HTMLElement>(null)
 
-  // Dynamically import @emoji-mart/data and initialise the web component
+  // Load and initialise emoji data once on mount — before the picker is ever opened
+  // This ensures em.init() always completes before <em-emoji-picker> mounts
   useEffect(() => {
-    if (!isOpen) return
-
     let cancelled = false
 
     import('@emoji-mart/data').then((mod) => {
       if (cancelled) return
       import('emoji-mart').then((em) => {
-        if (!cancelled) em.init({ data: mod.default })
+        if (cancelled) return
+        em.init({ data: mod.default }).then(() => {
+          if (!cancelled) setDataReady(true)
+        })
       })
     })
 
     return () => { cancelled = true }
-  }, [isOpen])
+  }, [])
 
   // Wire up the emoji-select event from the web component
   useEffect(() => {
@@ -87,7 +90,7 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
             height: 350px !important;
           }
         `}</style>
-        {isOpen && (
+        {isOpen && dataReady && (
           <em-emoji-picker
             ref={pickerRef as any}
             theme="dark"

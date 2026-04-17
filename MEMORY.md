@@ -72,7 +72,90 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
-> ## Session 29: JSON parsing cleanup, API key pattern fix, emotions.ts rewrite, component architecture audit (04/12/2026)
+> ## Session 30: BioLLM document upload, markdown table rendering, file picker fix, emoji picker race condition (04/17/2026)
+
+### Overview
+
+Session 30 focused on feature parity for BioLLM, markdown rendering improvements, and two bug fixes — one around file type filtering in the browser file picker, and a long-standing emoji picker race condition on desktop.
+
+---
+
+### 1. BioLLM Document Attachment Support
+
+`biollm.ts` now supports text document file uploads using the same `escapeDocumentContent()` pattern already used in `groq.ts` and `custom.ts`. Document content is injected as a fenced code block inside the message content. Image attachments are intentionally not implemented — BioLLM is text-only hardware. The docstring was updated to reflect the change. The full chain from `chat-interface.tsx` through `router.ts` to `biollm.ts` was confirmed complete — no props, routing, or UI changes were needed since document data travels naturally through the existing `Message` type.
+
+**Lesson learned:** When an identical pattern already exists and works, copy it exactly — do not reinterpret or rewrite it.
+
+---
+
+### 2. Markdown Table Rendering — `remark-gfm` Added
+
+`markdown-message.tsx` was missing `remark-gfm` which is required for GitHub Flavored Markdown table support. Without it, `| col |` syntax rendered as raw pipe characters. Fixed by:
+- Adding `remark-gfm` to `remarkPlugins` (already in `package.json`, no new dep needed)
+- Adding styled `table`, `thead`, `tbody`, `tr`, `th`, `td` component overrides using semantic design tokens
+
+Full markdown renderer audit also addressed:
+- Deprecated `inline` prop on `code` — split into separate `code` and `pre` overrides, `className` used to detect block vs inline
+- Language label displayed above fenced code blocks
+- `h4`, `h5`, `h6` added
+- `hr` added
+- `img` added with `max-w-full rounded-md` styling
+- `del` (strikethrough via `~~text~~`) added
+- `li` spacing improved with `mb-1`
+
+---
+
+### 3. File Picker — Browser MIME Type Inconsistency Fix
+
+The `accept` attribute on the file input was using only `DOCUMENT_FORMAT_MIME_TYPES` — browsers on Linux/Windows do not reliably associate `.md`, `.sh`, `.ts`, `.py` etc. with their MIME types, causing those files to be hidden in the picker.
+
+**Fix:** Added `DOCUMENT_FORMAT_EXTENSIONS` constant to `lib/constants.ts` with explicit file extensions (`.md`, `.markdown`, `.ts`, `.tsx`, `.py`, `.sh`, etc.) and combined it with MIME types in the `accept` attribute:
+```ts
+accept={`image/*,${DOCUMENT_FORMAT_MIME_TYPES.join(',')},${DOCUMENT_FORMAT_EXTENSIONS.join(',')}`}
+```
+Issue confirmed resolved by user testing.
+
+---
+
+### 4. Emoji Picker Race Condition — Desktop Fix
+
+**Root cause:** On first load, `@emoji-mart/data` and `emoji-mart` took ~1.5s to import. `<em-emoji-picker>` mounted immediately when `isOpen` became true and rendered with no data (showing only the flags category). `em.init()` completed 1.5s later but the component had already rendered. On mobile the modules were already cached so `em.init()` completed synchronously before mount — which is why mobile always worked.
+
+Previous fix attempts (`window.EmojiMart` removal, `customElements.whenDefined`) did not address the root cause.
+
+**Correct fix:**
+- `useEffect` dependency changed from `[isOpen]` to `[]` — data loading starts on component mount, independent of `isOpen`
+- `dataReady` state added — set to `true` only after `em.init()` resolves
+- `<em-emoji-picker>` now only mounts when `isOpen && dataReady` — guarantees data is always populated before the component renders
+- Debug logs removed after issue confirmed resolved
+
+Issue confirmed resolved by user testing.
+
+---
+
+### Open Items Carried Forward to Session 31
+
+1. **`lib/chat.ts` creation** — extract `sendMessage()`, `loadConversation()`, `newConversation()`, `processFile()` from `chat-interface.tsx`
+2. **`lib/llm/brain.ts` state extraction** — `isLoading`, `isSpeaking`, `isPlayingTTS`, `ttsAudioControls`, `replayingMessageId`, `tokenUsage`, `memorySize`, `memoryWindowSize`, `isTranscribing`, `isRecording`
+3. **`expressionState` dual source conflict** — `useBrain()` and `ChatInterface` both drive it simultaneously
+4. **Emotion display logic** — review and fix
+5. **Processing / Speaking display logic** — review and fix
+6. **Mic button disabled while AI is speaking**
+7. **Speaker button becomes Stop button while AI is speaking**
+8. **`/app/companion/[id]/page.tsx` full review / rewrite**
+9. **Visual formats logic / rendering full review / rewrite**
+10. **Runway-based `live-avatar` implementation**
+11. **CSP header still missing**
+12. **Popup live-sync** — `BroadcastChannel`, deferred
+13. **`DEBUG_MODE` constant + `debugLog()` utility** — priority
+14. **`thinking` state universal** — all providers show thinking state during inference
+15. **Model capabilities display** — hybrid: dropdown icons + settings panel active model summary
+16. **BioLLM tool detection via `gpt-5.4-nano`** — deferred until base integration stable
+17. **`EMOTION_CONFIG` duplication** — move from both avatar components to `constants.ts`
+
+---
+
+## Session 29: JSON parsing cleanup, API key pattern fix, emotions.ts rewrite, component architecture audit (04/12/2026)
 
 ### Overview
 
