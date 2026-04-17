@@ -30,21 +30,38 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
 
   // Dynamically import @emoji-mart/data and initialise the web component
   useEffect(() => {
+    console.log('[v0] EmojiPicker: useEffect triggered — isOpen:', isOpen)
     if (!isOpen) return
 
     let cancelled = false
 
+    console.log('[v0] EmojiPicker: starting data load')
     import('@emoji-mart/data').then((mod) => {
+      console.log('[v0] EmojiPicker: @emoji-mart/data loaded — cancelled:', cancelled, '— data keys:', Object.keys(mod.default))
       if (cancelled) return
       import('emoji-mart').then((em) => {
+        console.log('[v0] EmojiPicker: emoji-mart loaded — cancelled:', cancelled, '— em keys:', Object.keys(em))
         if (cancelled) return
+        const registered = customElements.get('em-emoji-picker')
+        console.log('[v0] EmojiPicker: em-emoji-picker already registered?', !!registered)
         customElements.whenDefined('em-emoji-picker').then(() => {
-          if (!cancelled) em.init({ data: mod.default })
+          console.log('[v0] EmojiPicker: em-emoji-picker is defined — cancelled:', cancelled)
+          if (cancelled) return
+          console.log('[v0] EmojiPicker: calling em.init() now')
+          em.init({ data: mod.default })
+          console.log('[v0] EmojiPicker: em.init() call completed')
         })
+      }).catch((err) => {
+        console.log('[v0] EmojiPicker: failed to import emoji-mart —', err)
       })
+    }).catch((err) => {
+      console.log('[v0] EmojiPicker: failed to import @emoji-mart/data —', err)
     })
 
-    return () => { cancelled = true }
+    return () => {
+      console.log('[v0] EmojiPicker: cleanup — setting cancelled = true, isOpen was:', isOpen)
+      cancelled = true
+    }
   }, [isOpen])
 
   // Wire up the emoji-select event from the web component
