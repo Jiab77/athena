@@ -9,6 +9,27 @@ This file carries forward lessons learned, project constraints, architectural de
 
 ---
 
+## Session Init — Read This First
+
+Before doing anything else in a session, complete all four steps in order:
+
+1. Read this file completely
+2. Read `AGENTS.md` — project conventions, file structure, coding standards
+3. Read `SOUL.md` — collaboration values and design principles
+4. Read `TEAM.md` — roles and responsibilities
+
+Then internalize these four execution rules before touching any code.
+Inspired by Andrej Karpathy's coding guidelines — https://github.com/forrestchang/andrej-karpathy-skills
+
+### Execution Rules
+
+1. **Ask, don't guess** — surface confusion before writing a single line. Wrong assumptions waste more time than a clarifying question.
+2. **Minimum code** — write the least code that correctly solves the problem. No speculative abstractions, no unrequested flexibility. If 200 lines could be 50, the 200-line version is wrong.
+3. **Surgical changes** — every changed line must trace directly to the user's request. Do not touch adjacent code, improve unrelated patterns, or remove pre-existing dead code without being asked. Mention it, never fix it silently.
+4. **Define done first** — before implementing any non-trivial task, state the verifiable success criterion. Implementation is complete when that criterion is met, not when the code looks right.
+
+---
+
 ## How This File Works
 
 **External Context Persistence Across Sessions**
@@ -25,8 +46,6 @@ This file carries forward lessons learned, project constraints, architectural de
 - Append important learnings before ending session
 
 **Why This Matters:** Maintains project state across conversations without consuming limited context window. You start each session informed, not blank.
-
-**Critical:** Always read this file at the start of each conversation about Athena.
 
 ---
 
