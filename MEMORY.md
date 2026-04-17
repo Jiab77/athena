@@ -9,13 +9,34 @@ This file carries forward lessons learned, project constraints, architectural de
 
 ---
 
+## Session Init — Read This First
+
+Before doing anything else in a session, complete all four steps in order:
+
+1. Read this file completely
+2. Read `AGENTS.md` — project conventions, file structure, coding standards
+3. Read `SOUL.md` — collaboration values and design principles
+4. Read `HUMAN.md` — Who you're working with and how they approach problems
+5. Read `TEAM.md` — roles and responsibilities
+
+Then internalize these four execution rules before touching any code.
+Inspired by Andrej Karpathy's coding guidelines — https://github.com/forrestchang/andrej-karpathy-skills
+
+### Execution Rules
+
+1. **Ask, don't guess** — surface confusion before writing a single line. Wrong assumptions waste more time than a clarifying question.
+2. **Minimum code** — write the least code that correctly solves the problem. No speculative abstractions, no unrequested flexibility. If 200 lines could be 50, the 200-line version is wrong.
+3. **Surgical changes** — every changed line must trace directly to the user's request. Do not touch adjacent code, improve unrelated patterns, or remove pre-existing dead code without being asked. Mention it, never fix it silently.
+4. **Define done first** — before implementing any non-trivial task, state the verifiable success criterion. Implementation is complete when that criterion is met, not when the code looks right.
+
+---
+
 ## How This File Works
 
 **External Context Persistence Across Sessions**
 
 ### Session 2+ Flow
-- Read updated MEMORY.md first
-- Know what happened before (doesn't consume context window)
+- Read updated MEMORY.md first — restores project continuity without repeating past mistakes or redoing completed work
 - Continue effectively where previous session left off
 - Append new learnings
 
@@ -26,7 +47,18 @@ This file carries forward lessons learned, project constraints, architectural de
 
 **Why This Matters:** Maintains project state across conversations without consuming limited context window. You start each session informed, not blank.
 
-**Critical:** Always read this file at the start of each conversation about Athena.
+---
+
+## Key Documents Reference
+
+| Document | Purpose |
+|---|---|
+| `MEMORY.md` | This file — session continuity and lessons learned |
+| `docs/REDESIGN.md` | Kai-inspired redesign discussion — UX rework + persistent memory + feature comparison |
+| `docs/ROADMAP.md` | Phase roadmap (MVP → Quality → Advanced → Desktop) |
+| `docs/IMPLEMENTATION_STATUS.md` | Checkbox-level feature implementation status |
+| `docs/IMPLEMENTATION_NOTES.md` | Technical architecture notes |
+| `docs/SECURITY_REPORT.md` | OWASP Top 10:2025 security audit |
 
 ---
 
@@ -43,6 +75,20 @@ This file carries forward lessons learned, project constraints, architectural de
 Of course, these rules should be adapted to the programming language used in the user project.
 
 **YOU MUST REPLACE `.ext` BY THE FILE EXTENSION RELATED TO THE USED PROGRAMING LANGUAGE.**
+
+### Context Gathering Rules
+
+- Use parallel tool calls where possible.
+- Don't stop at the first match — examine ALL matching files to find the right variant/version.
+- Understand the full system before making changes — check existing patterns, parent components, utilities, schemas, and architecture.
+- Search systematically: broad → specific → verify relationships.
+
+### Impact Assessment Rules (CRITICAL — learned the hard way)
+
+- Before removing ANY import, constant, or function, grep ALL consumers across the full codebase first.
+- Before adding ANY new abstraction (proxy, middleware, cookies), verify it is architecturally compatible with the existing session/auth design.
+- Before claiming something is "dead code", confirm zero consumers exist outside the file itself.
+- When cleaning up after a change, read the full diff mentally and check every removed line for hidden dependencies.
 
 ---
 
@@ -72,7 +118,37 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
-> ## Session 30: BioLLM document upload, markdown table rendering, file picker fix, emoji picker race condition (04/17/2026)
+> ## Session 31: Kai-inspired redesign discussion, REDESIGN.md created (04/17/2026)
+
+### Overview
+
+Session 31 was a discussion-only session. No code was changed. The focus was reviewing the [Kai](https://github.com/SimonSchubert/Kai) / [kai9000.com](https://kai9000.com) project and identifying what can improve Athena's UX and feature set.
+
+### Key Decisions
+
+- A dedicated `docs/REDESIGN.md` was created to hold the design discussion (not `ROADMAP.md`, which is kept clean and phase-structured)
+- `MEMORY.md` updated with a key documents reference table pointing to all major project docs
+
+### What REDESIGN.md Covers
+
+1. **Chat-first UX redesign** — chat becomes full-screen primary surface, companion becomes a draggable floating overlay anchored top-right with a pop-out button. Several Session 29/30 open items become irrelevant if this is implemented (items 3, 5, 8).
+2. **Persistent memory system** — Kai-inspired `memories` IndexedDB store with `hitCount`, promotion to system prompt, `remember()` / `recall()` tools, per-companion memory bank, hybrid (LLM + user) approach. Heartbeat deferred.
+3. **PWA install prompt** — being handled independently by Jiab77.
+4. **Other Kai features** — multi-provider fallback chain, session prompt override, web search (full — both OpenAI via Responses API and Groq via compound-beta), MCP (future), AI-generated UI screens (not planned).
+
+### Impact on Session 29/30 Open Items
+
+Items that remain relevant regardless of redesign: 1, 2, 6, 7, 11, 13, 14, 15, 16, 17.
+Items that become irrelevant if redesign is implemented: 3, 5, 8.
+Items to reassess after redesign scope is finalized: 4, 9, 10, 12.
+
+### Status
+
+> `docs/REDESIGN.md` is under active discussion. No implementation started.
+
+---
+
+## Session 30: BioLLM document upload, markdown table rendering, file picker fix, emoji picker race condition (04/17/2026)
 
 ### Overview
 

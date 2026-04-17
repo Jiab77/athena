@@ -2,7 +2,7 @@
 
 A visually charming, personality-driven AI companion designed with privacy, user agency, and emotional safety as core principles. Combines the **fun, playful spirit of VirtuaGirl** with the **functional personality selection of Project AVA**, while actively avoiding the **parasocial dependency risks of GateBox and ChatGPT-4o**.
 
-<a href="https://athena-seven-beta.vercel.app" title="Try Athena" target="_blank"><img src="athena.png" alt="Athena" /></a>
+<a href="https://athena-seven-beta.vercel.app" title="Try Athena" target="_blank"><img src="public/images/athena-desktop.png" alt="Athena" /></a>
 
 <p align="center"><strong>Try Athena: <a href="https://athena-seven-beta.vercel.app">https://athena-seven-beta.vercel.app</a></strong></p>
 
