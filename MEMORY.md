@@ -36,8 +36,7 @@ Inspired by Andrej Karpathy's coding guidelines — https://github.com/forrestch
 **External Context Persistence Across Sessions**
 
 ### Session 2+ Flow
-- Read updated MEMORY.md first
-- Know what happened before (doesn't consume context window)
+- Read updated MEMORY.md first — restores project continuity without repeating past mistakes or redoing completed work
 - Continue effectively where previous session left off
 - Append new learnings
 
