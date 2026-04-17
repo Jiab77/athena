@@ -129,11 +129,12 @@ If the primary provider fails (rate limit, downtime), automatically retry with t
 
 ### Web Search Tool
 
-OpenAI `web_search` is fully implemented — the tool is included in every request via the Responses API with `tool_choice: 'auto'`, the model invokes it autonomously, and the response parsing handles `web_search_call` output items correctly. No further work needed for OpenAI.
+Both OpenAI and Groq are fully implemented:
 
-Groq has native compound model support for web search (compound-beta / compound-beta-mini). Implementation is pending.
+- **OpenAI** — `web_search` tool included in every Responses API request with `tool_choice: 'auto'`, `web_search_call` output items parsed correctly
+- **Groq** — implemented in two layers: `tools.ts` pre-flight uses `compound-beta` with `browser_automation`, `web_search`, and `visit_website` enabled; `groq.ts` main call also applies `compound_custom` for compound-capable models; `router.ts` routes Groq through the pre-flight first and returns early if tools fired
 
-**Status:** Complete for OpenAI — pending for Groq
+**Status:** Complete for both OpenAI and Groq
 
 ### Conversation-Level System Prompt Override
 
@@ -165,7 +166,7 @@ Kai's most unique feature — the AI can generate and render full interactive UI
 | Draggable companion overlay | No | Partial (popup only) | Medium effort |
 | Multi-provider fallback | Yes | No | Medium value |
 | MCP server support | Yes | No | Future |
-| Web search | Yes | OpenAI: full / Groq: pending | Groq implementation pending |
+| Web search | Yes | Full (OpenAI + Groq) | No gap |
 | Session prompt override | Yes | No | Low effort |
 | Encrypted local storage | No | Yes | Athena advantage |
 | BioLLM support | No | Yes | Athena advantage |

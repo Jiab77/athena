@@ -101,7 +101,7 @@ Session 31 was a discussion-only session. No code was changed. The focus was rev
 1. **Chat-first UX redesign** — chat becomes full-screen primary surface, companion becomes a draggable floating overlay anchored top-right with a pop-out button. Several Session 29/30 open items become irrelevant if this is implemented (items 3, 5, 8).
 2. **Persistent memory system** — Kai-inspired `memories` IndexedDB store with `hitCount`, promotion to system prompt, `remember()` / `recall()` tools, per-companion memory bank, hybrid (LLM + user) approach. Heartbeat deferred.
 3. **PWA install prompt** — being handled independently by Jiab77.
-4. **Other Kai features** — multi-provider fallback chain, session prompt override, web search (OpenAI: full / Groq: pending), MCP (future), AI-generated UI screens (not planned).
+4. **Other Kai features** — multi-provider fallback chain, session prompt override, web search (full — both OpenAI via Responses API and Groq via compound-beta), MCP (future), AI-generated UI screens (not planned).
 
 ### Impact on Session 29/30 Open Items
 
