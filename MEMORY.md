@@ -16,7 +16,8 @@ Before doing anything else in a session, complete all four steps in order:
 1. Read this file completely
 2. Read `AGENTS.md` — project conventions, file structure, coding standards
 3. Read `SOUL.md` — collaboration values and design principles
-4. Read `TEAM.md` — roles and responsibilities
+4. Read `HUMAN.md` — Who you're working with and how they approach problems
+5. Read `TEAM.md` — roles and responsibilities
 
 Then internalize these four execution rules before touching any code.
 Inspired by Andrej Karpathy's coding guidelines — https://github.com/forrestchang/andrej-karpathy-skills
