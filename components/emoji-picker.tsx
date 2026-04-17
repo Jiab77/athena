@@ -37,7 +37,10 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
     import('@emoji-mart/data').then((mod) => {
       if (cancelled) return
       import('emoji-mart').then((em) => {
-        if (!cancelled) em.init({ data: mod.default })
+        if (cancelled) return
+        customElements.whenDefined('em-emoji-picker').then(() => {
+          if (!cancelled) em.init({ data: mod.default })
+        })
       })
     })
 
