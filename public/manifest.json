@@ -30,26 +30,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-512x512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ],
   "screenshots": [
     {
-      "src": "/images/athena.png",
+      "src": "/images/athena-desktop.png",
       "type": "image/png",
       "sizes": "1348x577",
       "form_factor": "wide",
       "label": "Athena AI Companion — desktop view"
     },
     {
-      "src": "/images/athena.png",
+      "src": "/images/athena-mobile.png",
       "type": "image/png",
-      "sizes": "1348x577",
+      "sizes": "577x1281",
       "form_factor": "narrow",
       "label": "Athena AI Companion — mobile view"
     }
