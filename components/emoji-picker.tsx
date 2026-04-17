@@ -26,43 +26,26 @@ interface EmojiPickerProps {
 
 export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [dataReady, setDataReady] = useState(false)
   const pickerRef = useRef<HTMLElement>(null)
 
-  // Dynamically import @emoji-mart/data and initialise the web component
+  // Load and initialise emoji data once on mount — before the picker is ever opened
+  // This ensures em.init() always completes before <em-emoji-picker> mounts
   useEffect(() => {
-    console.log('[v0] EmojiPicker: useEffect triggered — isOpen:', isOpen)
-    if (!isOpen) return
-
     let cancelled = false
 
-    console.log('[v0] EmojiPicker: starting data load')
     import('@emoji-mart/data').then((mod) => {
-      console.log('[v0] EmojiPicker: @emoji-mart/data loaded — cancelled:', cancelled, '— data keys:', Object.keys(mod.default))
       if (cancelled) return
       import('emoji-mart').then((em) => {
-        console.log('[v0] EmojiPicker: emoji-mart loaded — cancelled:', cancelled, '— em keys:', Object.keys(em))
         if (cancelled) return
-        const registered = customElements.get('em-emoji-picker')
-        console.log('[v0] EmojiPicker: em-emoji-picker already registered?', !!registered)
-        customElements.whenDefined('em-emoji-picker').then(() => {
-          console.log('[v0] EmojiPicker: em-emoji-picker is defined — cancelled:', cancelled)
-          if (cancelled) return
-          console.log('[v0] EmojiPicker: calling em.init() now')
-          em.init({ data: mod.default })
-          console.log('[v0] EmojiPicker: em.init() call completed')
+        em.init({ data: mod.default }).then(() => {
+          if (!cancelled) setDataReady(true)
         })
-      }).catch((err) => {
-        console.log('[v0] EmojiPicker: failed to import emoji-mart —', err)
       })
-    }).catch((err) => {
-      console.log('[v0] EmojiPicker: failed to import @emoji-mart/data —', err)
     })
 
-    return () => {
-      console.log('[v0] EmojiPicker: cleanup — setting cancelled = true, isOpen was:', isOpen)
-      cancelled = true
-    }
-  }, [isOpen])
+    return () => { cancelled = true }
+  }, [])
 
   // Wire up the emoji-select event from the web component
   useEffect(() => {
@@ -107,7 +90,7 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
             height: 350px !important;
           }
         `}</style>
-        {isOpen && (
+        {isOpen && dataReady && (
           <em-emoji-picker
             ref={pickerRef as any}
             theme="dark"
