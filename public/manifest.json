@@ -4,14 +4,20 @@
   "short_name": "Athena",
   "description": "Your privacy-first visual AI companion. All conversations encrypted locally. Your data, your privacy, your legacy.",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
   "start_url": "/",
   "scope": "/",
   "orientation": "portrait-primary",
   "theme_color": "#0d0d0d",
   "background_color": "#0d0d0d",
   "lang": "en",
-  "categories": ["productivity", "lifestyle"],
+  "categories": [
+    "productivity",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/icons/icon-192x192.jpg",
@@ -26,14 +32,26 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "/images/athena.png",
+      "type": "image/png",
+      "sizes": "1348x577",
+      "form_factor": "wide"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Open Companion",
       "short_name": "Companion",
       "description": "Jump directly to your AI companion",
       "url": "/",
-      "icons": [{ "src": "/icons/icon-192x192.jpg", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.jpg",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
