@@ -127,11 +127,13 @@ If the primary provider fails (rate limit, downtime), automatically retry with t
 
 **Status:** Under consideration
 
-### Web Search Tool (Groq)
+### Web Search Tool
 
-Already partially planned. Groq has native compound model support for web search. OpenAI already has `web_search` tool support.
+OpenAI `web_search` is fully implemented — the tool is included in every request via the Responses API with `tool_choice: 'auto'`, the model invokes it autonomously, and the response parsing handles `web_search_call` output items correctly. No further work needed for OpenAI.
 
-**Status:** Partially implemented (OpenAI), planned for Groq
+Groq has native compound model support for web search (compound-beta / compound-beta-mini). Implementation is pending.
+
+**Status:** Complete for OpenAI — pending for Groq
 
 ### Conversation-Level System Prompt Override
 
@@ -163,7 +165,7 @@ Kai's most unique feature — the AI can generate and render full interactive UI
 | Draggable companion overlay | No | Partial (popup only) | Medium effort |
 | Multi-provider fallback | Yes | No | Medium value |
 | MCP server support | Yes | No | Future |
-| Web search | Yes | Partial | Medium effort |
+| Web search | Yes | OpenAI: full / Groq: pending | Groq implementation pending |
 | Session prompt override | Yes | No | Low effort |
 | Encrypted local storage | No | Yes | Athena advantage |
 | BioLLM support | No | Yes | Athena advantage |
