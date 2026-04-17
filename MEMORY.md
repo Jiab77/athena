@@ -30,6 +30,19 @@ This file carries forward lessons learned, project constraints, architectural de
 
 ---
 
+## Key Documents Reference
+
+| Document | Purpose |
+|---|---|
+| `MEMORY.md` | This file — session continuity and lessons learned |
+| `docs/REDESIGN.md` | Kai-inspired redesign discussion — UX rework + persistent memory + feature comparison |
+| `docs/ROADMAP.md` | Phase roadmap (MVP → Quality → Advanced → Desktop) |
+| `docs/IMPLEMENTATION_STATUS.md` | Checkbox-level feature implementation status |
+| `docs/IMPLEMENTATION_NOTES.md` | Technical architecture notes |
+| `docs/SECURITY_REPORT.md` | OWASP Top 10:2025 security audit |
+
+---
+
 ## Your Development Rules (MUST NOT BE SKIPPED)
 
 1. EVERY shared constant goes in `/lib/constants.ext` - NO exceptions
@@ -69,6 +82,36 @@ Read `MEMORY.md` for **EVERY** session.
 **Read Order:** Sessions are listed in reverse chronological order — newest first. Read from the top down. Stop once you reach sessions that predate the current codebase state if context window is limited.
 
 **Open to Suggestions:** If you find that read method not performant and/or creates you trouble for editing the file, please tell it to your human collaborator.
+
+---
+
+> ## Session 31: Kai-inspired redesign discussion, REDESIGN.md created (04/17/2026)
+
+### Overview
+
+Session 31 was a discussion-only session. No code was changed. The focus was reviewing the [Kai](https://github.com/SimonSchubert/Kai) / [kai9000.com](https://kai9000.com) project and identifying what can improve Athena's UX and feature set.
+
+### Key Decisions
+
+- A dedicated `docs/REDESIGN.md` was created to hold the design discussion (not `ROADMAP.md`, which is kept clean and phase-structured)
+- `MEMORY.md` updated with a key documents reference table pointing to all major project docs
+
+### What REDESIGN.md Covers
+
+1. **Chat-first UX redesign** — chat becomes full-screen primary surface, companion becomes a draggable floating overlay anchored top-right with a pop-out button. Several Session 29/30 open items become irrelevant if this is implemented (items 3, 5, 8).
+2. **Persistent memory system** — Kai-inspired `memories` IndexedDB store with `hitCount`, promotion to system prompt, `remember()` / `recall()` tools, per-companion memory bank, hybrid (LLM + user) approach. Heartbeat deferred.
+3. **PWA install prompt** — being handled independently by Jiab77.
+4. **Other Kai features** — multi-provider fallback chain, session prompt override, web search (partial), MCP (future), AI-generated UI screens (not planned).
+
+### Impact on Session 29/30 Open Items
+
+Items that remain relevant regardless of redesign: 1, 2, 6, 7, 11, 13, 14, 15, 16, 17.
+Items that become irrelevant if redesign is implemented: 3, 5, 8.
+Items to reassess after redesign scope is finalized: 4, 9, 10, 12.
+
+### Status
+
+> `docs/REDESIGN.md` is under active discussion. No implementation started.
 
 ---
 
