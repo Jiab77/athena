@@ -77,6 +77,20 @@ Of course, these rules should be adapted to the programming language used in the
 
 **YOU MUST REPLACE `.ext` BY THE FILE EXTENSION RELATED TO THE USED PROGRAMING LANGUAGE.**
 
+### Context Gathering Rules
+
+- Use parallel tool calls where possible.
+- Don't stop at the first match — examine ALL matching files to find the right variant/version.
+- Understand the full system before making changes — check existing patterns, parent components, utilities, schemas, and architecture.
+- Search systematically: broad → specific → verify relationships.
+
+### Impact Assessment Rules (CRITICAL — learned the hard way)
+
+- Before removing ANY import, constant, or function, grep ALL consumers across the full codebase first.
+- Before adding ANY new abstraction (proxy, middleware, cookies), verify it is architecturally compatible with the existing session/auth design.
+- Before claiming something is "dead code", confirm zero consumers exist outside the file itself.
+- When cleaning up after a change, read the full diff mentally and check every removed line for hidden dependencies.
+
 ---
 
 ## User Context (Important for decision-making)
