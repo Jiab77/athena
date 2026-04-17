@@ -149,7 +149,7 @@ Items to reassess after redesign scope is finalized: 4, 9, 10, 12.
 
 ---
 
-> ## Session 30: BioLLM document upload, markdown table rendering, file picker fix, emoji picker race condition (04/17/2026)
+## Session 30: BioLLM document upload, markdown table rendering, file picker fix, emoji picker race condition (04/17/2026)
 
 ### Overview
 
