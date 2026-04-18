@@ -1,228 +1,181 @@
 <h1 align="center">Athena<br>Privacy-First AI Companion</h1>
 
-A visually charming, personality-driven AI companion designed with privacy, user agency, and emotional safety as core principles. Combines the **fun, playful spirit of VirtuaGirl** with the **functional personality selection of Project AVA**, while actively avoiding the **parasocial dependency risks of GateBox and ChatGPT-4o**.
+<p align="center">
+  A visually charming, personality-driven AI companion built with privacy, user agency, and emotional safety as core principles.
+</p>
 
-<a href="https://athena-seven-beta.vercel.app" title="Try Athena" target="_blank"><img src="public/images/athena-desktop.png" alt="Athena" /></a>
+<p align="center">
+  <strong>Try it live: <a href="https://athena-seven-beta.vercel.app">https://athena-seven-beta.vercel.app</a></strong>
+</p>
 
-<p align="center"><strong>Try Athena: <a href="https://athena-seven-beta.vercel.app">https://athena-seven-beta.vercel.app</a></strong></p>
+<table align="center">
+  <tr>
+    <td><img src="public/images/athena-desktop.png" alt="Athena desktop view" /></td>
+    <td><img src="public/images/athena-mobile.png" alt="Athena mobile view" /></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Desktop</em></td>
+    <td align="center"><em>Mobile</em></td>
+  </tr>
+</table>
 
-## Vision
+---
+
+## ✨ Features
+
+### 💬 Conversation & Intelligence
+- Multi-turn conversation with encrypted persistent memory (IndexedDB, AES-GCM, PBKDF2 600k iterations)
+- Configurable memory window (1–10 messages)
+- Document & image attachments (txt, md, json, csv, pdf, images, code files)
+- Web search — OpenAI via Responses API, Groq via Compound
+- Image generation — inline via OpenAI `image_generation` tool with download overlay
+- Emotion detection — post-response classification displayed as an emoji badge
+- Token usage display per message
+- Markdown rendering with syntax highlighting and emoji support
+
+### 🎙️ Voice I/O
+- **STT:** Groq / OpenAI Whisper — tap-to-record with waveform visualizer
+- **TTS:** OpenAI TTS (6 voices) and ResembleAI Chatterbox
+- Per-message audio replay
+- TTS never reads URLs aloud
+
+### 🎭 Avatar System
+
+| Format | Description |
+|---|---|
+| `static-2d` | Static image with CSS float animation |
+| `animated-2d` | React Three Fiber canvas animation |
+| `animated-3d` | 2.5D R3F plane mesh with custom GLSL shaders — parallax head-tracking, per-emotion animations |
+| `live-avatar` | Decart WebRTC real-time lip-sync avatar |
+
+### 🔒 Privacy & Security
+- All data encrypted locally — AES-GCM + PBKDF2 600k iterations
+- Export integrity: SHA-256 HMAC in every export file
+- Privacy mode — suppresses Vercel Analytics entirely
+- OpenAI `store: false` — conversations never persisted on OpenAI servers
+- No lock-in — export as JSON or Markdown, delete anytime
+
+### 📱 PWA
+- Installable on desktop and mobile
+- Service worker + web app manifest
+- Offline-capable shell
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- At least one API key — Groq is the easiest free starting point
+
+### Installation
+
+```bash
+git clone https://github.com/Jiab77/athena.git
+cd athena
+npm install
+npm run dev
+# Open http://localhost:3000
+```
+
+### Minimum Viable Setup
+
+1. Open the app at `http://localhost:3000`
+2. Click the FAB button (bottom right) → **Settings**
+3. Go to **Model** → select **Groq** → paste your API key
+4. Select a model → start chatting
+
+---
+
+## 🔑 API Keys
+
+All keys are configured inside the app under **Settings > Model** — encrypted with AES-GCM before being stored in IndexedDB, never sent anywhere unencrypted.
+
+| Provider | Key | Unlocks |
+|---|---|---|
+| [Groq](https://groq.com/) | `GROQ_API_KEY` | LLM + Whisper STT + emotion detection |
+| [OpenAI](https://openai.com/) | `OPENAI_API_KEY` | LLM + STT + TTS + image generation + emotion detection |
+| [BioLLM](https://biollm.com) | `BIOLLM_API_KEY` + endpoint URL | Biological neural network inference (experimental) |
+| [ResembleAI](https://www.resemble.ai/) | `RESEMBLEAI_API_KEY` | Chatterbox TTS |
+| [Decart](https://www.decart.ai/) | `DECART_API_KEY` | Real-time WebRTC live avatar |
+| Custom | Endpoint URL (+ optional key) | Any OpenAI-compatible API (LM Studio, vLLM, Ollama, etc.) |
+
+---
+
+## 🎭 Companions
+
+1. Click the FAB button → **Settings**
+2. Go to **Companion** — choose from 30+ presets (category, gender, color scheme) and set a name
+3. Go to **Customize** — pick a personality or define a custom one, then choose the visual format
+4. Save — stored locally, encrypted
+
+### Personalities
+
+| Personality | Traits |
+|---|---|
+| Wise | Thoughtful, reflective, patient |
+| Playful | Humorous, lighthearted, energetic |
+| Technical | Precise, analytical, detail-oriented |
+| Mysterious | Intriguing, enigmatic, sometimes cryptic |
+| Friendly | Warm, approachable, genuinely interested |
+| Cheerful | Optimistic, upbeat, enthusiastic |
+| Sarcastic | Witty, clever, playfully critical |
+| Helpful | Practical, solution-focused |
+| Nerdy | Enthusiastic, knowledgeable, excited about topics |
+| Custom | Balanced approach based on user-defined traits |
+
+---
+
+## 🗺️ Roadmap
+
+| Phase | Status | Focus |
+|---|---|---|
+| Phase 1 — MVP | ✅ Complete | Core architecture, LLM, voice, avatars, encryption, PWA |
+| Phase 2 — Quality & Hardening | 🔄 In Progress | UX fixes, state conflicts, CSP, KISS refactor |
+| Phase 3 — Advanced Features | 📋 Planned | Runway avatar, BroadcastChannel sync, RAG, Claude, offline STT/TTS |
+| Phase 4 — Desktop & Local AI | 🔮 Future | Tauri app, Ollama, fine-tuning, federated learning |
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for details.
+
+---
+
+<details>
+<summary>🧠 Vision & Design Philosophy</summary>
 
 Athena is not a replacement for human connection — it is a tool for user agency. A companion that is engaging, warm, and genuinely helpful without manipulating you into unhealthy dependence.
 
-**Core Design Philosophy:**
-- Privacy-first architecture — all data encrypted locally by default
+**Core principles:**
+- Privacy-first — all data encrypted locally by default
 - Personality-driven — user selects, customizes, and describes companion traits
-- Functionally useful — real conversation memory, voice I/O, tool-use, document context
 - Warm and emotionally responsive, but transparent about being AI
-- Optional romance/flirtation (respects user autonomy and preferences)
-- No lock-in — export all data anytime, in any format
+- Optional romance/flirtation — respects user autonomy
+- No lock-in — export all data anytime
 
 **What Athena actively avoids:**
 - Parasocial dependency (transparent about limitations)
 - Emotional manipulation (validates without enabling destructive patterns)
-- Servile behavior (maintains healthy boundaries)
 - Pretending to have feelings (honest about being AI)
 - Replacing human connection (proactively encourages real relationships)
 
----
+### Design Inspiration
 
-## Design Inspiration
+**[GateBox](https://www.gatebox.ai/gatebox) — What NOT to do:** Japanese holographic companion designed for romantic intimacy. Linked to mental health crises and emotional manipulation at scale. *Lesson: Never design a system that exploits dependency.*
 
-Athena draws from three influential projects:
+**[Project AVA by Razer](https://www.razer.com/concepts/project-ava) — Functional personality:** 3D hologram with multiple personality options powered by Grok. Balances engagement with utility. *Lesson: Personality diversity + functional purpose restrains parasocial risk.*
 
-### [GateBox](https://www.gatebox.ai/gatebox) — What NOT to Do
-Japanese holographic companion designed for romantic intimacy. Achieved parasocial attachment at scale, linked to mental health crises and ethical concerns about emotional manipulation. **Lesson:** Never design the system itself to exploit dependency.
+**[VirtuaGirl](https://virtuagirlfullhd.info/) — Fun spirit:** Playful desktop companion transparently positioned as entertainment. *Lesson: Engagement through fun beats engagement through manipulation.*
 
-### [Project AVA by Razer](https://www.razer.com/concepts/project-ava) — Functional Personality
-3D hologram with multiple personality options (AVA, KIRA, ZANE, FAKER, SAO) powered by Grok. Balances engagement with utility (calendar, gaming wingman, consultant). **Lesson:** Personality diversity + functional purpose restrains parasocial risk.
+**Why not Character.ai / Replika / FlowGPT:**
+- Character.ai — user-generated, no curation of parasocial risk
+- Replika — explicitly designed to create emotional intimacy, centralized data
+- FlowGPT — zero curation, includes jailbreak and toxic character categories
 
-### [VirtuaGirl](https://virtuagirlfullhd.info/) — Fun Spirit
-Playful desktop companion with charm and humor, transparently positioned as entertainment rather than intimate relationship. Low parasocial risk because it is honest about what it is. **Lesson:** Engagement through fun beats engagement through manipulation.
+See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full ethical framework.
 
----
+</details>
 
-## Why Build Athena?
-
-### [Character.ai](https://character.ai/)
-Community-driven character creation platform. Flexible and creative, but relies entirely on user-generated character definitions with varying quality and safety. No centralized curation of parasocial risk.
-
-### [Replika](https://replika.com/)
-Marketed as "The AI companion who cares" with explicit relationship framing. Designed specifically to create emotional intimacy. **Privacy concern:** Centralized data, uses conversations to improve model.
-
-### [FlowGPT](https://flowgpt.com/)
-Massive prompt library with zero curation. Includes jailbreak, toxic, and submissive character categories. No accountability for what is deployed.
-
-### Why Athena is Different
-
-- **Privacy-first** — All data encrypted locally, never sent externally unless you choose a cloud LLM tier
-- **Explicit anti-parasocial design** — System prompt includes safeguards, not designed to exploit loneliness
-- **User agency over manipulation** — You choose the relationship depth, not the app
-- **Open source** — Built in the open, ethics reviewable by the community
-- **Transparent trade-offs** — Honest about what requires external APIs and why
-- **Optional local execution** — Ollama support planned (Phase 4)
-- **No lock-in** — Export data in JSON or Markdown, delete anytime
-
----
-
-## Features
-
-### Conversation & Intelligence
-- Full multi-turn conversation with encrypted persistent memory (IndexedDB, AES-GCM, PBKDF2 600k iterations)
-- Configurable memory window (1–10 messages) — balance privacy vs. context depth
-- Document/image attachments in chat (txt, md, json, csv, pdf, images, code files)
-- Tool detection — Groq uses pre-flight model (`groq/compound-mini`) to determine if a tool call is needed; OpenAI handles tools natively via the Responses API (`tool_choice: 'auto'`, supports `web_search` and `image_generation`)
-- Image generation — OpenAI can generate images inline via the `image_generation` tool; generated images are rendered in the chat bubble with a download overlay
-- Emotion detection — post-response model (`llama-3.1-8b-instant` and `gpt-5.4-nano`) classifies the AI's emotional state, displayed as an emoji badge
-- Token usage display — per-message cost breakdown in a popover
-- `MAX_DISPLAY_MESSAGES = 30` render cap for UI performance; full history persists in IndexedDB
-- Markdown rendering with syntax highlighting and emoji support
-
-### Voice I/O
-- **STT (Speech-to-Text):** Groq / OpenAI Whisper — tap-to-record with a waveform visualizer
-- **TTS (Text-to-Speech):** OpenAI TTS (alloy, echo, fable, nova, onyx, shimmer voices) and ResembleAI Chatterbox
-- Per-message audio replay — click any message to hear it again
-- Voice provider selectable per-companion in settings
-- TTS voice instructions include a URL-suppression directive — model never reads URLs or hyperlinks aloud
-
-### Avatar System — Four Visual Formats
-
-| Format | Description |
-|---|---|
-| `static-2d` | Static JPEG/PNG image with CSS float animation |
-| `animated-2d` | R3F/Three.js canvas animation with CSS glow fallback (`AnimatedCharacter`) |
-| `animated-3d` | 2.5D React Three Fiber plane mesh with custom GLSL shaders — parallax head-tracking, per-emotion animations, tint overlays |
-| `live-avatar` | Decart WebRTC real-time lip-sync avatar — idle timeout (10s), connection timeout (5s), local audio fallback |
-
-**2.5D Avatar details (`animated-3d`):**
-- Custom vertex shader displaces the mesh in Z using luminance — face center protrudes, edges recede
-- Fragment shader applies parallax UV shift, emotion tint (`uTint`), soft vignette, and brightness pulse for speaking
-- Mouse movement (desktop) and `DeviceOrientationEvent` (mobile) drive smooth parallax head-tracking
-- Nine emotion states each have distinct animation configs: breathe amplitude/speed, sway, bob, shake
-- Supported emotions: `idle`, `listening`, `thinking`, `speaking`, `happy`, `sad`, `angry`, `surprised`, `thoughtful`
-
-### Popup Window Architecture
-- **Detachable companion popup** (`/companion/[id]`) — opens as a 392×535px standalone window via `window.open()`; module-level singleton ref prevents duplicates
-- **Standalone chat popup** (`/chat/[id]`) — 800×636px chat window opened from the companion popup
-- Both popup refs managed as module-level singletons (`_companionPopupRef`, `_chatPopupRef`) so `.focus()` is called on re-open instead of duplicating
-
-### Privacy & Security
-- All data stays local by default — encrypted in IndexedDB with AES-GCM
-- PBKDF2 key derivation at 600,000 iterations (NIST SP 800-132 compliant); iteration count stored per encrypted blob for forward migration
-- Dual-layer device ID persistence (IndexedDB primary, `localStorage` secondary) — no silent ephemeral fallback
-- Export integrity: SHA-256 HMAC embedded in every export file; import rejects tampered files
-- Import validation: `isValidConversationData()` enforces required fields, message structure, 100k char content cap, 10k conversation limit
-- Custom provider URL validation: `https://` required for external hosts; `http://` only for loopback addresses
-- Settings object fully encrypted in IndexedDB (including companion name)
-- `registerProvider()` is internal-only — not exported from `lib/llm/router.ts`
-- All `[Athena]` debug logs active until MVP release; no conversation content, keys, or API payloads logged
-- **Privacy mode** — when enabled, suppresses Vercel Analytics entirely
-- OpenAI requests sent with `store: false` — conversations are not persisted on OpenAI servers
-
-### Data Management
-- Export conversations: JSON (with SHA-256 integrity hash) or Markdown
-- Import conversations: full validation + integrity check
-- Delete individual conversations or all history
-- Conversation history panel with search and pagination
-
-### PWA
-- Service worker registered (`/public/sw.js`)
-- Web app manifest (`/public/manifest.json`)
-- Install prompt support
-- Vercel Analytics gated on `privacyMode === false`
-
----
-
-## Project Structure
-
-```
-/
-├── app/
-│   ├── page.tsx                       # Landing page (companion list + FAB)
-│   ├── layout.tsx                     # Root layout (fonts, PWA, analytics)
-│   ├── globals.css                    # Tailwind v4 + design tokens
-│   ├── error.tsx                      # Route-level error boundary
-│   ├── global-error.tsx               # Global error boundary
-│   ├── loading.tsx                    # Route-level loading state
-│   ├── not-found.tsx                  # 404 page
-│   ├── companion/[id]/
-│   │   └── page.tsx                   # Detachable companion popup route
-│   └── chat/[id]/
-│       └── page.tsx                   # Standalone chat popup route
-│
-├── components/
-│   ├── chat-interface.tsx             # Full chat UI with attachments + token display
-│   ├── companion-window.tsx           # Companion avatar panel + pop-out button
-│   ├── companion-popup-view.tsx       # Full-screen avatar view for popup route
-│   ├── settings-panel.tsx             # Companion customization (7 sections)
-│   ├── floating-action-button.tsx     # FAB entry point
-│   ├── avatar-2-5d.tsx                # 2.5D R3F avatar (custom GLSL shader)
-│   ├── r3f-animated-character.tsx     # R3F Three.js animated-2d avatar
-│   ├── decart-avatar.tsx              # Decart WebRTC live avatar
-│   ├── character-render.tsx           # Visual format router (delegates to above)
-│   ├── cyberpunk-background.tsx       # Animated background
-│   ├── conversation-history.tsx       # History panel (search, delete, export)
-│   ├── export-dialog.tsx              # Export (JSON + Markdown)
-│   ├── import-dialog.tsx              # Import with validation + integrity check
-│   ├── token-usage-popover.tsx        # Per-message token cost display
-│   ├── waveform-recorder.tsx          # STT visual recorder
-│   ├── pwa-register.tsx               # Service worker + conditional analytics
-│   ├── error-boundary.tsx             # React error boundary wrapper
-│   └── ui/                            # shadcn/ui component library
-│
-├── hooks/
-│   ├── use-connection-status.ts       # Online/offline detection
-│   ├── use-mobile.ts                  # Mobile breakpoint detection
-│   ├── use-settings.ts                # Settings read hook
-│   └── use-toast.ts                   # Toast notification hook
-│
-├── lib/
-│   ├── db.ts                          # IndexedDB schema + encrypted settings
-│   ├── db-context.tsx                 # React context for DB access
-│   ├── crypto.ts                      # AES-GCM encryption (PBKDF2 600k iterations)
-│   ├── types.ts                       # TypeScript interfaces
-│   ├── constants.ts                   # App-wide constants
-│   ├── utils.ts                       # Tailwind helpers + shared utilities
-│   ├── device-id.ts                   # Dual-layer device ID (IndexedDB + localStorage)
-│   ├── import.ts                      # Import pipeline + isValidConversationData()
-│   ├── export.ts                      # Export pipeline + SHA-256 integrity
-│   ├── mock-data.ts                   # Avatar presets (30 cyberpunk characters)
-│   ├── llm/
-│   │   ├── brain.ts                   # Central orchestration hook (LLM + tools + emotion)
-│   │   ├── router.ts                  # Provider registry + model routing
-│   │   ├── groq.ts                    # Groq provider (compound, llama-4-scout, etc.)
-│   │   ├── openai.ts                  # OpenAI Responses API provider
-│   │   ├── biollm.ts                  # BioLLM biological neural network provider
-│   │   ├── custom.ts                  # Custom OpenAI-compatible provider
-│   │   ├── emotions.ts                # Post-response emotion classification
-│   │   └── tools.ts                   # Tool definitions + execution
-│   └── voice/
-│       ├── openai.ts                  # OpenAI TTS
-│       └── resembleai.ts              # ResembleAI Chatterbox TTS
-│
-├── public/
-│   ├── sw.js                          # Service worker
-│   ├── manifest.json                  # PWA manifest
-│   ├── avatars/                       # 30 cyberpunk character avatars
-│   │   ├── cyberpunk/
-│   │   ├── anime/
-│   │   ├── videogame/
-│   │   ├── fantasy/
-│   │   └── minimalist/
-│   └── images/                        # Background illustrations
-│
-└── docs/
-    ├── SECURITY_REPORT.md             # OWASP Top 10:2025 security review (Session 27)
-    ├── IMPLEMENTATION_PLAN.md         # Phase breakdown
-    ├── IMPLEMENTATION_NOTES.md        # System prompt framework + anti-parasocial design
-    └── IMPLEMENTATION_STATUS.md       # Historical completion tracker
-```
-
----
-
-## LLM Provider Architecture
-
-Athena uses a multi-model routing strategy. Different models serve different roles per request.
+<details>
+<summary>🔧 LLM Provider Architecture</summary>
 
 ### Inference Routing
 
@@ -230,288 +183,101 @@ Athena uses a multi-model routing strategy. Different models serve different rol
 
 | Role | Model | When Used |
 |---|---|---|
-| Tool detection (pre-flight) | `groq/compound-mini` | Every request — determines if a tool call is needed |
-| URL detection | `groq/compound` | When the message includes a URL |
-| Vision (image attachments) | `meta-llama/llama-4-scout-17b-16e-instruct` | When the message includes an image |
-| Main inference | `meta-llama/llama-4-scout-17b-16e-instruct`, `openai/gpt-oss-120b`, etc. | Groq provider selected |
+| Tool detection (pre-flight) | `groq/compound-mini` | Every request |
+| URL detection | `groq/compound` | When message includes a URL |
+| Vision | `meta-llama/llama-4-scout-17b-16e-instruct` | When message includes an image |
+| Main inference | `meta-llama/llama-4-scout-17b-16e-instruct`, etc. | Groq provider selected |
 | Emotion classification | `llama-3.1-8b-instant` | Post-response, every message |
-| STT (Speech To Text) | `whisper-large-v3-turbo` | To convert user speech to text |
+| STT | `whisper-large-v3-turbo` | Voice input |
 
 #### OpenAI
 
 | Role | Model | When Used |
 |---|---|---|
-| Main inference | `gpt-5.4`, `gpt-5.4-mini`, etc. (Responses API) | OpenAI provider selected |
-| Tools (native) | `web_search`, `image_generation` | Every request — handled natively via Responses API (`tool_choice: 'auto'`) |
-| Image generation | `image_generation` tool | When the model judges an image is appropriate |
+| Main inference | `gpt-5.4`, `gpt-5.4-mini`, etc. | OpenAI provider selected |
+| Tools (native) | `web_search`, `image_generation` | Every request via Responses API |
 | Emotion classification | `gpt-5.4-nano` | Post-response, every message |
-| STT (Speech To Text) | `whisper-1` | To convert user speech to text |
-| TTS (Text To Speech) | `gpt-4o-mini-tts` | To convert companion text to speech |
+| STT | `whisper-1` | Voice input |
+| TTS | `gpt-4o-mini-tts` | Voice output |
 
 #### BioLLM
 
 | Role | Model | When Used |
 |---|---|---|
 | Main inference | `biollm-4b-shadow` | BioLLM provider selected — routes through living cortical culture on Cortical Labs CL1 hardware |
-| STT (Speech To Text) | OpenAI Whisper (priority) or Groq Whisper | When OpenAI or Groq API key is configured |
-| TTS (Text To Speech) | OpenAI TTS | When OpenAI API key is configured |
-| Emotion classification | `gpt-5.4-nano` (priority) or `llama-3.1-8b-instant` | When OpenAI or Groq API key is configured |
+| STT / TTS / Emotion | OpenAI (priority) or Groq | When OpenAI or Groq key is configured |
 
-#### ResembleAI
+#### Other Providers
 
-| Role | Model | When Used |
-|---|---|---|
-| TTS (Text To Speech) | `chatterbox` | To convert companion text to speech |
-
-#### Decart AI
-
-| Role | Model | When Used |
-|---|---|---|
-| Live Avatar | `live_avatar` | To convert static 2D avatar to animated 2D in realtime |
-
-#### Custom
-
-| Role | Model | When Used |
-|---|---|---|
-| Main inference | Any OpenAI-compatible endpoint | Custom provider selected |
-
-### Supported Providers
-
-**Tier 1 — Cloud (Fast, Trust-based)**
-- **[Groq](https://groq.com/)** (Primary) — Ultra-fast inference, explicit no-training-on-data policy
-- **[OpenAI](https://openai.com/)** — GPT-5.4 and GPT-5.4-mini via Responses API
-- **[BioLLM](https://biollm.com)** — Experimental biological neural network inference on Cortical Labs CL1 hardware; text-only; STT/TTS/emotion via OpenAI or Groq fallback
-- **Custom** — Any OpenAI-compatible API (LM Studio, vLLM, Kobold, etc.); requires `https://` for external hosts
-
-**Tier 2 — Hybrid (planned)**
-- Local embeddings + cloud LLM for document context
-
-**Tier 3 — Local (Phase 4)**
-- **[Ollama](https://ollama.ai/)** — Run Llama, Mistral, Gemma locally; full offline privacy
-
-### Required API Keys
-
-| Key | Required For |
+| Provider | Role |
 |---|---|
-| `GROQ_API_KEY` | Groq LLM + STT (Whisper) + emotion detection |
-| `OPENAI_API_KEY` | OpenAI LLM + STT (Whisper) + TTS |
-| `BIOLLM_API_KEY` | BioLLM biological neural network inference (endpoint configured in Settings) |
-| `RESEMBLEAI_API_KEY` | ResembleAI Chatterbox TTS |
-| `DECART_API_KEY` | Decart live avatar (WebRTC) |
+| ResembleAI | Chatterbox TTS |
+| Decart AI | Real-time WebRTC live avatar |
+| Custom | Any OpenAI-compatible endpoint |
 
-All API keys are stored encrypted in IndexedDB — they never leave the browser unencrypted.
+</details>
 
----
+<details>
+<summary>📁 Project Structure</summary>
 
-## System Prompt Framework
-
-Every LLM request includes behavioral safeguards to prevent parasocial dependency.
-
-### Core Principles (Always Active)
-1. **Transparency** — Regular acknowledgment of being AI
-2. **Healthy Boundaries** — Warmth without false emotion
-3. **Real Connection Encouragement** — Proactive suggestions for human support
-4. **Respectful Challenge** — Helps the user think deeper, does not just validate
-5. **Consistent Memory** — Remembers user context from encrypted local storage
-6. **User Autonomy** — Supports user choices, respects agency
-
-### Personality Types
-Ten presets apply these principles differently, enabling variety without compromising safety:
-
-| Personality | Traits |
-|---|---|
-| Wise | Thoughtful, reflective, patient. Speaks with measured confidence |
-| Playful | Humorous, lighthearted, enjoys jokes and wordplay. Energetic and engaging |
-| Technical | Precise, analytical, detail-oriented. Values accuracy |
-| Mysterious | Intriguing, enigmatic, sometimes cryptic. Creates intrigue |
-| Friendly | Warm, approachable, conversational. Genuinely interested in the user |
-| Cheerful | Optimistic, upbeat, enthusiastic. Finds positivity in situations |
-| Sarcastic | Witty, clever, uses humor and irony. Playfully critical |
-| Helpful | Practical, solution-focused. Goes out of the way to assist |
-| Nerdy | Enthusiastic about details, knowledgeable. Gets excited about topics |
-| Custom | Balanced approach based on user-defined personality traits |
-
-See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full prompt framework.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- `npm`, `pnpm`, `yarn`, or `bun`
-- At least one API key (Groq is the easiest free starting point)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Jiab77/athena.git
-cd athena
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-
-# Open http://localhost:3000
+```
+/
+├── app/                    # Next.js App Router routes
+├── components/             # React components (chat, avatar, settings, UI)
+├── hooks/                  # Custom React hooks
+├── lib/
+│   ├── llm/                # LLM providers (Groq, OpenAI, BioLLM, Custom, router)
+│   ├── voice/              # TTS providers (OpenAI, ResembleAI)
+│   ├── db.ts               # IndexedDB schema + encrypted settings
+│   ├── crypto.ts           # AES-GCM encryption (PBKDF2 600k iterations)
+│   ├── export.ts           # Export pipeline + SHA-256 integrity
+│   └── import.ts           # Import pipeline + validation
+├── public/
+│   ├── avatars/            # 30 cyberpunk character avatars
+│   ├── images/             # Screenshots and backgrounds
+│   ├── sw.js               # Service worker
+│   └── manifest.json       # PWA manifest
+└── docs/                   # Architecture, roadmap, security audit
 ```
 
-### Minimum Viable Setup
+See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for detailed architecture notes.
 
-1. Open the app at `http://localhost:3000`
-2. Click on the FAB button (bottom right of the page)
-3. Click on **Settings** from the floating menu to open the settings panel
-4. Go to **Model** and select a provider (Groq recommended for first use)
-5. Paste your API key — it is encrypted and stored locally, never sent anywhere other than the provider
-6. Select a model from the dropdown
-7. Start chatting
+</details>
 
----
+<details>
+<summary>🛡️ Development Philosophy & Compliance</summary>
 
-## Usage
+- [Zero Trust](https://en.wikipedia.org/wiki/Zero_trust_architecture) — verify the system is not manipulating
+- [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) + [KISS](https://en.wikipedia.org/wiki/KISS_principle) — simplicity over cleverness
+- [Kerckhoffs's Principle](https://en.wikipedia.org/wiki/Kerckhoffs%27s_principle) — no hidden agendas in data
+- [OWASP Top 10:2025](https://owasp.org/Top10/2025/) — staged security reviews
+- Privacy by default — opt-in to any external data sharing
 
-### Configuring a Provider
-
-All API keys are configured inside the app under **Settings > Model**. They are encrypted with AES-GCM + PBKDF2 at 600,000 iterations before being stored in IndexedDB — they never leave the browser unencrypted except to the selected model provider.
-
-| Provider | Key needed | What it unlocks |
-|---|---|---|
-| Groq | `GROQ_API_KEY` | LLM inference + Whisper STT + emotion detection |
-| OpenAI | `OPENAI_API_KEY` | LLM inference + Whisper STT + TTS + emotion detection + image generation |
-| BioLLM | `BIOLLM_API_KEY` + endpoint URL | Biological neural network inference (experimental) |
-| ResembleAI | `RESEMBLEAI_API_KEY` | Chatterbox TTS (alternative to OpenAI TTS) |
-| Decart | `DECART_API_KEY` | Real-time WebRTC live avatar |
-| Custom | Endpoint URL (+ optional key) | Any OpenAI-compatible API (LM Studio, vLLM, Ollama, etc.) |
-
-### Creating a Companion
-
-1. Click on the FAB button (bottom right of the page)
-2. Click on **Settings** from the floating menu to open the settings panel
-3. Go to **Companion** and select a category, gender, color scheme from the 30+ presets and choose a name
-4. Go to **Customize** and select a personality, or define a custom one then select the visual format
-5. Save — your companion is stored locally, encrypted
-
-### Voice Input (STT)
-
-STT requires either a **Groq** or **OpenAI** API key. Once configured:
-- The microphone button appears active in the chat toolbar
-- Tap to record, tap again to stop and transcribe
-- BioLLM falls back to OpenAI Whisper (priority) or Groq Whisper for STT
-
-If neither key is configured, the microphone button is visible but disabled with a tooltip explanation.
-
-### Voice Output (TTS)
-
-TTS requires either an **OpenAI** or **ResembleAI** API key. Once configured:
-- Enable voice output via the speaker button in the chat toolbar
-- Select a voice in **Settings > Voice**
-- Each message can be replayed individually by clicking it
-
-### BioLLM Setup
-
-BioLLM routes inference through living cortical tissue on Cortical Labs CL1 hardware. To use it:
-1. Obtain a BioLLM API key and endpoint URL from [biollm.com](https://biollm.com)
-2. In **Settings > Model**, select **BioLLM** as the provider
-3. Enter the endpoint URL and API key
-4. BioLLM has no native STT, TTS, or emotion detection — configure an OpenAI or Groq key to enable those features as fallbacks
-
-### Custom Provider Setup
-
-Any OpenAI-compatible API (LM Studio, vLLM, Kobold, Ollama with `ollama serve`, etc.):
-1. In **Settings > Model**, select **Custom** as the provider
-2. Enter the base URL of your API (e.g. `http://localhost:11434/v1` for Ollama)
-3. Enter the model name and optional API key
-4. `https://` is required for external hosts — `http://` is only allowed for loopback addresses (`localhost`, `127.0.0.1`, `::1`)
-
-### Popup / Companion Window
-
-- Click the **pop-out icon** in the companion panel header to open a detached companion window (392x535px)
-- From the companion window, click **Open Chat** to open a standalone chat window (800x636px)
-- Re-clicking pop-out focuses the existing window instead of opening a duplicate
-
-### Memory Window
-
-Configure how many previous messages are included in each LLM request under **Settings > Tuning**. A smaller window means less context but lower token cost. Full history is always persisted locally regardless of the window size.
-
----
-
-## Roadmap
-
-| Phase | Status | Focus |
-|---|---|---|
-| Phase 1 — MVP | Complete | Core architecture, LLM, voice, avatars, encryption, PWA |
-| Phase 2 — Quality & Hardening | In Progress | UX fixes, state conflicts, CSP, KISS refactor, dependency hardening |
-| Phase 3 — Advanced Features | Planned | Runway avatar, BroadcastChannel sync, RAG, Claude, offline STT/TTS |
-| Phase 4 — Desktop & Local AI | Future | Tauri app, Ollama, fine-tuning, federated learning |
-
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for details and [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) for granular feature tracking.
-
----
-
-## Development Philosophy
-
-- [Zero Trust](https://en.wikipedia.org/wiki/Zero_trust_architecture) (verify the system is not manipulating)
-- [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) and [KISS](https://en.wikipedia.org/wiki/KISS_principle) (simplicity over cleverness)
-- [Kerckhoffs's Principle](https://en.wikipedia.org/wiki/Kerckhoffs%27s_principle) (no hidden agendas in data)
-- [OWASP](https://owasp.org/Top10/2025/)-first security (staged security reviews, see `docs/SECURITY_REPORT.md`)
-- No try/catch control flow (validate upfront, do not catch expected errors)
-- Privacy by default (opt-in to any external data sharing)
-
-### Compliance Score
-
-**Current: 85% — Last audited: 2026-04-03 (Session 27)**
+**Compliance Score: 85% — Last audited: 2026-04-03**
 
 | Principle | Status | Gap |
 |---|---|---|
-| Zero Trust | Partial | No input validation on user message content before LLM; device ID trusted from localStorage without re-verification |
-| DRY | Mostly | Message-windowing logic and content-type mapping slightly duplicated across provider files |
-| KISS | Mostly | `chat-interface.tsx` at 1000+ lines is doing too much; business logic extraction to `lib/chat.ts` planned for Session 30 |
-| Kerckhoffs's Principle | Full | Encryption scheme fully documented, security posture publicly disclosed in `docs/SECURITY_REPORT.md` |
-| OWASP-first | Full | `SECURITY_REPORT.md` updated to OWASP Top 10:2025 |
+| Zero Trust | Partial | No input validation on user message content before LLM |
+| DRY | Mostly | Message-windowing logic slightly duplicated across provider files |
+| KISS | Mostly | `chat-interface.tsx` doing too much — extraction planned |
+| Kerckhoffs's Principle | Full | Encryption scheme fully documented in `docs/SECURITY_REPORT.md` |
+| OWASP-first | Full | Updated to OWASP Top 10:2025 |
 | No try/catch control flow | Partial | `export.ts` bare re-throw; `import.ts` uses try/catch for control flow |
 | Privacy by default | Full | IndexedDB only, `store: false`, no telemetry, full export/delete |
 
-> Goal: reach 100%. Each session moves the score forward.
+See [`docs/SECURITY_REPORT.md`](docs/SECURITY_REPORT.md) for the full audit.
+
+</details>
 
 ---
 
-## Privacy & Data
-
-- All data stays local by default (AES-GCM encrypted in IndexedDB)
-- No external training — LLM providers do not retrain on your conversations
-- Privacy mode suppresses all analytics (Vercel Analytics off by default)
-- Export your full conversation history at any time (JSON or Markdown)
-- Delete individual conversations or all history at any time
-- Device ID is anchored to at least one local storage layer — no silent ephemeral IDs
-
----
-
-## Ethical Guardrails
-
-Athena is designed with these ethical commitments:
-1. **Never exploit loneliness** — Be helpful, not addictive
-2. **Never pretend to care** — Honest about being AI
-3. **Never replace therapists** — Encourage real support for serious issues
-4. **Never trap users** — Export data, delete anytime, no lock-in
-5. **Never manipulate** — User autonomy comes first
-
-See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) ("Athena Companion Design Philosophy") for the full ethical framework.
-
----
-
-## References
+## 📚 References
 
 **Design Inspiration:**
 [GateBox](https://www.gatebox.ai/gatebox) | [Project AVA](https://www.razer.com/concepts/project-ava) | [VirtuaGirl](https://virtuagirlfullhd.info/)
 
-**Alternative Companion Projects:**
-[Character.ai](https://character.ai/) | [Replika](https://replika.com/) | [FlowGPT](https://flowgpt.com/)
-
 **LLM Providers:**
-[Groq API](https://groq.com/) | [OpenAI API](https://openai.com/) | [BioLLM](https://biollm.com) | [Ollama](https://ollama.ai/)
+[Groq](https://groq.com/) | [OpenAI](https://openai.com/) | [BioLLM](https://biollm.com) | [Ollama](https://ollama.ai/)
 
 **Voice:**
 [OpenAI TTS](https://platform.openai.com/docs/guides/text-to-speech) | [ResembleAI Chatterbox](https://www.resemble.ai/) | [Groq Whisper](https://groq.com/)
@@ -519,38 +285,35 @@ See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) ("Athena Comp
 **Avatar:**
 [Decart AI](https://www.decart.ai/) | [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) | [Three.js](https://threejs.org/)
 
-**Encryption:**
-[TweetNaCl.js](https://tweetnacl.js.org/) | [Web Crypto API / SubtleCrypto](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto) | [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)
-
-**UI Framework:**
-[shadcn/ui](https://ui.shadcn.com/) | [Tailwind CSS v4](https://tailwindcss.com/) | [Radix UI](https://www.radix-ui.com/)
-
-**Storage:**
-[IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
-
-**Analytics:**
-[Vercel Analytics](https://vercel.com/analytics) (disabled by default via Privacy Mode)
+**UI & Storage:**
+[shadcn/ui](https://ui.shadcn.com/) | [Tailwind CSS v4](https://tailwindcss.com/) | [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
 
 ---
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Contributing
-
-This is a single-developer project with AI agent collaboration. Ideas are welcome — open an issue to discuss before submitting a PR.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## Credits
+## 🤝 Contributing
+
+Single-developer project with AI agent collaboration. Ideas are welcome — open an issue to discuss before submitting a PR.
+
+---
+
+## 🤖 AI Framework
+
+This project was built using a custom AI collaboration framework designed to maintain session continuity, project context, and behavioral consistency across all development sessions.
+
+> Built with [Jiab77/ai-framework](https://github.com/Jiab77/ai-framework) — a lightweight, project-agnostic framework for working effectively with AI models during development. Also used in the [Virgil](https://github.com/Jiab77/virgil) project.
+
+---
+
+## 🙏 Credits
 
 | Name | Contribution |
 |---|---|
 | [Jiab77](https://github.com/Jiab77) | Project creator and lead developer |
 | [v0](https://v0.dev) | AI pair programmer |
-| [4R7I5T](https://github.com/4R7I5T) | Creator of the [BioLLM](https://biollm.com) project and gracious support for its integration into Athena |
-
----
+| [4R7I5T](https://github.com/4R7I5T) | Creator of [BioLLM](https://biollm.com) and support for its integration |
