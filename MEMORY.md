@@ -515,7 +515,7 @@ Session 27 was a massive session covering: recovering the full backlog from conv
 
 - `docs/SECURITY_REPORT.md` fully rewritten against OWASP Top 10:2025 (previous was 2021)
 - Key changes from 2021 → 2025:
-  - **A03** now "Software Supply Chain Failures" (new) �� flagged `@decartai/sdk` (pre-1.0) and `tweetnacl` (unmaintained since 2019)
+  - **A03** now "Software Supply Chain Failures" (new) — flagged `@decartai/sdk` (pre-1.0) and `tweetnacl` (unmaintained since 2019)
   - **A10** now "Mishandling of Exceptional Conditions" (new) — 3 new issues identified
   - **A02** "Security Misconfiguration" jumped from #5 to #2 — CSP still top unfixed issue
 - Mapping table added showing what moved/renamed/added vs 2021 edition
