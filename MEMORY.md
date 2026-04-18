@@ -118,7 +118,70 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
-> ## Session 31: Kai-inspired redesign discussion, REDESIGN.md created (04/17/2026)
+> ## Session 32: PWA fixes, README restructure, AI framework improvements (04/18/2026)
+
+### Overview
+
+Mixed session covering PWA manifest fixes, README restructure with collapsible sections, AI framework session init improvements with Karpathy-inspired execution rules, and documentation updates.
+
+---
+
+### 1. PWA Manifest Fixes
+
+Resolved all Chrome/Chromium installability warnings:
+- Icons updated from JPG to PNG with correct `type: "image/png"` and accurate `sizes` values
+- `purpose: "any maskable"` (discouraged combined form) split into separate `"any"` and `"maskable"` entries
+- `icon-512x512-maskable.png` created via GIMP canvas expansion (10% safe zone padding on all sides)
+- Screenshots updated with dedicated `athena-desktop.png` and `athena-mobile.png` files — correct `wide` and `narrow` form factors with labels
+- Desktop screenshot aspect ratio fixed: Chrome enforces width cannot exceed 2.3x the height — `1348x577` (ratio 2.337) cropped to `1280x548` (ratio 2.336 — still borderline) and resolved through further iteration
+
+**Install prompt now appears correctly in Chrome/Chromium address bar.**
+
+---
+
+### 2. README.md Restructure
+
+README reduced from 557 lines to ~320 lines (44% reduction):
+- Hero section with side-by-side desktop + mobile screenshot table
+- Emoji section headers for visual scanning (`🧠`, `🚀`, `🔑`, `🎭`, `🔒`, etc.)
+- Four `<details>` collapsible sections: Vision & Design Philosophy, LLM Provider Architecture, Project Structure tree, Development Philosophy compliance matrix
+- New "AI Framework" section between Contributing and Credits referencing [Jiab77/ai-framework](https://github.com/Jiab77/ai-framework) and the Virgil project
+- Duplicate provider information and exhaustive inline file tree comments moved into collapsibles
+
+---
+
+### 3. AI Framework — Session Init Improvements
+
+`MEMORY.md` restructured with a prominent Session Init block at the top (before session history):
+- Four-step init sequence: read MEMORY.md → AGENTS.md → SOUL.md → HUMAN.md → TEAM.md
+- Four Karpathy-inspired execution rules embedded inline with attribution to [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
+- Key documents reference table added
+- Misleading "doesn't consume context window" wording corrected to "restores project continuity without repeating past mistakes or redoing completed work"
+
+**Key insight from session:** Rules alone do not prevent violations — the most effective enforcement is in-the-moment checkpoints (before/after reviews, asking before touching). Embedding rules where the AI is already motivated to read (MEMORY.md) is more reliable than a separate instruction file.
+
+---
+
+### 4. HUMAN.md Template Published
+
+`HUMAN.md` template created and published to [Jiab77/ai-framework](https://github.com/Jiab77/ai-framework) repo:
+- All fields optional — note added that it is not a strict format
+- Privacy warning prominent at the top
+- Actual `HUMAN.md` is gitignored to protect OPSEC
+
+---
+
+### 5. Karpathy Framework Comparison
+
+Reviewed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) `CLAUDE.md` against [AI Framework](https://github.com/Jiab77/ai-framework):
+- Karpathy: 4 tight behavioral rules targeting specific LLM failure modes
+- AI Framework: stronger on memory continuity, human context, collaboration model
+- Conclusion: frameworks are complementary — Karpathy covers behavioral discipline, AI Framework covers context and memory
+- Attribution added to all derived work — proper credit, not reputation borrowing
+
+---
+
+## Session 31: Kai-inspired redesign discussion, REDESIGN.md created (04/17/2026)
 
 ### Overview
 
