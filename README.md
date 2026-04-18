@@ -317,3 +317,15 @@ This project was built using a custom AI collaboration framework designed to mai
 | [Jiab77](https://github.com/Jiab77) | Project creator and lead developer |
 | [v0](https://v0.dev) | AI pair programmer |
 | [4R7I5T](https://github.com/4R7I5T) | Creator of [BioLLM](https://biollm.com) and support for its integration |
+
+---
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=jiab77%2Fathena&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jiab77/athena&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jiab77/athena&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jiab77/athena&type=date&legend=top-left" />
+ </picture>
+</a>
