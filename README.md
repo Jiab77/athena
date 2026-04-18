@@ -1,4 +1,4 @@
-<h1 align="center">Athena — Privacy-First AI Companion</h1>
+<h1 align="center">Athena<br>Privacy-First AI Companion</h1>
 
 <p align="center">
   A visually charming, personality-driven AI companion built with privacy, user agency, and emotional safety as core principles.
@@ -27,7 +27,7 @@
 - Multi-turn conversation with encrypted persistent memory (IndexedDB, AES-GCM, PBKDF2 600k iterations)
 - Configurable memory window (1–10 messages)
 - Document & image attachments (txt, md, json, csv, pdf, images, code files)
-- Web search — OpenAI via Responses API, Groq via compound-beta
+- Web search — OpenAI via Responses API, Groq via Compound
 - Image generation — inline via OpenAI `image_generation` tool with download overlay
 - Emotion detection — post-response classification displayed as an emoji badge
 - Token usage display per message
