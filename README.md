@@ -302,6 +302,14 @@ Single-developer project with AI agent collaboration. Ideas are welcome — open
 
 ---
 
+## 🤖 AI Framework
+
+This project was built using a custom AI collaboration framework designed to maintain session continuity, project context, and behavioral consistency across all development sessions.
+
+> Built with [Jiab77/ai-framework](https://github.com/Jiab77/ai-framework) — a lightweight, project-agnostic framework for working effectively with AI models during development. Also used in the [Virgil](https://github.com/Jiab77/virgil) project.
+
+---
+
 ## 🙏 Credits
 
 | Name | Contribution |
