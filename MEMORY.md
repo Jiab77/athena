@@ -132,7 +132,7 @@ Resolved all Chrome/Chromium installability warnings:
 - Icons updated from JPG to PNG with correct `type: "image/png"` and accurate `sizes` values
 - `purpose: "any maskable"` (discouraged combined form) split into separate `"any"` and `"maskable"` entries
 - `icon-512x512-maskable.png` created via GIMP canvas expansion (10% safe zone padding on all sides)
-- Screenshots updated with dedicated `athena-desktop.png` (1280x548) and `athena-mobile.png` files — correct `wide` and `narrow` form factors with labels
+- Screenshots updated with dedicated `athena-desktop.png` and `athena-mobile.png` files — correct `wide` and `narrow` form factors with labels
 - Desktop screenshot aspect ratio fixed: Chrome enforces width cannot exceed 2.3x the height — `1348x577` (ratio 2.337) cropped to `1280x548` (ratio 2.336 — still borderline) and resolved through further iteration
 
 **Install prompt now appears correctly in Chrome/Chromium address bar.**
@@ -173,15 +173,15 @@ README reduced from 557 lines to ~320 lines (44% reduction):
 
 ### 5. Karpathy Framework Comparison
 
-Reviewed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) CLAUDE.md against Athena AI framework:
+Reviewed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) `CLAUDE.md` against [AI Framework](https://github.com/Jiab77/ai-framework):
 - Karpathy: 4 tight behavioral rules targeting specific LLM failure modes
-- Athena framework: stronger on memory continuity, human context, collaboration model
-- Conclusion: frameworks are complementary — Karpathy covers behavioral discipline, Athena covers context and memory
+- AI Framework: stronger on memory continuity, human context, collaboration model
+- Conclusion: frameworks are complementary — Karpathy covers behavioral discipline, AI Framework covers context and memory
 - Attribution added to all derived work — proper credit, not reputation borrowing
 
 ---
 
-> ## Session 31: Kai-inspired redesign discussion, REDESIGN.md created (04/17/2026)
+## Session 31: Kai-inspired redesign discussion, REDESIGN.md created (04/17/2026)
 
 ### Overview
 
