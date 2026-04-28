@@ -16,6 +16,17 @@ export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'it'] as const
 export type Locale = (typeof SUPPORTED_LOCALES)[number]
 export const DEFAULT_LOCALE: Locale = 'en'
 
+/**
+ * Native language labels — always shown in the language's own script
+ * so users always recognise their language regardless of the active UI locale.
+ */
+export const LOCALE_LABELS: Record<Locale, string> = {
+  en: 'English',
+  fr: 'Français',
+  de: 'Deutsch',
+  it: 'Italiano',
+}
+
 const TRANSLATIONS = { en, fr, de, it } as const
 
 /**

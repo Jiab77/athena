@@ -46,6 +46,8 @@ import type { PersonalityType, VisualFormat, GenderType, TTSProvider } from '@/l
 import { useDB } from '@/lib/db-context'
 import { encryptData, decryptData } from '@/lib/crypto'
 import { useToast } from '@/hooks/use-toast'
+import { useTranslation } from '@/hooks/use-translation'
+import { SUPPORTED_LOCALES, LOCALE_LABELS, type Locale } from '@/lib/i18n'
 
 interface SettingsPanelProps {
   onClose: () => void
@@ -55,6 +57,7 @@ interface SettingsPanelProps {
 export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) {
   const { toast } = useToast()
   const { db, dbReady } = useDB()
+  const { t, locale, setLocale } = useTranslation()
   const [companion, setCompanion] = useState(DEFAULT_COMPANION_ID)
   const [avatarCategory, setAvatarCategory] = useState<(typeof AVATAR_CATEGORIES)[number]>(DEFAULT_AVATAR_CATEGORY)
   const [avatarGender, setAvatarGender] = useState<GenderType>(DEFAULT_GENDER)
@@ -987,7 +990,47 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
             </AccordionContent>
           </AccordionItem>
 
-          {/* 7. Summary Section */}
+          {/* 7. Language Section */}
+          <AccordionItem value="language" className="border-b border-border/50">
+            <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
+              🌐 {t('settings.language').toUpperCase()}
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4 pt-2">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-foreground mb-2">
+                    {t('settings.language')}
+                  </label>
+                  <Select
+                    value={locale}
+                    onValueChange={(value: Locale) => {
+                      void setLocale(value)
+                      toast({
+                        title: t('settings.language'),
+                        description: LOCALE_LABELS[value],
+                      })
+                    }}
+                  >
+                    <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SUPPORTED_LOCALES.map((code) => (
+                        <SelectItem key={code} value={code} className="focus:bg-secondary/50">
+                          {LOCALE_LABELS[code]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {t('settings.languageDescription')}
+                  </p>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* 8. Summary Section */}
           <AccordionItem value="summary" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
               🔮 SUMMARY
