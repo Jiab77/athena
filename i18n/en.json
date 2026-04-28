@@ -192,9 +192,9 @@
     "successAlert": "Import successful: {imported} imported, {skipped} skipped"
   },
   "connection": {
-    "title": "API key required",
-    "message": "Configure at least one model provider with an API key to start chatting with Athena.",
-    "configure": "Configure API Key",
+    "title": "Let's get you connected",
+    "message": "Add an API key for any supported provider and Athena will be ready to chat.",
+    "configure": "Add an API key",
     "heroCta": "Configure now"
   },
   "settings": {

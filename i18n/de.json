@@ -192,9 +192,9 @@
     "successAlert": "Import erfolgreich: {imported} importiert, {skipped} übersprungen"
   },
   "connection": {
-    "title": "API-Schlüssel erforderlich",
-    "message": "Konfigurieren Sie mindestens einen Modellanbieter mit einem API-Schlüssel, um mit Athena zu chatten.",
-    "configure": "API-Schlüssel einrichten",
+    "title": "Verbinden wir Sie",
+    "message": "Fügen Sie einen API-Schlüssel für einen unterstützten Anbieter hinzu, und Athena ist bereit zu chatten.",
+    "configure": "API-Schlüssel hinzufügen",
     "heroCta": "Jetzt einrichten"
   },
   "settings": {
