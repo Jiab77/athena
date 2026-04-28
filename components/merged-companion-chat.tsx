@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/resizable'
 import { useBrain } from '@/lib/llm/brain'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useTranslation } from '@/hooks/use-translation'
 import { useEffect, useRef, useState } from 'react'
 import { ExternalLink, Keyboard, Mic2, X } from 'lucide-react'
 import {
@@ -43,6 +44,8 @@ interface MergedCompanionChatProps {
   voiceProvider: string
   onVoiceOutputToggle: () => Promise<void>
   visualFormat?: VisualFormat
+  /** Opens the settings panel scrolled to the Model section. Used by the chat empty-state CTA when no API key is configured. */
+  onConfigureApiKey?: () => void
 }
 
 export function MergedCompanionChat({
@@ -59,6 +62,7 @@ export function MergedCompanionChat({
   voiceProvider,
   onVoiceOutputToggle,
   visualFormat,
+  onConfigureApiKey,
 }: MergedCompanionChatProps) {
   const {
     expressionState,
@@ -76,6 +80,7 @@ export function MergedCompanionChat({
   const isMobile = useIsMobile()
   const [isTablet, setIsTablet] = useState(false)
   const [activeTab, setActiveTab] = useState<MobileTab>('companion')
+  const { t } = useTranslation()
 
   // Touch tracking for swipe
   const touchStartX = useRef<number | null>(null)
@@ -91,9 +96,12 @@ export function MergedCompanionChat({
   const isSmallScreen = isMobile || isTablet
   const showChat = isChatVisible && !isVoiceMode
 
-  // When chat becomes hidden, switch back to companion tab
+  // Auto-sync the active tab with chat visibility — when the chat appears
+  // we switch to the chat tab, and we fall back to the companion tab when
+  // the chat hides. Centralising this here avoids the cross-component
+  // state coordination that the click handlers had to do manually.
   useEffect(() => {
-    if (!showChat) setActiveTab('companion')
+    setActiveTab(showChat ? 'chat' : 'companion')
   }, [showChat])
 
   if (!isOpen) return null
@@ -135,11 +143,11 @@ export function MergedCompanionChat({
               onClick={onVoiceModeToggle}
             >
               <Mic2 className="h-4 w-4" />
-              <span className="text-xs">Voice Mode</span>
+              <span className="text-xs">{t('companion.voiceModeButton')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent side="top">
-            <p>{isVoiceMode ? 'Disable voice mode' : 'Enable voice mode'}</p>
+            <p>{isVoiceMode ? t('companion.voiceModeDisable') : t('companion.voiceModeEnable')}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -158,17 +166,14 @@ export function MergedCompanionChat({
                   : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
                 isVoiceMode ? 'opacity-40 cursor-not-allowed' : '',
               ].join(' ')}
-              onClick={() => {
-                setIsChatVisible(!isChatVisible)
-                if (!isChatVisible) setActiveTab('chat')
-              }}
+              onClick={() => setIsChatVisible(!isChatVisible)}
             >
               <Keyboard className="h-4 w-4" />
-              <span className="text-xs">{isChatVisible ? 'Hide Chat' : 'Start Chat'}</span>
+              <span className="text-xs">{isChatVisible ? t('companion.hideChat') : t('companion.startChat')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent side="top">
-            <p>{isChatVisible ? 'Close the chat window' : 'Open the chat window'}</p>
+            <p>{isChatVisible ? t('companion.chatClose') : t('companion.chatOpen')}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -207,7 +212,7 @@ export function MergedCompanionChat({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Pop out</p>
+                  <p>{t('companion.popOut')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -234,7 +239,7 @@ export function MergedCompanionChat({
                   : 'border-transparent text-muted-foreground hover:text-foreground',
               ].join(' ')}
             >
-              Companion
+              {t('companion.tabCompanion')}
             </button>
             <button
               onClick={() => setActiveTab('chat')}
@@ -245,7 +250,7 @@ export function MergedCompanionChat({
                   : 'border-transparent text-muted-foreground hover:text-foreground',
               ].join(' ')}
             >
-              Chat
+              {t('companion.tabChat')}
             </button>
           </div>
         )}
@@ -265,10 +270,7 @@ export function MergedCompanionChat({
               isOpen={true}
               onClose={onClose}
               isChatVisible={isChatVisible}
-              setIsChatVisible={(v) => {
-                setIsChatVisible(v)
-                if (v) setActiveTab('chat')
-              }}
+              setIsChatVisible={setIsChatVisible}
               isVoiceMode={isVoiceMode}
               onVoiceModeToggle={onVoiceModeToggle}
               isOnline={isOnline}
@@ -306,6 +308,7 @@ export function MergedCompanionChat({
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
                 sttSupported={sttSupported}
+                onConfigureApiKey={onConfigureApiKey}
               />
             </div>
           )}
@@ -340,6 +343,7 @@ export function MergedCompanionChat({
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
                 sttSupported={sttSupported}
+                onConfigureApiKey={onConfigureApiKey}
               />
             </Card>
           </ResizablePanel>

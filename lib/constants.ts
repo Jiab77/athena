@@ -3,7 +3,34 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, LLMProvider, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import type { Avatar, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import en from '@/i18n/en.json'
+import fr from '@/i18n/fr.json'
+import de from '@/i18n/de.json'
+import it from '@/i18n/it.json'
+
+/**
+ * i18n
+ * Locale codes, native labels and translation dictionaries.
+ * The `t()` helper and the `useTranslation` hook read from `TRANSLATIONS`
+ * via `getTranslations(locale)` in `@/lib/i18n`.
+ */
+export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'it'] as const
+
+export const DEFAULT_LOCALE: Locale = 'en'
+
+/**
+ * Native language labels — always shown in the language's own script
+ * so users always recognise their language regardless of the active UI locale.
+ */
+export const LOCALE_LABELS: Record<Locale, string> = {
+  en: 'English',
+  fr: 'Français',
+  de: 'Deutsch',
+  it: 'Italiano',
+}
+
+export const TRANSLATIONS = { en, fr, de, it } as const
 
 /**
  * Default Props
@@ -352,6 +379,60 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         model: 'gpt-5.4',
         description: 'Advanced model with enhanced capabilities for complex reasoning and nuanced tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4',
+        visible: true,
+      },
+    ],
+  },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gpt-5.2',
+        name: 'GPT-5.2',
+        model: 'openai/gpt-5.2',
+        description: 'OpenAI flagship via OpenRouter. Broad capability across reasoning, coding, and conversation.',
+        url: 'https://openrouter.ai/openai/gpt-5.2',
+        visible: true,
+      },
+      {
+        id: 'gpt-5-mini',
+        name: 'GPT-5 Mini',
+        model: 'openai/gpt-5-mini',
+        description: 'Lightweight, low-latency OpenAI model for fast everyday chat.',
+        url: 'https://openrouter.ai/openai/gpt-5-mini',
+        visible: true,
+      },
+      {
+        id: 'claude-opus-4.6',
+        name: 'Claude Opus 4.6',
+        model: 'anthropic/claude-opus-4.6',
+        description: "Anthropic's frontier model. Strongest reasoning and long-context handling.",
+        url: 'https://openrouter.ai/anthropic/claude-opus-4.6',
+        visible: true,
+      },
+      {
+        id: 'claude-sonnet-4.6',
+        name: 'Claude Sonnet 4.6',
+        model: 'anthropic/claude-sonnet-4.6',
+        description: 'Balanced Anthropic model. Faster and cheaper than Opus with strong overall quality.',
+        url: 'https://openrouter.ai/anthropic/claude-sonnet-4.6',
+        visible: true,
+      },
+      {
+        id: 'gemini-3-pro',
+        name: 'Gemini 3 Pro',
+        model: 'google/gemini-3-pro',
+        description: "Google's flagship multimodal model with strong vision and reasoning capabilities.",
+        url: 'https://openrouter.ai/google/gemini-3-pro',
+        visible: true,
+      },
+      {
+        id: 'llama-4-maverick-free',
+        name: 'Llama 4 Maverick (Free)',
+        model: 'meta-llama/llama-4-maverick:free',
+        description: 'Free open-source flagship from Meta. Rate-limited; great for trying OpenRouter at zero cost.',
+        url: 'https://openrouter.ai/meta-llama/llama-4-maverick:free',
         visible: true,
       },
     ],

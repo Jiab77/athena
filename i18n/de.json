@@ -1,0 +1,343 @@
+{
+  "fab": {
+    "install": "App installieren",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "companion": { "default": "Begleiterin", "m": "Begleiter" },
+    "settings": "Einstellungen"
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "error": "Fehler",
+    "default": "Standard",
+    "none": "Keine",
+    "custom": "Benutzerdefiniert",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert"
+  },
+  "languages": {
+    "en": "Englisch",
+    "fr": "Französisch",
+    "de": "Deutsch",
+    "it": "Italienisch"
+  },
+  "home": {
+    "hero": {
+      "taglineLine1Prefix": { "default": "Ihre", "m": "Ihr" },
+      "taglineLine1Highlight": {
+        "default": "datenschutzorientierte",
+        "m": "datenschutzorientierter"
+      },
+      "taglineLine1Suffix": { "default": "KI-Begleiterin.", "m": "KI-Begleiter." },
+      "taglineLine2Accent": "Immer schwebend an Ihrer Seite.",
+      "taglineLine2Primary": "Niemals werden Ihre Daten preisgegeben.",
+      "activate": "ATHENA AKTIVIEREN",
+      "learnMore": "MEHR ERFAHREN",
+      "statusOnline": "SYSTEM ONLINE • BEREIT FÜR DEN EINSATZ",
+      "statusOffline": "SYSTEM OFFLINE • BITTE KONFIGURIEREN"
+    },
+    "features": {
+      "title": "WARUM ATHENA WÄHLEN",
+      "privacy": {
+        "title": "Datenschutz zuerst",
+        "description": "Alle Konversationen lokal verschlüsselt. Ihre Daten verlassen niemals Ihr Gerät."
+      },
+      "alwaysOn": {
+        "title": "Immer verfügbar",
+        "description": "Schwebendes Begleiter-Widget. Interagieren Sie jederzeit aus jeder Anwendung."
+      },
+      "personalized": {
+        "title": "Personalisiert",
+        "description": {
+          "default": "Trainieren Sie Ihre Begleiterin, wie Sie zu denken und zu handeln. Ein wahres digitales Erbe.",
+          "m": "Trainieren Sie Ihren Begleiter, wie Sie zu denken und zu handeln. Ein wahres digitales Erbe."
+        }
+      },
+      "openSource": {
+        "title": "Open Source",
+        "description": "Community-getriebene Entwicklung. Transparent, prüfbar und sicher."
+      }
+    },
+    "preview": {
+      "title": { "default": "IHRE BEGLEITERIN WARTET", "m": "IHR BEGLEITER WARTET" },
+      "description1": {
+        "default": "Ihre Denkbegleiterin. Teilen Sie Ihre Interessen und beobachten Sie, wie sie lernt, Ihre Perspektive zu verstehen.",
+        "m": "Ihr Denkbegleiter. Teilen Sie Ihre Interessen und beobachten Sie, wie er lernt, Ihre Perspektive zu verstehen."
+      },
+      "description2": "Jede Konversation lokal verschlüsselt und gespeichert. Ihre Gedanken und Ideen gehören Ihnen allein.",
+      "startChatting": "GESPRÄCH STARTEN"
+    },
+    "cta": {
+      "title": "BEREIT FÜR DEN EINSATZ?",
+      "description": "Klicken Sie auf den schwebenden Button unten, um Athena zu aktivieren. Keine Anmeldung erforderlich. Ihre Privatsphäre ist garantiert.",
+      "launch": "ATHENA STARTEN"
+    },
+    "footer": {
+      "madeWith": "wird mit ❤️ entwickelt von",
+      "and": "und"
+    },
+    "alerts": {
+      "importFailed": "Import fehlgeschlagen. Details siehe Konsole.",
+      "fileError": "Fehler bei der Dateiverarbeitung. Details siehe Konsole."
+    }
+  },
+  "chat": {
+    "header": {
+      "title": "Chat",
+      "online": "Online",
+      "offline": "Offline",
+      "popOut": "Ablösen"
+    },
+    "messages": {
+      "empty": "Noch keine Nachrichten. Starten Sie ein Gespräch!",
+      "thinking": "Denkt nach...",
+      "transcribing": "Transkribiert...",
+      "imageAttached": "Bild angehängt",
+      "documentChars": "({count} Zeichen)",
+      "copyMessage": "Nachricht kopieren",
+      "replayMessage": "Nachricht erneut abspielen",
+      "stopReplay": "Wiedergabe stoppen",
+      "chatImage": "Chat-Bild",
+      "generatedImage": "Generiertes Bild",
+      "downloadImage": "Generiertes Bild herunterladen"
+    },
+    "input": {
+      "placeholder": "Nachricht senden...",
+      "attachFile": "Datei anhängen",
+      "memoryTooltip": "KI-Kontext: {used} / {total} Nachrichten",
+      "micUnavailable": "Spracherkennung für diesen Anbieter nicht verfügbar",
+      "micStop": "Aufnahme stoppen",
+      "micTranscribing": "Transkribiert...",
+      "micRecord": "Audio aufnehmen",
+      "voiceOutputEnabled": "Sprachausgabe aktiviert",
+      "voiceOutputDisabled": "Sprachausgabe deaktiviert",
+      "sendMessage": "Nachricht senden"
+    },
+    "alerts": {
+      "micDenied": "Mikrofonzugriff verweigert oder nicht verfügbar",
+      "transcribeFailed": "Audio-Transkription fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "errors": {
+      "generic": "Entschuldigung, ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "rateLimit": "Anfragelimit erreicht. Bitte warten Sie einen Moment, bevor Sie es erneut versuchen.",
+      "payloadTooLarge": "Nachricht zu groß. Versuchen Sie, Ihre Eingabe zu kürzen oder eine kleinere Datei hochzuladen.",
+      "serverError": "Serverfehler. Bitte versuchen Sie es in einem Moment erneut.",
+      "tooManyRequests": "Zu viele Anfragen. Bitte warten Sie, bevor Sie es erneut versuchen.",
+      "authError": "Authentifizierungsfehler. Bitte überprüfen Sie Ihren API-Schlüssel."
+    }
+  },
+  "companion": {
+    "popOut": "Ablösen",
+    "voiceEnable": "Stimme aktivieren",
+    "voiceDisable": "Stimme deaktivieren",
+    "micUnavailable": "Spracherkennung für diesen Anbieter nicht verfügbar",
+    "micTapStop": "Zum Stoppen tippen",
+    "micTranscribing": "Transkribiert...",
+    "micProcessing": "Verarbeitet...",
+    "micTapSpeak": "Zum Sprechen tippen",
+    "voiceModeEnable": "Sprachmodus aktivieren",
+    "voiceModeDisable": "Sprachmodus deaktivieren",
+    "chatOpen": "Chat-Fenster öffnen",
+    "chatClose": "Chat-Fenster schließen",
+    "voiceModeButton": "Sprachmodus",
+    "startChat": "Chat starten",
+    "hideChat": "Chat ausblenden",
+    "tabCompanion": { "default": "Begleiterin", "m": "Begleiter" },
+    "tabChat": "Chat",
+    "live": "Live",
+    "insufficientCredits": "Nicht genügend Guthaben",
+    "connectionFailed": "Verbindung fehlgeschlagen",
+    "connecting": "Verbindet...",
+    "liveAvatarLabel": "Live-Avatar von {name}",
+    "info": {
+      "personality": "Persönlichkeit",
+      "created": "Erstellt"
+    },
+    "online": "Online",
+    "offline": "Offline",
+    "openChat": "Chat öffnen"
+  },
+  "history": {
+    "newConversation": "Neue Unterhaltung",
+    "title": "Unterhaltungsverlauf",
+    "loading": "Wird geladen...",
+    "empty": "Noch keine Unterhaltungen",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "daysAgo": "vor {count} Tagen",
+    "emptyConversation": "Leere Unterhaltung",
+    "moreConversations": "+{count} weitere Unterhaltungen",
+    "moreConversationsOne": "+1 weitere Unterhaltung"
+  },
+  "export": {
+    "title": "Unterhaltungen exportieren",
+    "description": "Wählen Sie ein Format für den Export Ihres Unterhaltungsverlaufs mit Athena.",
+    "json": {
+      "title": "JSON-Format",
+      "description": "Vollständiger Export mit kompletter Struktur. Optimal für Backup und Re-Import."
+    },
+    "markdown": {
+      "title": "Markdown-Format",
+      "description": "Lesbarer Transkriptionstext. Einfach zu lesen und zu teilen."
+    },
+    "exporting": "Exportiere...",
+    "export": "Exportieren",
+    "errorFallback": "Export fehlgeschlagen"
+  },
+  "import": {
+    "title": "Unterhaltungen importieren",
+    "description": "Überprüfen Sie den Inhalt, bevor Sie in Ihre Datenbank importieren.",
+    "format": "Format",
+    "fileSize": "Dateigröße",
+    "conversations": "Unterhaltungen",
+    "exported": "Exportiert am",
+    "markdownWarning": "Markdown-Importe sind nur eine Vorschau. Verwenden Sie JSON für die vollständige Wiederherstellung.",
+    "loadFailed": "Datei konnte nicht geladen werden",
+    "errorFallback": "Import fehlgeschlagen",
+    "importing": "Importiere...",
+    "import": "Importieren",
+    "successAlert": "Import erfolgreich: {imported} importiert, {skipped} übersprungen"
+  },
+  "connection": {
+    "title": "Verbinden wir Sie",
+    "message": "Fügen Sie einen API-Schlüssel für einen unterstützten Anbieter hinzu, und Athena ist bereit zu chatten.",
+    "configure": "API-Schlüssel hinzufügen",
+    "heroCta": "Jetzt einrichten"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "save": "Einstellungen speichern",
+    "saved": "Einstellungen gespeichert",
+    "savedDescription": "Ihre Einstellungen und Anpassungen wurden gespeichert.",
+    "saveFailed": "Einstellungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+
+    "language": "Sprache",
+    "languageDescription": "Wählen Sie Ihre bevorzugte Oberflächensprache. Änderungen werden sofort angewendet.",
+
+    "sections": {
+      "companion": { "default": "Begleiterin", "m": "Begleiter" },
+      "customize": "Anpassen",
+      "model": "Modell",
+      "tuning": "Feinabstimmung",
+      "voice": "Stimme",
+      "privacy": "Datenschutz",
+      "language": "Sprache",
+      "summary": "Zusammenfassung",
+      "about": "Über"
+    },
+
+    "companion": {
+      "category": "Kategorie",
+      "gender": "Geschlecht",
+      "female": "Weiblich",
+      "male": "Männlich",
+      "colorScheme": "Farbschema",
+      "name": "Name",
+      "namePlaceholder": {
+        "default": "Namen der Begleiterin eingeben",
+        "m": "Namen des Begleiters eingeben"
+      }
+    },
+
+    "customize": {
+      "personalityType": "Persönlichkeitstyp",
+      "customTraits": "Eigene Eigenschaften",
+      "customTraitsPlaceholder": "Persönlichkeitsmerkmale und Eigenschaften hinzufügen...",
+      "customTraitsHelp": {
+        "default": "Beschreiben Sie, wie sich Ihre Begleiterin verhalten und interagieren soll",
+        "m": "Beschreiben Sie, wie sich Ihr Begleiter verhalten und interagieren soll"
+      },
+      "visualFormat": "Visuelles Format",
+      "decartApiKey": "Decart API-Schlüssel",
+      "decartApiKeyPlaceholder": "Geben Sie Ihren Decart API-Schlüssel ein",
+      "decartApiKeyHelpStart": "Holen Sie sich Ihren Schlüssel auf",
+      "decartApiKeyHelpEnd": ". Verschlüsselt auf Ihrem Gerät gespeichert."
+    },
+
+    "model": {
+      "provider": "KI-Anbieter",
+      "customProvider": "Benutzerdefinierter Anbieter",
+      "customProviderOption": "+ Benutzerdefinierter Anbieter",
+      "providerName": "Anbietername",
+      "providerNamePlaceholder": "z. B. WormGPT",
+      "baseUrl": "Basis-URL",
+      "baseUrlPlaceholder": "https://api.beispiel.com/v1",
+      "modelName": "Modellname",
+      "modelNamePlaceholder": "z. B. wormgpt-v2",
+      "supportsSTT": "Unterstützt Sprache-zu-Text",
+      "supportsSTTHelp": "Aktivieren, wenn dieser benutzerdefinierte Anbieter Audio-Transkription unterstützt",
+      "sttModelName": "STT-Modellname",
+      "sttModelNamePlaceholder": "z. B. whisper-1",
+      "sttApiUrl": "STT-API-URL",
+      "sttApiUrlPlaceholder": "z. B. https://api.beispiel.com/v1/audio/transcriptions",
+      "model": "Modell",
+      "apiEndpoint": "API-Endpunkt",
+      "apiEndpointPlaceholder": "Bereitgestellten API-Endpunkt eingeben",
+      "apiKey": "API-Schlüssel",
+      "apiKeyPlaceholder": "Geben Sie Ihren {provider}-Schlüssel ein",
+      "apiKeyFallback": "API",
+      "encryptionNotice": "Lokal verschlüsselt, nur zur Authentifizierung an API-Anbieter gesendet",
+      "modelsCount": "{count} Modelle"
+    },
+
+    "tuning": {
+      "memoryWindow": "Speicherfenster",
+      "memoryWindowUnit": "Nachrichten",
+      "memoryWindowHelp": "Anzahl der letzten Nachrichten, die in jede LLM-Anfrage einbezogen werden",
+      "streamingMode": "Streaming-Modus",
+      "streamingModeHelp": "Verfügbar in der nächsten Version"
+    },
+
+    "voice": {
+      "ttsProvider": "TTS-Anbieter",
+      "voice": "Stimme",
+      "voicesAvailable": "{count} Stimmen verfügbar für {gender}",
+      "voiceAvailable": "{count} Stimme verfügbar für {gender}",
+      "noVoices": "Keine Stimmen für dieses Geschlecht verfügbar",
+      "apiKey": "API-Schlüssel",
+      "globalKeyPlaceholder": "Verwendung des globalen OpenAI-Schlüssels",
+      "apiKeyPlaceholder": "Geben Sie Ihren {provider}-Schlüssel ein",
+      "apiKeyFallback": "TTS",
+      "globalKeyNotice": "Verwendung Ihres globalen OpenAI API-Schlüssels",
+      "encryptionNotice": "Lokal verschlüsselt, nur zur Authentifizierung an API-Anbieter gesendet",
+      "voiceOutput": "Sprachausgabe",
+      "voiceOutputHelp": "Sprache aus Antworten generieren"
+    },
+
+    "privacy": {
+      "privacyMode": "Datenschutzmodus",
+      "enabledHelp": "Nutzungsanalyse deaktiviert — keine Telemetriedaten werden gesammelt",
+      "disabledHelp": "Anonyme Nutzungsanalyse aktiviert, um Athena zu verbessern",
+      "infoBox": "Anonyme Nutzungsdaten helfen, Funktionen zu priorisieren und Probleme zu beheben. Keine Konversationen, persönlichen Daten oder API-Schlüssel werden jemals gesammelt."
+    },
+
+    "summary": {
+      "avatar": "Avatar",
+      "personality": "Persönlichkeit",
+      "visualFormat": "Visuelles Format",
+      "created": "Erstellt",
+      "aiConfiguration": "KI-Konfiguration",
+      "provider": "Anbieter",
+      "model": "Modell",
+      "memory": "Speicher",
+      "memoryUnit": "Nachrichten",
+      "privacyMode": "Datenschutzmodus",
+      "voiceConfiguration": "Sprachkonfiguration",
+      "ttsProvider": "TTS-Anbieter",
+      "apiKey": "API-Schlüssel",
+      "globalKey": "Verwendung des globalen OpenAI-Schlüssels",
+      "traits": "Eigenschaften"
+    },
+
+    "about": {
+      "version": "ATHENA v0.1",
+      "tagline": {
+        "default": "Datenschutzorientierte KI-Begleiterin. Open Source, lokal verschlüsselt.",
+        "m": "Datenschutzorientierter KI-Begleiter. Open Source, lokal verschlüsselt."
+      },
+      "copyright": "© 2026 Athena-Projekt"
+    }
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "fab": {
+    "install": "Install App",
+    "export": "Export",
+    "import": "Import",
+    "companion": "Companion",
+    "settings": "Settings"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "error": "Error",
+    "default": "Default",
+    "none": "None",
+    "custom": "Custom",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "languages": {
+    "en": "English",
+    "fr": "French",
+    "de": "German",
+    "it": "Italian"
+  },
+  "home": {
+    "hero": {
+      "taglineLine1Prefix": "Your",
+      "taglineLine1Highlight": "privacy-first",
+      "taglineLine1Suffix": "AI companion.",
+      "taglineLine2Accent": "Always floating by your side.",
+      "taglineLine2Primary": "Never exposing your data.",
+      "activate": "ACTIVATE ATHENA",
+      "learnMore": "LEARN MORE",
+      "statusOnline": "SYSTEM ONLINE • READY FOR DEPLOYMENT",
+      "statusOffline": "SYSTEM OFFLINE • PLEASE CONFIGURE"
+    },
+    "features": {
+      "title": "WHY CHOOSE ATHENA",
+      "privacy": {
+        "title": "Privacy First",
+        "description": "All conversations encrypted locally. Your data never leaves your device."
+      },
+      "alwaysOn": {
+        "title": "Always On",
+        "description": "Floating companion widget. Interact anytime from any application."
+      },
+      "personalized": {
+        "title": "Personalized",
+        "description": "Train your companion to think and act like you. True digital legacy."
+      },
+      "openSource": {
+        "title": "Open Source",
+        "description": "Community-driven development. Transparent, auditable, and secure."
+      }
+    },
+    "preview": {
+      "title": "YOUR COMPANION AWAITS",
+      "description1": {
+        "default": "Your thinking companion. Share your interests, and watch as she learns to understand your perspective.",
+        "m": "Your thinking companion. Share your interests, and watch as he learns to understand your perspective."
+      },
+      "description2": "Every conversation encrypted and stored locally. Your thoughts and ideas are yours alone.",
+      "startChatting": "START CHATTING"
+    },
+    "cta": {
+      "title": "READY TO DEPLOY?",
+      "description": "Click the floating button below to activate Athena. No sign-up required. Your privacy is guaranteed.",
+      "launch": "LAUNCH ATHENA"
+    },
+    "footer": {
+      "madeWith": "is made with ❤️ by",
+      "and": "and"
+    },
+    "alerts": {
+      "importFailed": "Import failed. Check console for details.",
+      "fileError": "Error processing file. Check console for details."
+    }
+  },
+  "chat": {
+    "header": {
+      "title": "Chat",
+      "online": "Online",
+      "offline": "Offline",
+      "popOut": "Pop out"
+    },
+    "messages": {
+      "empty": "No messages yet. Start a conversation!",
+      "thinking": "Thinking...",
+      "transcribing": "Transcribing...",
+      "imageAttached": "Image attached",
+      "documentChars": "({count} chars)",
+      "copyMessage": "Copy message",
+      "replayMessage": "Replay message",
+      "stopReplay": "Stop replay",
+      "chatImage": "Chat image",
+      "generatedImage": "Generated image",
+      "downloadImage": "Download generated image"
+    },
+    "input": {
+      "placeholder": "Send a message...",
+      "attachFile": "Attach file",
+      "memoryTooltip": "AI context: {used} / {total} messages",
+      "micUnavailable": "STT not available for this provider",
+      "micStop": "Stop recording",
+      "micTranscribing": "Transcribing...",
+      "micRecord": "Record audio",
+      "voiceOutputEnabled": "Voice output enabled",
+      "voiceOutputDisabled": "Voice output disabled",
+      "sendMessage": "Send message"
+    },
+    "alerts": {
+      "micDenied": "Microphone access denied or unavailable",
+      "transcribeFailed": "Failed to transcribe audio. Please try again."
+    },
+    "errors": {
+      "generic": "Sorry, I encountered an error. Please try again.",
+      "rateLimit": "Rate limit reached. Please wait a moment before trying again.",
+      "payloadTooLarge": "Message too large. Try shortening your input or uploading a smaller file.",
+      "serverError": "Server error. Please try again in a moment.",
+      "tooManyRequests": "Too many requests. Please wait before trying again.",
+      "authError": "Authentication error. Please check your API key."
+    }
+  },
+  "companion": {
+    "popOut": "Pop out",
+    "voiceEnable": "Enable voice",
+    "voiceDisable": "Disable voice",
+    "micUnavailable": "STT not available for this provider",
+    "micTapStop": "Tap to stop",
+    "micTranscribing": "Transcribing...",
+    "micProcessing": "Processing...",
+    "micTapSpeak": "Tap to speak",
+    "voiceModeEnable": "Enable voice mode",
+    "voiceModeDisable": "Disable voice mode",
+    "chatOpen": "Open the chat window",
+    "chatClose": "Close the chat window",
+    "voiceModeButton": "Voice Mode",
+    "startChat": "Start Chat",
+    "hideChat": "Hide Chat",
+    "tabCompanion": "Companion",
+    "tabChat": "Chat",
+    "live": "Live",
+    "insufficientCredits": "Insufficient credits",
+    "connectionFailed": "Connection failed",
+    "connecting": "Connecting...",
+    "liveAvatarLabel": "{name} live avatar",
+    "info": {
+      "personality": "Personality",
+      "created": "Created"
+    },
+    "online": "Online",
+    "offline": "Offline",
+    "openChat": "Open chat"
+  },
+  "history": {
+    "newConversation": "New conversation",
+    "title": "Conversation history",
+    "loading": "Loading...",
+    "empty": "No conversations yet",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count} days ago",
+    "emptyConversation": "Empty conversation",
+    "moreConversations": "+{count} more conversations",
+    "moreConversationsOne": "+1 more conversation"
+  },
+  "export": {
+    "title": "Export Conversations",
+    "description": "Choose a format for exporting your conversation history with Athena.",
+    "json": {
+      "title": "JSON Format",
+      "description": "Complete export with full structure. Best for backup and re-import."
+    },
+    "markdown": {
+      "title": "Markdown Format",
+      "description": "Human-readable transcript. Easy to read and share."
+    },
+    "exporting": "Exporting...",
+    "export": "Export",
+    "errorFallback": "Export failed"
+  },
+  "import": {
+    "title": "Import Conversations",
+    "description": "Review the contents before importing to your database.",
+    "format": "Format",
+    "fileSize": "File Size",
+    "conversations": "Conversations",
+    "exported": "Exported",
+    "markdownWarning": "Markdown imports are preview-only. Use JSON for full recovery.",
+    "loadFailed": "Failed to load file",
+    "errorFallback": "Import failed",
+    "importing": "Importing...",
+    "import": "Import",
+    "successAlert": "Import successful: {imported} imported, {skipped} skipped"
+  },
+  "connection": {
+    "title": "Let's get you connected",
+    "message": "Add an API key for any supported provider and Athena will be ready to chat.",
+    "configure": "Add an API key",
+    "heroCta": "Configure now"
+  },
+  "settings": {
+    "title": "Settings",
+    "save": "Save Settings",
+    "saved": "Settings Saved",
+    "savedDescription": "Your settings and customizations have been saved.",
+    "saveFailed": "Failed to save settings. Please try again.",
+
+    "language": "Language",
+    "languageDescription": "Choose your preferred interface language. Changes apply immediately.",
+
+    "sections": {
+      "companion": "Companion",
+      "customize": "Customize",
+      "model": "Model",
+      "tuning": "Tuning",
+      "voice": "Voice",
+      "privacy": "Privacy",
+      "language": "Language",
+      "summary": "Summary",
+      "about": "About"
+    },
+
+    "companion": {
+      "category": "Category",
+      "gender": "Gender",
+      "female": "Female",
+      "male": "Male",
+      "colorScheme": "Color Scheme",
+      "name": "Name",
+      "namePlaceholder": "Enter companion name"
+    },
+
+    "customize": {
+      "personalityType": "Personality Type",
+      "customTraits": "Custom Traits",
+      "customTraitsPlaceholder": "Add personality traits and characteristics...",
+      "customTraitsHelp": "Describe how your companion should behave and interact",
+      "visualFormat": "Visual Format",
+      "decartApiKey": "Decart API Key",
+      "decartApiKeyPlaceholder": "Enter your Decart API key",
+      "decartApiKeyHelpStart": "Get your key at",
+      "decartApiKeyHelpEnd": ". Stored encrypted on your device."
+    },
+
+    "model": {
+      "provider": "AI Provider",
+      "customProvider": "Custom Provider",
+      "customProviderOption": "+ Custom Provider",
+      "providerName": "Provider Name",
+      "providerNamePlaceholder": "e.g., WormGPT",
+      "baseUrl": "Base URL",
+      "baseUrlPlaceholder": "https://api.example.com/v1",
+      "modelName": "Model Name",
+      "modelNamePlaceholder": "e.g., wormgpt-v2",
+      "supportsSTT": "Supports Speech-to-Text",
+      "supportsSTTHelp": "Enable if this custom provider supports audio transcription",
+      "sttModelName": "STT Model Name",
+      "sttModelNamePlaceholder": "e.g., whisper-1",
+      "sttApiUrl": "STT API URL",
+      "sttApiUrlPlaceholder": "e.g., https://api.example.com/v1/audio/transcriptions",
+      "model": "Model",
+      "apiEndpoint": "API Endpoint",
+      "apiEndpointPlaceholder": "Enter provided API endpoint",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "Enter your {provider} key",
+      "apiKeyFallback": "API",
+      "encryptionNotice": "Encrypted locally, sent only to API providers for authentication",
+      "modelsCount": "{count} models"
+    },
+
+    "tuning": {
+      "memoryWindow": "Memory Window",
+      "memoryWindowUnit": "messages",
+      "memoryWindowHelp": "Number of recent messages included in each LLM request",
+      "streamingMode": "Streaming Mode",
+      "streamingModeHelp": "Coming in the next release"
+    },
+
+    "voice": {
+      "ttsProvider": "TTS Provider",
+      "voice": "Voice",
+      "voicesAvailable": "{count} voices available for {gender}",
+      "voiceAvailable": "{count} voice available for {gender}",
+      "noVoices": "No voices available for this gender",
+      "apiKey": "API Key",
+      "globalKeyPlaceholder": "Using Global OpenAI Key",
+      "apiKeyPlaceholder": "Enter your {provider} key",
+      "apiKeyFallback": "TTS",
+      "globalKeyNotice": "Using your global OpenAI API key",
+      "encryptionNotice": "Encrypted locally, sent only to API providers for authentication",
+      "voiceOutput": "Voice Output",
+      "voiceOutputHelp": "Generate speech from responses"
+    },
+
+    "privacy": {
+      "privacyMode": "Privacy Mode",
+      "enabledHelp": "Usage analytics disabled — no telemetry data is collected",
+      "disabledHelp": "Anonymous usage analytics enabled to help improve Athena",
+      "infoBox": "Anonymous usage data helps prioritise features and fix issues. No conversations, personal data, or API keys are ever collected."
+    },
+
+    "summary": {
+      "avatar": "Avatar",
+      "personality": "Personality",
+      "visualFormat": "Visual Format",
+      "created": "Created",
+      "aiConfiguration": "AI Configuration",
+      "provider": "Provider",
+      "model": "Model",
+      "memory": "Memory",
+      "memoryUnit": "messages",
+      "privacyMode": "Privacy Mode",
+      "voiceConfiguration": "Voice Configuration",
+      "ttsProvider": "TTS Provider",
+      "apiKey": "API Key",
+      "globalKey": "Using Global OpenAI Key",
+      "traits": "Traits"
+    },
+
+    "about": {
+      "version": "ATHENA v0.1",
+      "tagline": "Privacy-first AI companion. Open source, locally encrypted.",
+      "copyright": "© 2026 Athena Project"
+    }
+  }
+}

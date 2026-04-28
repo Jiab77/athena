@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { exportAndDownload } from '@/lib/export'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface ExportModalProps {
   isOpen: boolean
@@ -19,6 +20,7 @@ interface ExportModalProps {
 export function ExportModal({ isOpen, onClose }: ExportModalProps) {
   const [isExporting, setIsExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { t } = useTranslation()
 
   const handleExport = async (format: 'json' | 'markdown') => {
     setIsExporting(true)
@@ -28,7 +30,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
       await exportAndDownload(format)
       onClose()
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Export failed'
+      const message = err instanceof Error ? err.message : t('export.errorFallback')
       setError(message)
     } finally {
       setIsExporting(false)
@@ -39,9 +41,9 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Export Conversations</DialogTitle>
+          <DialogTitle>{t('export.title')}</DialogTitle>
           <DialogDescription>
-            Choose a format for exporting your conversation history with Athena.
+            {t('export.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -58,9 +60,9 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-foreground">JSON Format</h3>
+                <h3 className="font-semibold text-foreground">{t('export.json.title')}</h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Complete export with full structure. Best for backup and re-import.
+                  {t('export.json.description')}
                 </p>
               </div>
               <Button
@@ -72,7 +74,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
                   handleExport('json')
                 }}
               >
-                {isExporting ? 'Exporting...' : 'Export'}
+                {isExporting ? t('export.exporting') : t('export.export')}
               </Button>
             </div>
           </div>
@@ -83,9 +85,9 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-foreground">Markdown Format</h3>
+                <h3 className="font-semibold text-foreground">{t('export.markdown.title')}</h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Human-readable transcript. Easy to read and share.
+                  {t('export.markdown.description')}
                 </p>
               </div>
               <Button
@@ -97,7 +99,7 @@ export function ExportModal({ isOpen, onClose }: ExportModalProps) {
                   handleExport('markdown')
                 }}
               >
-                {isExporting ? 'Exporting...' : 'Export'}
+                {isExporting ? t('export.exporting') : t('export.export')}
               </Button>
             </div>
           </div>

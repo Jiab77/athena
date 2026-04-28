@@ -11,13 +11,29 @@ import type {
   GENDERS,
   COLOR_SCHEMES,
   GENDER_MAPPING,
+  SUPPORTED_LOCALES,
 } from './constants'
+// Imported for `typeof` derivation only — the English locale acts as the
+// canonical translation schema. Other locales must structurally match it.
+import type enDict from '@/i18n/en.json'
 
 export type VisualFormat = (typeof VISUAL_FORMATS)[number]
 
 export type PersonalityType = (typeof PERSONALITIES)[number]
 
 export type GenderType = keyof typeof GENDER_MAPPING
+
+/**
+ * Supported UI locale code (e.g. 'en', 'fr'). Derived from `SUPPORTED_LOCALES`
+ * so the union stays in lockstep with the runtime list of locale files.
+ */
+export type Locale = (typeof SUPPORTED_LOCALES)[number]
+
+/**
+ * Translation dictionary shape. Inferred from the English JSON file, which
+ * serves as the canonical schema for every other locale.
+ */
+export type TranslationDict = typeof enDict
 
 /**
  * Conversation states reflect what the companion is currently doing
@@ -181,6 +197,7 @@ export interface StoredSettings {
   hasSTTSupport?: boolean // For custom providers, indicates if STT is supported
   customSTTModelName?: string // For custom providers, the STT model name
   customSTTUrl?: string // For custom providers, the STT API endpoint URL
+  locale?: 'en' | 'fr' | 'de' | 'it' // UI language preference — falls back to browser detection if unset
   updatedAt: string
 }
 

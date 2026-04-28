@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink, Download } from 'lucide-react'
+import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink, Download, KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -23,6 +23,7 @@ import {
   isImageMimeType
 } from '@/lib/utils'
 import { useDB } from '@/lib/db-context'
+import { useTranslation } from '@/hooks/use-translation'
 import { encryptData, decryptData } from '@/lib/crypto'
 import {
   DEFAULT_COMPANION_ID,
@@ -74,6 +75,8 @@ interface ChatInterfaceProps {
   isPopup?: boolean
   /** STT availability — determined by brain.ts, passed down as prop */
   sttSupported?: boolean
+  /** Opens the settings panel scrolled to the Model section. When provided and the user is offline with no messages, an empty-state CTA is shown. */
+  onConfigureApiKey?: () => void
 }
 
 export function ChatInterface({
@@ -88,6 +91,7 @@ export function ChatInterface({
   onTTSReady,
   isPopup = false,
   sttSupported: sttSupportedProp = false,
+  onConfigureApiKey,
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const [displayMessages, setDisplayMessages] = useState<Message[]>([])
@@ -116,6 +120,7 @@ export function ChatInterface({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null)
   const { db, dbReady } = useDB()
+  const { t } = useTranslation()
 
   // Load conversation history on mount and when updated externally (voice chat)
   useEffect(() => {
@@ -234,7 +239,7 @@ export function ChatInterface({
       mediaRecorder.start()
       setIsRecording(true)
     } catch (error) {
-      alert('Microphone access denied or unavailable')
+      alert(t('chat.alerts.micDenied'))
     }
   }
 
@@ -262,7 +267,7 @@ export function ChatInterface({
           setInput((prev) => (prev ? prev + ' ' + transcribed : transcribed))
         }
       } catch (error) {
-        alert('Failed to transcribe audio. Please try again.')
+        alert(t('chat.alerts.transcribeFailed'))
       } finally {
         setIsTranscribing(false)
         audioChunksRef.current = []
@@ -515,23 +520,23 @@ export function ChatInterface({
     } catch (error) {
 
       // Generate specific error message based on status code
-      let userFriendlyMessage = 'Sorry, I encountered an error. Please try again.'
+      let userFriendlyMessage = t('chat.errors.generic')
 
       if (error && typeof error === 'object' && 'status' in error) {
         const apiError = error as { status: number; message: string }
         if (apiError.status === 413) {
           // Check if it's payload size or rate limit
           if (apiError.message.toLowerCase().includes('rate')) {
-            userFriendlyMessage = 'Rate limit reached. Please wait a moment before trying again.'
+            userFriendlyMessage = t('chat.errors.rateLimit')
           } else {
-            userFriendlyMessage = 'Message too large. Try shortening your input or uploading a smaller file.'
+            userFriendlyMessage = t('chat.errors.payloadTooLarge')
           }
         } else if (apiError.status === 500) {
-          userFriendlyMessage = 'Server error. Please try again in a moment.'
+          userFriendlyMessage = t('chat.errors.serverError')
         } else if (apiError.status === 429) {
-          userFriendlyMessage = 'Too many requests. Please wait before trying again.'
+          userFriendlyMessage = t('chat.errors.tooManyRequests')
         } else if (apiError.status === 401 || apiError.status === 403) {
-          userFriendlyMessage = 'Authentication error. Please check your API key.'
+          userFriendlyMessage = t('chat.errors.authError')
         }
       }
 
@@ -710,10 +715,10 @@ export function ChatInterface({
           )}
           <div>
             <h2 className="text-lg font-bold text-foreground">
-              {isPopup && companionName ? companionName : 'Chat'}
+              {isPopup && companionName ? companionName : t('chat.header.title')}
             </h2>
             <p className={`text-sm ${isOnline ? 'text-muted-foreground' : 'text-gray-500'}`}>
-              {isOnline ? 'Online' : 'Offline'}
+              {isOnline ? t('chat.header.online') : t('chat.header.offline')}
             </p>
           </div>
         </div>
@@ -743,7 +748,7 @@ export function ChatInterface({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Pop out</p>
+                  <p>{t('chat.header.popOut')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -765,13 +770,33 @@ export function ChatInterface({
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full w-full">
           <div className="p-4 space-y-4">
-            {displayMessages.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
+          {displayMessages.length === 0 ? (
+            <div className="h-full flex items-center justify-center p-4">
+              {!isOnline && onConfigureApiKey ? (
+                <div className="flex flex-col items-center gap-3 text-center max-w-xs">
+                  <div className="rounded-full bg-accent/10 p-3 border border-accent/30">
+                    <KeyRound className="h-5 w-5 text-accent" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-foreground">{t('connection.title')}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed text-pretty">{t('connection.message')}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={onConfigureApiKey}
+                    className="cursor-pointer font-medium"
+                  >
+                    <KeyRound className="h-3.5 w-3.5 mr-1.5" />
+                    {t('connection.configure')}
+                  </Button>
+                </div>
+              ) : (
                 <p className="text-sm text-muted-foreground text-center">
-                  No messages yet. Start a conversation!
+                  {t('chat.messages.empty')}
                 </p>
-              </div>
-            ) : (
+              )}
+            </div>
+          ) : (
               <>
                 {displayMessages.slice(-MAX_DISPLAY_MESSAGES).map((message) => {
                   const isUser = message.role === 'user'
@@ -793,7 +818,7 @@ export function ChatInterface({
                         <button
                           onClick={handleCopy}
                           className="self-start mt-1 mr-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
-                          aria-label="Copy message"
+                          aria-label={t('chat.messages.copyMessage')}
                         >
                           {isCopied
                             ? <span className="text-green-500"><CheckIcon /></span>
@@ -812,7 +837,7 @@ export function ChatInterface({
                           <div className={`relative mb-2 group/img ${!isUser ? 'inline-block' : ''}`}>
                             <img
                               src={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
-                              alt={isUser ? 'Chat image' : 'Generated image'}
+                              alt={isUser ? t('chat.messages.chatImage') : t('chat.messages.generatedImage')}
                               className="max-w-xs rounded max-h-64 object-cover"
                             />
                             {!isUser && (
@@ -820,7 +845,7 @@ export function ChatInterface({
                                 href={`data:image/${message.imageFormat};base64,${message.imageBase64}`}
                                 download={`athena-image-${message.id}.${message.imageFormat}`}
                                 className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity rounded"
-                                aria-label="Download generated image"
+                                aria-label={t('chat.messages.downloadImage')}
                               >
                                 <Download className="h-6 w-6 text-white" />
                               </a>
@@ -847,7 +872,7 @@ export function ChatInterface({
                             <button
                               onClick={() => handleReplayTTS(message.id, message.content)}
                               className="ml-2 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
-                              aria-label={replayingMessageId === message.id ? 'Stop replay' : 'Replay message'}
+                              aria-label={replayingMessageId === message.id ? t('chat.messages.stopReplay') : t('chat.messages.replayMessage')}
                             >
                               {replayingMessageId === message.id
                                 ? <Square className="h-3 w-3" />
@@ -863,7 +888,7 @@ export function ChatInterface({
                         <button
                           onClick={handleCopy}
                           className="self-start mt-1 ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity cursor-pointer"
-                          aria-label="Copy message"
+                          aria-label={t('chat.messages.copyMessage')}
                         >
                           {isCopied
                             ? <span className="text-green-500"><CheckIcon /></span>
@@ -874,8 +899,8 @@ export function ChatInterface({
                     </div>
                   )
                 })}
-                {isLoading && <TypingIndicator message="Thinking..." />}
-                {isTranscribing && <TypingIndicator message="Transcribing..." />}
+                {isLoading && <TypingIndicator message={t('chat.messages.thinking')} />}
+                {isTranscribing && <TypingIndicator message={t('chat.messages.transcribing')} />}
                 <div ref={scrollRef} />
               </>
             )}
@@ -893,7 +918,7 @@ export function ChatInterface({
               alt="Selected"
               className="h-12 w-12 rounded object-cover"
             />
-            <span className="text-xs text-muted-foreground flex-1">Image attached</span>
+            <span className="text-xs text-muted-foreground flex-1">{t('chat.messages.imageAttached')}</span>
             <Button
               size="sm"
               variant="ghost"
@@ -910,7 +935,7 @@ export function ChatInterface({
             <div className="flex-1">
               <span className="text-xs text-foreground">{selectedDocument.name}</span>
               <span className="text-xs text-muted-foreground ml-2">
-                ({selectedDocument.content.length.toLocaleString()} chars)
+                {t('chat.messages.documentChars', { count: selectedDocument.content.length.toLocaleString() })}
               </span>
             </div>
             <Button
@@ -949,7 +974,7 @@ export function ChatInterface({
               <>
                 <textarea
                   ref={textareaRef}
-                  placeholder="Send a message..."
+                  placeholder={t('chat.input.placeholder')}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onPaste={handlePaste}
@@ -991,7 +1016,7 @@ export function ChatInterface({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Attach file</p>
+                  <p>{t('chat.input.attachFile')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -1012,7 +1037,7 @@ export function ChatInterface({
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>AI context: {Math.min(memoryWindowSize, memorySize)} / {memorySize} messages</p>
+                  <p>{t('chat.input.memoryTooltip', { used: Math.min(memoryWindowSize, memorySize), total: memorySize })}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -1034,7 +1059,7 @@ export function ChatInterface({
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>{!sttSupported ? 'STT not available for this provider' : isRecording ? 'Stop recording' : isTranscribing ? 'Transcribing...' : 'Record audio'}</p>
+                  <p>{!sttSupported ? t('chat.input.micUnavailable') : isRecording ? t('chat.input.micStop') : isTranscribing ? t('chat.input.micTranscribing') : t('chat.input.micRecord')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -1054,7 +1079,7 @@ export function ChatInterface({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>{voiceOutputEnabled ? 'Voice output enabled' : 'Voice output disabled'}</p>
+                  <p>{voiceOutputEnabled ? t('chat.input.voiceOutputEnabled') : t('chat.input.voiceOutputDisabled')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -1081,7 +1106,7 @@ export function ChatInterface({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Send message</p>
+                  <p>{t('chat.input.sendMessage')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
