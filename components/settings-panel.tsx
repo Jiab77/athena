@@ -352,6 +352,13 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
       // Dispatch event so other components can react to settings changes
       window.dispatchEvent(new CustomEvent('settings-changed'))
 
+      // Notify the i18n hook that the companion gender may have changed
+      // so gendered nouns ("Compagne"/"Compagnon", "Begleiterin"/"Begleiter", etc.)
+      // re-render across the whole UI without waiting for a reload.
+      window.dispatchEvent(
+        new CustomEvent<GenderType>('athena:gender-changed', { detail: avatarGender })
+      )
+
       onSettingsSaved?.()
       onClose()
     } catch (error) {

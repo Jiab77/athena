@@ -3,7 +3,7 @@
     "install": "App installieren",
     "export": "Exportieren",
     "import": "Importieren",
-    "companion": "Begleiter",
+    "companion": { "default": "Begleiterin", "m": "Begleiter" },
     "settings": "Einstellungen"
   },
   "common": {
@@ -135,7 +135,7 @@
     "voiceModeButton": "Sprachmodus",
     "startChat": "Chat starten",
     "hideChat": "Chat ausblenden",
-    "tabCompanion": "Begleiter",
+    "tabCompanion": { "default": "Begleiterin", "m": "Begleiter" },
     "tabChat": "Chat",
     "live": "Live",
     "insufficientCredits": "Nicht genügend Guthaben",
@@ -208,7 +208,7 @@
     "languageDescription": "Wählen Sie Ihre bevorzugte Oberflächensprache. Änderungen werden sofort angewendet.",
 
     "sections": {
-      "companion": "Begleiter",
+      "companion": { "default": "Begleiterin", "m": "Begleiter" },
       "customize": "Anpassen",
       "model": "Modell",
       "tuning": "Feinabstimmung",

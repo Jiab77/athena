@@ -3,7 +3,7 @@
     "install": "Installa l'app",
     "export": "Esporta",
     "import": "Importa",
-    "companion": "Compagno",
+    "companion": { "default": "Compagna", "m": "Compagno" },
     "settings": "Impostazioni"
   },
   "common": {
@@ -135,7 +135,7 @@
     "voiceModeButton": "Modalità vocale",
     "startChat": "Inizia chat",
     "hideChat": "Nascondi chat",
-    "tabCompanion": "Compagno",
+    "tabCompanion": { "default": "Compagna", "m": "Compagno" },
     "tabChat": "Chat",
     "live": "Dal vivo",
     "insufficientCredits": "Crediti insufficienti",
@@ -208,7 +208,7 @@
     "languageDescription": "Scegli la lingua dell'interfaccia preferita. Le modifiche vengono applicate immediatamente.",
 
     "sections": {
-      "companion": "Compagno",
+      "companion": { "default": "Compagna", "m": "Compagno" },
       "customize": "Personalizza",
       "model": "Modello",
       "tuning": "Regolazione",

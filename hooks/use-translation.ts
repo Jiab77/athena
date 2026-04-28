@@ -7,6 +7,9 @@
  * - Falls back to browser detection if no preference set
  * - Falls back to English if browser language is unsupported
  * - All consumers re-render when locale changes via the `athena:locale-changed` event
+ * - Gender-aware translations follow the same pattern via `athena:gender-changed`,
+ *   so gendered nouns ("Compagne"/"Compagnon", "Begleiterin"/"Begleiter", etc.)
+ *   reflect the active companion's gender from settings.
  */
 
 import { useCallback, useEffect, useState } from 'react'
@@ -18,19 +21,22 @@ import {
   t as translate,
   type Locale,
 } from '@/lib/i18n'
-import type { StoredSettings } from '@/lib/types'
+import { DEFAULT_GENDER } from '@/lib/constants'
+import type { GenderType, StoredSettings } from '@/lib/types'
 
 const LOCALE_CHANGE_EVENT = 'athena:locale-changed'
+const GENDER_CHANGE_EVENT = 'athena:gender-changed'
 
 export function useTranslation() {
   const { db, dbReady } = useDB()
   const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
+  const [gender, setGenderState] = useState<GenderType>(DEFAULT_GENDER)
 
-  // Initial locale load: settings → browser detection → English fallback
+  // Initial locale & gender load: settings → defaults
   useEffect(() => {
     if (!dbReady || !db) return
 
-    const loadLocale = async () => {
+    const loadSettings = async () => {
       try {
         const settings = await db.getSettings()
         if (settings?.locale) {
@@ -38,12 +44,15 @@ export function useTranslation() {
         } else {
           setLocaleState(detectBrowserLocale())
         }
+        if (settings?.avatarGender) {
+          setGenderState(settings.avatarGender)
+        }
       } catch {
         setLocaleState(detectBrowserLocale())
       }
     }
 
-    loadLocale()
+    loadSettings()
   }, [db, dbReady])
 
   // Listen for locale changes from other components
@@ -54,6 +63,16 @@ export function useTranslation() {
     }
     window.addEventListener(LOCALE_CHANGE_EVENT, handler)
     return () => window.removeEventListener(LOCALE_CHANGE_EVENT, handler)
+  }, [])
+
+  // Listen for gender changes from the settings panel save flow
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<GenderType>).detail
+      if (detail) setGenderState(detail)
+    }
+    window.addEventListener(GENDER_CHANGE_EVENT, handler)
+    return () => window.removeEventListener(GENDER_CHANGE_EVENT, handler)
   }, [])
 
   /**
@@ -94,13 +113,13 @@ export function useTranslation() {
     [db, dbReady]
   )
 
-  // Translation function bound to the current locale
+  // Translation function bound to the current locale & gender
   const dict = getTranslations(locale)
   const t = useCallback(
     (key: string, params?: Record<string, string | number>) =>
-      translate(dict, key, params),
-    [dict]
+      translate(dict, key, params, gender),
+    [dict, gender]
   )
 
-  return { t, locale, setLocale }
+  return { t, locale, setLocale, gender }
 }
