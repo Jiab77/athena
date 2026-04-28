@@ -45,7 +45,7 @@
         "description": "Toutes les conversations chiffrées localement. Vos données ne quittent jamais votre appareil."
       },
       "alwaysOn": {
-        "title": "Toujours actif",
+        "title": { "default": "Toujours active", "m": "Toujours actif" },
         "description": {
           "default": "Compagne flottante. Interagissez à tout moment depuis n'importe quelle application.",
           "m": "Compagnon flottant. Interagissez à tout moment depuis n'importe quelle application."

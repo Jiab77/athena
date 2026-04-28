@@ -42,7 +42,7 @@
         "description": "Tutte le conversazioni crittografate localmente. I tuoi dati non lasciano mai il tuo dispositivo."
       },
       "alwaysOn": {
-        "title": "Sempre attivo",
+        "title": { "default": "Sempre attiva", "m": "Sempre attivo" },
         "description": "Widget compagno fluttuante. Interagisci in qualsiasi momento da qualsiasi applicazione."
       },
       "personalized": {
