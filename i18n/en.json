@@ -191,6 +191,12 @@
     "import": "Import",
     "successAlert": "Import successful: {imported} imported, {skipped} skipped"
   },
+  "connection": {
+    "title": "API key required",
+    "message": "Configure at least one model provider with an API key to start chatting with Athena.",
+    "configure": "Configure API Key",
+    "heroCta": "Configure now"
+  },
   "settings": {
     "title": "Settings",
     "save": "Save Settings",

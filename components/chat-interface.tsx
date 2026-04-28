@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink, Download } from 'lucide-react'
+import { Mic, X, Volume2, VolumeX, FileText, Paperclip, ArrowUp, Brain, Play, Square, ExternalLink, Download, KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -75,6 +75,8 @@ interface ChatInterfaceProps {
   isPopup?: boolean
   /** STT availability — determined by brain.ts, passed down as prop */
   sttSupported?: boolean
+  /** Opens the settings panel scrolled to the Model section. When provided and the user is offline with no messages, an empty-state CTA is shown. */
+  onConfigureApiKey?: () => void
 }
 
 export function ChatInterface({
@@ -89,6 +91,7 @@ export function ChatInterface({
   onTTSReady,
   isPopup = false,
   sttSupported: sttSupportedProp = false,
+  onConfigureApiKey,
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const [displayMessages, setDisplayMessages] = useState<Message[]>([])
@@ -767,13 +770,33 @@ export function ChatInterface({
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full w-full">
           <div className="p-4 space-y-4">
-            {displayMessages.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
+          {displayMessages.length === 0 ? (
+            <div className="h-full flex items-center justify-center p-4">
+              {!isOnline && onConfigureApiKey ? (
+                <div className="flex flex-col items-center gap-3 text-center max-w-xs">
+                  <div className="rounded-full bg-accent/10 p-3 border border-accent/30">
+                    <KeyRound className="h-5 w-5 text-accent" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-foreground">{t('connection.title')}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed text-pretty">{t('connection.message')}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={onConfigureApiKey}
+                    className="cursor-pointer font-medium"
+                  >
+                    <KeyRound className="h-3.5 w-3.5 mr-1.5" />
+                    {t('connection.configure')}
+                  </Button>
+                </div>
+              ) : (
                 <p className="text-sm text-muted-foreground text-center">
                   {t('chat.messages.empty')}
                 </p>
-              </div>
-            ) : (
+              )}
+            </div>
+          ) : (
               <>
                 {displayMessages.slice(-MAX_DISPLAY_MESSAGES).map((message) => {
                   const isUser = message.role === 'user'

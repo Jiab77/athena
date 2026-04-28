@@ -44,6 +44,8 @@ interface MergedCompanionChatProps {
   voiceProvider: string
   onVoiceOutputToggle: () => Promise<void>
   visualFormat?: VisualFormat
+  /** Opens the settings panel scrolled to the Model section. Used by the chat empty-state CTA when no API key is configured. */
+  onConfigureApiKey?: () => void
 }
 
 export function MergedCompanionChat({
@@ -60,6 +62,7 @@ export function MergedCompanionChat({
   voiceProvider,
   onVoiceOutputToggle,
   visualFormat,
+  onConfigureApiKey,
 }: MergedCompanionChatProps) {
   const {
     expressionState,
@@ -305,6 +308,7 @@ export function MergedCompanionChat({
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
                 sttSupported={sttSupported}
+                onConfigureApiKey={onConfigureApiKey}
               />
             </div>
           )}
@@ -339,6 +343,7 @@ export function MergedCompanionChat({
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
                 sttSupported={sttSupported}
+                onConfigureApiKey={onConfigureApiKey}
               />
             </Card>
           </ResizablePanel>

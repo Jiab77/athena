@@ -191,6 +191,12 @@
     "import": "Importer",
     "successAlert": "Import réussi : {imported} importées, {skipped} ignorées"
   },
+  "connection": {
+    "title": "Clé API requise",
+    "message": "Configurez au moins un fournisseur de modèle avec une clé API pour commencer à discuter avec Athena.",
+    "configure": "Configurer la clé API",
+    "heroCta": "Configurer maintenant"
+  },
   "settings": {
     "title": "Paramètres",
     "save": "Enregistrer les paramètres",

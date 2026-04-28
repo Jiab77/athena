@@ -35,6 +35,7 @@ import { getAPIKey } from '@/lib/utils'
 export default function Home() {
   const [showCompanion, setShowCompanion] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [settingsSection, setSettingsSection] = useState<string | undefined>(undefined)
   const [showExportModal, setShowExportModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
   const [selectedImportFile, setSelectedImportFile] = useState<File | null>(null)
@@ -314,11 +315,27 @@ export default function Home() {
           </div>
 
           {/* Status Indicator */}
-          <div className="mt-12 flex items-center justify-center gap-2 text-sm">
-            <div className={`w-2 h-2 rounded-full animate-pulse ${isOnline ? 'bg-primary' : 'bg-gray-500'}`} />
-            <span className={isOnline ? 'text-muted-foreground' : 'text-gray-500'}>
-              {isOnline ? t('home.hero.statusOnline') : t('home.hero.statusOffline')}
-            </span>
+          <div className="mt-12 flex flex-col items-center justify-center gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full animate-pulse ${isOnline ? 'bg-primary' : 'bg-gray-500'}`} />
+              <span className={isOnline ? 'text-muted-foreground' : 'text-gray-500'}>
+                {isOnline ? t('home.hero.statusOnline') : t('home.hero.statusOffline')}
+              </span>
+            </div>
+            {!isOnline && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setSettingsSection('model')
+                  setShowSettings(true)
+                }}
+                className="border-accent/60 text-accent hover:text-accent bg-transparent hover:bg-accent/10 cursor-pointer text-xs font-semibold"
+              >
+                <Settings className="h-3.5 w-3.5 mr-1.5" />
+                {t('connection.heroCta')}
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -517,14 +534,22 @@ export default function Home() {
           voiceProvider={voiceProvider}
           onVoiceOutputToggle={handleVoiceOutputToggle}
           visualFormat={visualFormat}
+          onConfigureApiKey={() => {
+            setSettingsSection('model')
+            setShowSettings(true)
+          }}
         />
       )}
 
       {showSettings && (
         <div className="fixed bottom-24 z-40 inset-x-4 md:inset-x-auto md:right-6 md:w-96">
           <SettingsPanel
-            onClose={() => setShowSettings(false)}
+            onClose={() => {
+              setShowSettings(false)
+              setSettingsSection(undefined)
+            }}
             onSettingsSaved={handleSettingsSaved}
+            initialSection={settingsSection}
           />
         </div>
       )}

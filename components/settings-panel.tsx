@@ -52,9 +52,11 @@ import { SUPPORTED_LOCALES, LOCALE_LABELS, type Locale } from '@/lib/i18n'
 interface SettingsPanelProps {
   onClose: () => void
   onSettingsSaved?: () => void
+  /** Accordion section to expand on mount, e.g. "model". When omitted, all sections are collapsed. */
+  initialSection?: string
 }
 
-export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) {
+export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: SettingsPanelProps) {
   const { toast } = useToast()
   const { db, dbReady } = useDB()
   const { t, locale, setLocale } = useTranslation()
@@ -376,7 +378,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
 
       {/* Accordion Sections */}
       <div className="flex-1 overflow-y-auto">
-        <Accordion type="single" collapsible className="w-full px-2 py-2">
+        <Accordion type="single" collapsible defaultValue={initialSection} className="w-full px-2 py-2">
           {/* 1. Companion Section */}
           <AccordionItem value="companion" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
