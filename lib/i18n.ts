@@ -1,40 +1,19 @@
 /**
  * i18n core — simple JSON-based translation system
- * 
+ *
  * - Locale files live in /i18n/{locale}.json
  * - User preference persisted in IndexedDB settings (key: `locale`)
  * - On first load, browser language is detected and mapped to nearest supported locale
  * - Falls back to English on any mismatch or load failure
+ *
+ * The locale list, native labels and dictionaries themselves live in
+ * `@/lib/constants`; the matching `Locale` and `TranslationDict` types live
+ * in `@/lib/types`. This file only owns the runtime helpers (detection,
+ * resolution, interpolation, gender variants).
  */
 
-import en from '@/i18n/en.json'
-import fr from '@/i18n/fr.json'
-import de from '@/i18n/de.json'
-import it from '@/i18n/it.json'
-
-export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'it'] as const
-export type Locale = (typeof SUPPORTED_LOCALES)[number]
-export const DEFAULT_LOCALE: Locale = 'en'
-
-/**
- * Native language labels — always shown in the language's own script
- * so users always recognise their language regardless of the active UI locale.
- */
-export const LOCALE_LABELS: Record<Locale, string> = {
-  en: 'English',
-  fr: 'Français',
-  de: 'Deutsch',
-  it: 'Italiano',
-}
-
-const TRANSLATIONS = { en, fr, de, it } as const
-
-/**
- * Translation dictionary type — derived from the English file
- * which serves as the canonical schema. Other locales must match
- * this shape.
- */
-export type TranslationDict = typeof en
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE, TRANSLATIONS } from './constants'
+import type { Locale, TranslationDict } from './types'
 
 /**
  * Detect browser language and map to the nearest supported locale
@@ -42,7 +21,7 @@ export type TranslationDict = typeof en
  */
 export function detectBrowserLocale(): Locale {
   if (typeof navigator === 'undefined') return DEFAULT_LOCALE
-  
+
   const browserLang = navigator.language.toLowerCase().split('-')[0]
   if (SUPPORTED_LOCALES.includes(browserLang as Locale)) {
     return browserLang as Locale

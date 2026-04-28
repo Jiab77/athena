@@ -40,14 +40,15 @@ import {
   AVATAR_CATEGORIES,
   GENDERS,
   COLOR_SCHEMES,
-  VISUAL_FORMATS
+  VISUAL_FORMATS,
+  SUPPORTED_LOCALES,
+  LOCALE_LABELS,
 } from '@/lib/constants'
-import type { PersonalityType, VisualFormat, GenderType, TTSProvider } from '@/lib/types'
+import type { PersonalityType, VisualFormat, GenderType, TTSProvider, Locale } from '@/lib/types'
 import { useDB } from '@/lib/db-context'
 import { encryptData, decryptData } from '@/lib/crypto'
 import { useToast } from '@/hooks/use-toast'
 import { useTranslation } from '@/hooks/use-translation'
-import { SUPPORTED_LOCALES, LOCALE_LABELS, type Locale } from '@/lib/i18n'
 
 interface SettingsPanelProps {
   onClose: () => void

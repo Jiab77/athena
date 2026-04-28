@@ -14,15 +14,9 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useDB } from '@/lib/db-context'
-import {
-  DEFAULT_LOCALE,
-  detectBrowserLocale,
-  getTranslations,
-  t as translate,
-  type Locale,
-} from '@/lib/i18n'
-import { DEFAULT_GENDER } from '@/lib/constants'
-import type { GenderType, StoredSettings } from '@/lib/types'
+import { detectBrowserLocale, getTranslations, t as translate } from '@/lib/i18n'
+import { DEFAULT_GENDER, DEFAULT_LOCALE } from '@/lib/constants'
+import type { GenderType, Locale, StoredSettings } from '@/lib/types'
 
 const LOCALE_CHANGE_EVENT = 'athena:locale-changed'
 const GENDER_CHANGE_EVENT = 'athena:gender-changed'

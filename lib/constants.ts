@@ -3,7 +3,34 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, LLMProvider, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import type { Avatar, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import en from '@/i18n/en.json'
+import fr from '@/i18n/fr.json'
+import de from '@/i18n/de.json'
+import it from '@/i18n/it.json'
+
+/**
+ * i18n
+ * Locale codes, native labels and translation dictionaries.
+ * The `t()` helper and the `useTranslation` hook read from `TRANSLATIONS`
+ * via `getTranslations(locale)` in `@/lib/i18n`.
+ */
+export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'it'] as const
+
+export const DEFAULT_LOCALE: Locale = 'en'
+
+/**
+ * Native language labels — always shown in the language's own script
+ * so users always recognise their language regardless of the active UI locale.
+ */
+export const LOCALE_LABELS: Record<Locale, string> = {
+  en: 'English',
+  fr: 'Français',
+  de: 'Deutsch',
+  it: 'Italiano',
+}
+
+export const TRANSLATIONS = { en, fr, de, it } as const
 
 /**
  * Default Props
