@@ -238,14 +238,20 @@
       "male": "Masculin",
       "colorScheme": "Palette de couleurs",
       "name": "Nom",
-      "namePlaceholder": "Entrez le nom du compagnon"
+      "namePlaceholder": {
+        "default": "Entrez le nom de la compagne",
+        "m": "Entrez le nom du compagnon"
+      }
     },
 
     "customize": {
       "personalityType": "Type de personnalité",
       "customTraits": "Traits personnalisés",
       "customTraitsPlaceholder": "Ajoutez des traits de personnalité et des caractéristiques...",
-      "customTraitsHelp": "Décrivez comment votre compagnon doit se comporter et interagir",
+      "customTraitsHelp": {
+        "default": "Décrivez comment votre compagne doit se comporter et interagir",
+        "m": "Décrivez comment votre compagnon doit se comporter et interagir"
+      },
       "visualFormat": "Format visuel",
       "decartApiKey": "Clé API Decart",
       "decartApiKeyPlaceholder": "Entrez votre clé API Decart",
@@ -330,7 +336,10 @@
 
     "about": {
       "version": "ATHENA v0.1",
-      "tagline": "Compagnon IA respectueux de la vie privée. Open source, chiffré localement.",
+      "tagline": {
+        "default": "Compagne IA respectueuse de la vie privée. Open source, chiffrée localement.",
+        "m": "Compagnon IA respectueux de la vie privée. Open source, chiffré localement."
+      },
       "copyright": "© 2026 Projet Athena"
     }
   }
