@@ -7,6 +7,7 @@ import {
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_AUDIO_FILE,
+  DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
   STT_PROVIDERS
 } from '../constants'
 import { getDB } from '../db'
@@ -14,6 +15,10 @@ import { buildSystemPrompt, getAPIKey } from '../utils'
 
 const CHAT_API_URL = 'https://api.openai.com/v1/responses'
 const STT_API_URL = 'https://api.openai.com/v1/audio/transcriptions'
+// Emotion detection uses the legacy Chat Completions endpoint (not the
+// Responses API) because it relies on `response_format: json_object` which is
+// natively supported there with low latency.
+const EMOTION_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 /**
  * Call OpenAI API with conversation history using fetch
@@ -319,4 +324,61 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     console.log('[Athena] transcribeAudio: caught error', error)
     throw error
   }
+}
+
+/**
+ * Run emotion classification on a piece of model-generated text using
+ * OpenAI's Chat Completions API in JSON mode.
+ *
+ * The function is intentionally narrow: it knows nothing about personalities,
+ * companion names, or fallback chains. It simply sends `(systemPrompt,
+ * userText)` to the configured emotion-detection model and returns the raw
+ * JSON string from the model. The caller (`lib/llm/emotions.ts`) is
+ * responsible for prompt construction, parsing, and validation.
+ *
+ * Throws on HTTP failures so the caller can decide whether to retry, fall
+ * back, or downgrade gracefully.
+ */
+export async function detectEmotion(systemPrompt: string, userText: string): Promise<string> {
+  const apiKey = await getAPIKey('openai')
+
+  const reqBody = {
+    model: DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
+    messages: [
+      { role: 'system' as const, content: systemPrompt },
+      { role: 'user' as const, content: userText },
+    ],
+    temperature: 0.3,
+    max_completion_tokens: 64,
+    response_format: { type: 'json_object' as const },
+  }
+
+  console.log('[Athena] detectEmotion (OpenAI): request', reqBody)
+
+  const response = await fetch(EMOTION_API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(reqBody),
+  })
+
+  console.log('[Athena] detectEmotion (OpenAI): HTTP response', { status: response.status, ok: response.ok })
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    console.error('[Athena] detectEmotion (OpenAI): API error', error)
+    throw new Error(error?.error?.message || `OpenAI emotion detection failed: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  console.log('[Athena] detectEmotion (OpenAI): raw response', data)
+
+  const content = data.choices?.[0]?.message?.content
+  if (!content) {
+    throw new Error('No content in OpenAI emotion detection response')
+  }
+
+  return content
 }
