@@ -356,6 +356,60 @@ export const LLM_PROVIDERS: LLMProvider[] = [
       },
     ],
   },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gpt-5.2',
+        name: 'GPT-5.2',
+        model: 'openai/gpt-5.2',
+        description: 'OpenAI flagship via OpenRouter. Broad capability across reasoning, coding, and conversation.',
+        url: 'https://openrouter.ai/openai/gpt-5.2',
+        visible: true,
+      },
+      {
+        id: 'gpt-5-mini',
+        name: 'GPT-5 Mini',
+        model: 'openai/gpt-5-mini',
+        description: 'Lightweight, low-latency OpenAI model for fast everyday chat.',
+        url: 'https://openrouter.ai/openai/gpt-5-mini',
+        visible: true,
+      },
+      {
+        id: 'claude-opus-4.6',
+        name: 'Claude Opus 4.6',
+        model: 'anthropic/claude-opus-4.6',
+        description: "Anthropic's frontier model. Strongest reasoning and long-context handling.",
+        url: 'https://openrouter.ai/anthropic/claude-opus-4.6',
+        visible: true,
+      },
+      {
+        id: 'claude-sonnet-4.6',
+        name: 'Claude Sonnet 4.6',
+        model: 'anthropic/claude-sonnet-4.6',
+        description: 'Balanced Anthropic model. Faster and cheaper than Opus with strong overall quality.',
+        url: 'https://openrouter.ai/anthropic/claude-sonnet-4.6',
+        visible: true,
+      },
+      {
+        id: 'gemini-3-pro',
+        name: 'Gemini 3 Pro',
+        model: 'google/gemini-3-pro',
+        description: "Google's flagship multimodal model with strong vision and reasoning capabilities.",
+        url: 'https://openrouter.ai/google/gemini-3-pro',
+        visible: true,
+      },
+      {
+        id: 'llama-4-maverick-free',
+        name: 'Llama 4 Maverick (Free)',
+        model: 'meta-llama/llama-4-maverick:free',
+        description: 'Free open-source flagship from Meta. Rate-limited; great for trying OpenRouter at zero cost.',
+        url: 'https://openrouter.ai/meta-llama/llama-4-maverick:free',
+        visible: true,
+      },
+    ],
+  },
 ]
 
 /**
