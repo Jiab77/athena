@@ -93,9 +93,12 @@ export function MergedCompanionChat({
   const isSmallScreen = isMobile || isTablet
   const showChat = isChatVisible && !isVoiceMode
 
-  // When chat becomes hidden, switch back to companion tab
+  // Auto-sync the active tab with chat visibility — when the chat appears
+  // we switch to the chat tab, and we fall back to the companion tab when
+  // the chat hides. Centralising this here avoids the cross-component
+  // state coordination that the click handlers had to do manually.
   useEffect(() => {
-    if (!showChat) setActiveTab('companion')
+    setActiveTab(showChat ? 'chat' : 'companion')
   }, [showChat])
 
   if (!isOpen) return null
@@ -160,10 +163,7 @@ export function MergedCompanionChat({
                   : 'border border-border text-foreground bg-transparent hover:bg-muted hover:text-foreground',
                 isVoiceMode ? 'opacity-40 cursor-not-allowed' : '',
               ].join(' ')}
-              onClick={() => {
-                setIsChatVisible(!isChatVisible)
-                if (!isChatVisible) setActiveTab('chat')
-              }}
+              onClick={() => setIsChatVisible(!isChatVisible)}
             >
               <Keyboard className="h-4 w-4" />
               <span className="text-xs">{isChatVisible ? t('companion.hideChat') : t('companion.startChat')}</span>
@@ -267,10 +267,7 @@ export function MergedCompanionChat({
               isOpen={true}
               onClose={onClose}
               isChatVisible={isChatVisible}
-              setIsChatVisible={(v) => {
-                setIsChatVisible(v)
-                if (v) setActiveTab('chat')
-              }}
+              setIsChatVisible={setIsChatVisible}
               isVoiceMode={isVoiceMode}
               onVoiceModeToggle={onVoiceModeToggle}
               isOnline={isOnline}
