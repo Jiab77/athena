@@ -18,6 +18,7 @@ import {
   t as translate,
   type Locale,
 } from '@/lib/i18n'
+import type { StoredSettings } from '@/lib/types'
 
 const LOCALE_CHANGE_EVENT = 'athena:locale-changed'
 
@@ -57,29 +58,37 @@ export function useTranslation() {
 
   /**
    * Update the user's locale preference
-   * Persists to IndexedDB and broadcasts the change to all components
+   * Updates state synchronously for instant UI feedback, then persists
+   * to IndexedDB and broadcasts the change to all other hook consumers.
    */
   const setLocale = useCallback(
     async (newLocale: Locale) => {
+      // Always update local state synchronously so the controlled <Select>
+      // reflects the user's choice immediately, regardless of persistence.
+      setLocaleState(newLocale)
+
+      // Broadcast to all other hook consumers so the entire UI re-renders.
+      window.dispatchEvent(
+        new CustomEvent<Locale>(LOCALE_CHANGE_EVENT, { detail: newLocale })
+      )
+
       if (!db || !dbReady) return
 
       try {
         const current = await db.getSettings()
-        if (!current) return // No settings to update — should not happen in practice
-        
-        await db.storeSettings({
-          ...current,
-          locale: newLocale,
-          updatedAt: new Date().toISOString(),
-        })
-        
-        // Broadcast to all hook consumers
-        window.dispatchEvent(
-          new CustomEvent<Locale>(LOCALE_CHANGE_EVENT, { detail: newLocale })
-        )
+        // If no settings record exists yet (fresh user), create a minimal one
+        // so the locale preference survives the next reload.
+        const next: StoredSettings = current
+          ? { ...current, locale: newLocale, updatedAt: new Date().toISOString() }
+          : {
+              key: 'userSettings',
+              locale: newLocale,
+              updatedAt: new Date().toISOString(),
+            } as StoredSettings
+
+        await db.storeSettings(next)
       } catch {
-        // Persistence failed — keep state local for this session
-        setLocaleState(newLocale)
+        // Persistence failed — state is already updated locally for this session.
       }
     },
     [db, dbReady]

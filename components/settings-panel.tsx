@@ -339,6 +339,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
         hasSTTSupport: isCustomProvider ? hasSTTSupport : undefined,
         customSTTModelName: isCustomProvider && hasSTTSupport ? customSTTModelName : undefined,
         customSTTUrl: isCustomProvider && hasSTTSupport ? customSTTUrl : undefined,
+        locale, // Preserve the active locale so it is not wiped on save
         updatedAt: new Date().toISOString(),
       })
       toast({
