@@ -8,6 +8,9 @@ import { callOpenAIAPI, transcribeAudio as transcribeOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
 import { callBioLLMAPI } from './biollm'
 import { callOpenRouterAPI, transcribeAudio as transcribeOpenRouter } from './openrouter'
+// `transcribeOpenAI` / `transcribeGroq` are still imported for their
+// registration in the `providers` map below — the fallback chain now reads
+// them from that registry rather than referencing the imports directly.
 import { detectTools } from './tools'
 
 /**
@@ -42,7 +45,7 @@ const providers: Record<string, LLMProvider> = {
   },
   biollm: {
     callAPI: callBioLLMAPI,
-    // No native STT/TTS — falls back to OpenAI Whisper/TTS if OpenAI API key is configured
+    // No native STT — handled generically via `STT_FALLBACK_CHAIN` below.
   },
   openrouter: {
     callAPI: callOpenRouterAPI,
@@ -110,87 +113,102 @@ export async function callLLM(messages: Message[], selectedProvider?: string): P
 }
 
 /**
- * Transcribe audio using STT
- * Automatically routes to correct provider based on settings
- * @param audioBlob - Audio data to transcribe
- * @returns Transcribed text
- * @throws Error if provider doesn't support STT
+ * Priority-ordered STT fallback chain.
+ *
+ * Used when the active chat provider can't transcribe natively (BioLLM today,
+ * Custom without `hasSTTSupport`, or any future no-STT provider). Listed in
+ * preference order: dedicated Whisper-class endpoints first, since they're
+ * faster and flat-rate compared to chat-completions-with-audio.
+ *
+ * OpenRouter is deliberately excluded: its STT path goes through chat
+ * completions, which is slower and token-billed. OpenRouter users still get
+ * OpenRouter STT when it's their *active* chat provider via the registry.
  */
-export async function transcribeAudio(audioBlob: Blob): Promise<string> {
-  const providerID = await getCurrentProvider()
+const STT_FALLBACK_CHAIN = ['openai', 'groq'] as const
+
+/**
+ * Resolve the active provider's *own* STT transcriber, taking per-provider
+ * gates into account. Returns `null` when the provider has no native STT or
+ * has it disabled (e.g. Custom provider with `hasSTTSupport: false`).
+ *
+ * Centralising this means `transcribeAudio()` and `supportsSTT()` agree by
+ * construction — they can't drift on per-provider gating logic.
+ */
+async function getNativeSTT(providerID: string): Promise<((blob: Blob) => Promise<string>) | null> {
   const provider = providers[providerID]
+  if (!provider?.transcribeAudio) return null
 
-  if (!provider) {
-    throw new Error(`Provider '${providerID}' not found in registry`)
-  }
-
-  // Custom provider - check hasSTTSupport setting before attempting
+  // Custom provider — STT is opt-in via user setting
   if (providerID === 'custom') {
     const db = await getDB()
     const settings = await db.getSettings()
-    if (!settings?.hasSTTSupport) {
-      throw new Error('Custom provider STT not enabled in settings')
-    }
+    if (!settings?.hasSTTSupport) return null
   }
 
-  // BioLLM — no native STT, fall back to OpenAI Whisper (priority) or Groq Whisper
-  if (providerID === 'biollm') {
-    const db = await getDB()
-    const openaiKey = await db.checkAPIKey('openai')
-    const groqKey = await db.checkAPIKey('groq')
-
-    if (openaiKey) {
-      console.log('[Router] BioLLM STT — falling back to OpenAI Whisper')
-      return transcribeOpenAI(audioBlob)
-    }
-    if (groqKey) {
-      console.log('[Router] BioLLM STT — falling back to Groq Whisper')
-      return transcribeGroq(audioBlob)
-    }
-
-    console.warn('[Router] BioLLM STT not available — no OpenAI or Groq API key configured')
-    return Promise.reject(new Error('STT not available'))
-  }
-
-  if (!provider.transcribeAudio) {
-    throw new Error(`Provider '${providerID}' does not support Speech-to-Text`)
-  }
-
-  return provider.transcribeAudio(audioBlob)
+  return provider.transcribeAudio
 }
 
 /**
- * Check if current provider supports STT
- * Accounts for custom providers with explicit hasSTTSupport setting
+ * Walk `STT_FALLBACK_CHAIN` and return the first provider whose API key is
+ * configured, or `null` when none are. The provider's transcriber is read
+ * from the registry so we never hardcode which functions to call.
+ */
+async function resolveSTTFallback(): Promise<{ providerID: string; transcribe: (blob: Blob) => Promise<string> } | null> {
+  const db = await getDB()
+  for (const providerID of STT_FALLBACK_CHAIN) {
+    const provider = providers[providerID]
+    if (!provider?.transcribeAudio) continue
+    const hasKey = await db.checkAPIKey(providerID)
+    if (hasKey) {
+      return { providerID, transcribe: provider.transcribeAudio }
+    }
+  }
+  return null
+}
+
+/**
+ * Transcribe audio using STT
+ * Routes to the active provider's native STT when available, otherwise walks
+ * the shared fallback chain. Throws when no native STT and no fallback is
+ * configured.
+ * @param audioBlob - Audio data to transcribe
+ * @returns Transcribed text
+ */
+export async function transcribeAudio(audioBlob: Blob): Promise<string> {
+  const providerID = await getCurrentProvider()
+
+  if (!providers[providerID]) {
+    throw new Error(`Provider '${providerID}' not found in registry`)
+  }
+
+  const native = await getNativeSTT(providerID)
+  if (native) {
+    return native(audioBlob)
+  }
+
+  const fallback = await resolveSTTFallback()
+  if (fallback) {
+    console.log(`[Router] '${providerID}' has no usable native STT — falling back to ${fallback.providerID}`)
+    return fallback.transcribe(audioBlob)
+  }
+
+  throw new Error(`No STT available for provider '${providerID}' and no fallback is configured`)
+}
+
+/**
+ * Check if STT is currently usable.
+ * True when the active provider has native STT enabled, or when at least one
+ * fallback provider has a configured API key.
  * @returns true if STT is supported, false otherwise
  */
 export async function supportsSTT(): Promise<boolean> {
   try {
     const providerID = await getCurrentProvider()
 
-    // Custom provider check - look at database setting
-    if (providerID === 'custom') {
-      const db = await getDB()
-      const settings = await db.getSettings()
-      return settings?.hasSTTSupport ?? false
-    }
+    if (await getNativeSTT(providerID)) return true
 
-    // BioLLM — STT supported if OpenAI (priority) or Groq API key is configured
-    if (providerID === 'biollm') {
-      const db = await getDB()
-      const openaiKey = await db.checkAPIKey('openai')
-      const groqKey = await db.checkAPIKey('groq')
-      return !!(openaiKey || groqKey)
-    }
-
-    // Built-in provider check
-    const provider = providers[providerID]
-    if (provider && provider.transcribeAudio) {
-      return true
-    }
-
-    return false
-  } catch (error) {
+    return (await resolveSTTFallback()) !== null
+  } catch {
     return false
   }
 }
