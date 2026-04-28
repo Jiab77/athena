@@ -458,19 +458,32 @@ export const STT_PROVIDERS: STTProvider[] = [
     ],
   },
   {
-    id: 'openai',
-    name: 'OpenAI',
-    models: [
-      {
-        id: 'whisper-1',
-        name: 'Whisper V1',
-        model: 'whisper-1',
-        description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
-        url: 'https://developers.openai.com/api/docs/models/whisper-1',
-      }
-    ],
+  id: 'openai',
+  name: 'OpenAI',
+  models: [
+  {
+  id: 'whisper-1',
+  name: 'Whisper V1',
+  model: 'whisper-1',
+  description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
+  url: 'https://developers.openai.com/api/docs/models/whisper-1',
+  }
+  ],
   },
-]
+  {
+  id: 'openrouter',
+  name: 'OpenRouter',
+  models: [
+  {
+  id: 'gemini-2.5-flash',
+  name: 'Gemini 2.5 Flash',
+  model: 'google/gemini-2.5-flash',
+  description: 'Multimodal Gemini model used for transcription via chat completions with audio input. Single OpenRouter key covers chat + STT.',
+  url: 'https://openrouter.ai/google/gemini-2.5-flash',
+  }
+  ],
+  },
+  ]
 
 /**
  * Text-to-Speech (TTS) Provider configurations

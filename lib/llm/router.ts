@@ -7,7 +7,7 @@ import { callGroqAPI, transcribeAudio as transcribeGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
 import { callBioLLMAPI } from './biollm'
-import { callOpenRouterAPI } from './openrouter'
+import { callOpenRouterAPI, transcribeAudio as transcribeOpenRouter } from './openrouter'
 import { detectTools } from './tools'
 
 /**
@@ -46,9 +46,10 @@ const providers: Record<string, LLMProvider> = {
   },
   openrouter: {
     callAPI: callOpenRouterAPI,
-    // No native STT — OpenRouter is a chat-completions-only gateway. Voice
-    // input is unavailable when this provider is selected; supportsSTT()
-    // will return false naturally via the registry check.
+    // STT performed via chat completions with an `input_audio` content block
+    // (OpenRouter has no dedicated Whisper endpoint). Lets users get STT with
+    // the same OpenRouter key already used for chat — see lib/llm/openrouter.ts.
+    transcribeAudio: transcribeOpenRouter,
   },
 }
 
