@@ -23,6 +23,130 @@
     "de": "Tedesco",
     "it": "Italiano"
   },
+  "home": {
+    "hero": {
+      "taglineLine1Prefix": "Il tuo",
+      "taglineLine1Highlight": "compagno IA",
+      "taglineLine1Suffix": "orientato alla privacy.",
+      "taglineLine2Accent": "Sempre fluttuante al tuo fianco.",
+      "taglineLine2Primary": "Senza mai esporre i tuoi dati.",
+      "activate": "ATTIVA ATHENA",
+      "learnMore": "SCOPRI DI PIÙ",
+      "statusOnline": "SISTEMA ONLINE • PRONTO PER L'IMPLEMENTAZIONE",
+      "statusOffline": "SISTEMA OFFLINE • CONFIGURARE"
+    },
+    "features": {
+      "title": "PERCHÉ SCEGLIERE ATHENA",
+      "privacy": {
+        "title": "Privacy prima di tutto",
+        "description": "Tutte le conversazioni crittografate localmente. I tuoi dati non lasciano mai il tuo dispositivo."
+      },
+      "alwaysOn": {
+        "title": "Sempre attivo",
+        "description": "Widget compagno fluttuante. Interagisci in qualsiasi momento da qualsiasi applicazione."
+      },
+      "personalized": {
+        "title": "Personalizzato",
+        "description": "Insegna al tuo compagno a pensare e agire come te. Un vero patrimonio digitale."
+      },
+      "openSource": {
+        "title": "Open source",
+        "description": "Sviluppo guidato dalla comunità. Trasparente, verificabile e sicuro."
+      }
+    },
+    "preview": {
+      "title": "IL TUO COMPAGNO TI ATTENDE",
+      "description1": "Il tuo compagno di pensiero. Condividi i tuoi interessi e osservala mentre impara a comprendere il tuo punto di vista.",
+      "description2": "Ogni conversazione crittografata e archiviata localmente. I tuoi pensieri e le tue idee appartengono solo a te.",
+      "startChatting": "INIZIA LA CHAT"
+    },
+    "cta": {
+      "title": "PRONTO ALL'IMPLEMENTAZIONE?",
+      "description": "Clicca il pulsante fluttuante qui sotto per attivare Athena. Nessuna registrazione richiesta. La tua privacy è garantita.",
+      "launch": "AVVIA ATHENA"
+    },
+    "footer": {
+      "madeWith": "è realizzato con ❤️ da",
+      "and": "e"
+    },
+    "alerts": {
+      "importFailed": "Importazione fallita. Controlla la console per i dettagli.",
+      "fileError": "Errore nell'elaborazione del file. Controlla la console per i dettagli."
+    }
+  },
+  "chat": {
+    "header": {
+      "title": "Chat",
+      "online": "Online",
+      "offline": "Offline",
+      "popOut": "Sgancia"
+    },
+    "messages": {
+      "empty": "Nessun messaggio ancora. Inizia una conversazione!",
+      "thinking": "Sto pensando...",
+      "transcribing": "Trascrivo...",
+      "imageAttached": "Immagine allegata",
+      "documentChars": "({count} caratteri)",
+      "copyMessage": "Copia messaggio",
+      "replayMessage": "Riproduci messaggio",
+      "stopReplay": "Interrompi riproduzione",
+      "chatImage": "Immagine della chat",
+      "generatedImage": "Immagine generata",
+      "downloadImage": "Scarica immagine generata"
+    },
+    "input": {
+      "placeholder": "Invia un messaggio...",
+      "attachFile": "Allega file",
+      "memoryTooltip": "Contesto IA: {used} / {total} messaggi",
+      "micUnavailable": "Riconoscimento vocale non disponibile per questo fornitore",
+      "micStop": "Interrompi registrazione",
+      "micTranscribing": "Trascrivo...",
+      "micRecord": "Registra audio",
+      "voiceOutputEnabled": "Output vocale attivato",
+      "voiceOutputDisabled": "Output vocale disattivato",
+      "sendMessage": "Invia messaggio"
+    },
+    "alerts": {
+      "micDenied": "Accesso al microfono negato o non disponibile",
+      "transcribeFailed": "Trascrizione audio fallita. Riprova."
+    },
+    "errors": {
+      "generic": "Mi dispiace, si è verificato un errore. Riprova.",
+      "rateLimit": "Limite di velocità raggiunto. Attendi un momento prima di riprovare.",
+      "payloadTooLarge": "Messaggio troppo grande. Prova ad accorciare il tuo input o caricare un file più piccolo.",
+      "serverError": "Errore del server. Riprova tra un momento.",
+      "tooManyRequests": "Troppe richieste. Attendi prima di riprovare.",
+      "authError": "Errore di autenticazione. Controlla la tua chiave API."
+    }
+  },
+  "companion": {
+    "popOut": "Sgancia",
+    "voiceEnable": "Attiva voce",
+    "voiceDisable": "Disattiva voce",
+    "micUnavailable": "Riconoscimento vocale non disponibile per questo fornitore",
+    "micTapStop": "Tocca per interrompere",
+    "micTranscribing": "Trascrivo...",
+    "micProcessing": "Elaboro...",
+    "micTapSpeak": "Tocca per parlare",
+    "voiceModeEnable": "Attiva modalità vocale",
+    "voiceModeDisable": "Disattiva modalità vocale",
+    "chatOpen": "Apri la finestra di chat",
+    "chatClose": "Chiudi la finestra di chat",
+    "voiceModeButton": "Modalità vocale",
+    "startChat": "Inizia chat",
+    "hideChat": "Nascondi chat",
+    "tabCompanion": "Compagno",
+    "tabChat": "Chat",
+    "live": "Dal vivo",
+    "insufficientCredits": "Crediti insufficienti",
+    "connectionFailed": "Connessione fallita",
+    "connecting": "Connessione...",
+    "liveAvatarLabel": "Avatar dal vivo di {name}",
+    "info": {
+      "personality": "Personalità",
+      "created": "Creato"
+    }
+  },
   "settings": {
     "title": "Impostazioni",
     "save": "Salva impostazioni",

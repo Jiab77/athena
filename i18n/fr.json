@@ -23,6 +23,130 @@
     "de": "Allemand",
     "it": "Italien"
   },
+  "home": {
+    "hero": {
+      "taglineLine1Prefix": "Votre",
+      "taglineLine1Highlight": "compagnon IA",
+      "taglineLine1Suffix": "respectueux de la vie privée.",
+      "taglineLine2Accent": "Toujours flottant à vos côtés.",
+      "taglineLine2Primary": "Sans jamais exposer vos données.",
+      "activate": "ACTIVER ATHENA",
+      "learnMore": "EN SAVOIR PLUS",
+      "statusOnline": "SYSTÈME EN LIGNE • PRÊT POUR LE DÉPLOIEMENT",
+      "statusOffline": "SYSTÈME HORS LIGNE • VEUILLEZ CONFIGURER"
+    },
+    "features": {
+      "title": "POURQUOI CHOISIR ATHENA",
+      "privacy": {
+        "title": "Confidentialité d'abord",
+        "description": "Toutes les conversations chiffrées localement. Vos données ne quittent jamais votre appareil."
+      },
+      "alwaysOn": {
+        "title": "Toujours actif",
+        "description": "Compagnon flottant. Interagissez à tout moment depuis n'importe quelle application."
+      },
+      "personalized": {
+        "title": "Personnalisé",
+        "description": "Apprenez à votre compagnon à penser et agir comme vous. Un véritable héritage numérique."
+      },
+      "openSource": {
+        "title": "Open source",
+        "description": "Développement communautaire. Transparent, auditable et sécurisé."
+      }
+    },
+    "preview": {
+      "title": "VOTRE COMPAGNON VOUS ATTEND",
+      "description1": "Votre compagnon de réflexion. Partagez vos centres d'intérêt et observez-la apprendre à comprendre votre perspective.",
+      "description2": "Chaque conversation chiffrée et stockée localement. Vos pensées et idées vous appartiennent.",
+      "startChatting": "DÉMARRER LA DISCUSSION"
+    },
+    "cta": {
+      "title": "PRÊT À DÉPLOYER ?",
+      "description": "Cliquez sur le bouton flottant ci-dessous pour activer Athena. Aucune inscription requise. Votre confidentialité est garantie.",
+      "launch": "LANCER ATHENA"
+    },
+    "footer": {
+      "madeWith": "est créé avec ❤️ par",
+      "and": "et"
+    },
+    "alerts": {
+      "importFailed": "Échec de l'importation. Vérifiez la console pour plus de détails.",
+      "fileError": "Erreur lors du traitement du fichier. Vérifiez la console pour plus de détails."
+    }
+  },
+  "chat": {
+    "header": {
+      "title": "Discussion",
+      "online": "En ligne",
+      "offline": "Hors ligne",
+      "popOut": "Détacher"
+    },
+    "messages": {
+      "empty": "Aucun message pour l'instant. Démarrez une conversation !",
+      "thinking": "Réflexion...",
+      "transcribing": "Transcription...",
+      "imageAttached": "Image jointe",
+      "documentChars": "({count} caractères)",
+      "copyMessage": "Copier le message",
+      "replayMessage": "Rejouer le message",
+      "stopReplay": "Arrêter la lecture",
+      "chatImage": "Image de la discussion",
+      "generatedImage": "Image générée",
+      "downloadImage": "Télécharger l'image générée"
+    },
+    "input": {
+      "placeholder": "Envoyer un message...",
+      "attachFile": "Joindre un fichier",
+      "memoryTooltip": "Contexte IA : {used} / {total} messages",
+      "micUnavailable": "Reconnaissance vocale indisponible pour ce fournisseur",
+      "micStop": "Arrêter l'enregistrement",
+      "micTranscribing": "Transcription...",
+      "micRecord": "Enregistrer un audio",
+      "voiceOutputEnabled": "Sortie vocale activée",
+      "voiceOutputDisabled": "Sortie vocale désactivée",
+      "sendMessage": "Envoyer le message"
+    },
+    "alerts": {
+      "micDenied": "Accès au microphone refusé ou indisponible",
+      "transcribeFailed": "Échec de la transcription audio. Veuillez réessayer."
+    },
+    "errors": {
+      "generic": "Désolé, une erreur s'est produite. Veuillez réessayer.",
+      "rateLimit": "Limite de débit atteinte. Veuillez patienter avant de réessayer.",
+      "payloadTooLarge": "Message trop volumineux. Essayez de raccourcir votre saisie ou téléverser un fichier plus petit.",
+      "serverError": "Erreur serveur. Veuillez réessayer dans un instant.",
+      "tooManyRequests": "Trop de requêtes. Veuillez patienter avant de réessayer.",
+      "authError": "Erreur d'authentification. Veuillez vérifier votre clé API."
+    }
+  },
+  "companion": {
+    "popOut": "Détacher",
+    "voiceEnable": "Activer la voix",
+    "voiceDisable": "Désactiver la voix",
+    "micUnavailable": "Reconnaissance vocale indisponible pour ce fournisseur",
+    "micTapStop": "Touchez pour arrêter",
+    "micTranscribing": "Transcription...",
+    "micProcessing": "Traitement...",
+    "micTapSpeak": "Touchez pour parler",
+    "voiceModeEnable": "Activer le mode vocal",
+    "voiceModeDisable": "Désactiver le mode vocal",
+    "chatOpen": "Ouvrir la fenêtre de discussion",
+    "chatClose": "Fermer la fenêtre de discussion",
+    "voiceModeButton": "Mode vocal",
+    "startChat": "Démarrer la discussion",
+    "hideChat": "Masquer la discussion",
+    "tabCompanion": "Compagnon",
+    "tabChat": "Discussion",
+    "live": "En direct",
+    "insufficientCredits": "Crédits insuffisants",
+    "connectionFailed": "Échec de la connexion",
+    "connecting": "Connexion...",
+    "liveAvatarLabel": "Avatar en direct de {name}",
+    "info": {
+      "personality": "Personnalité",
+      "created": "Créé"
+    }
+  },
   "settings": {
     "title": "Paramètres",
     "save": "Enregistrer les paramètres",

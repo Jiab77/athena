@@ -23,6 +23,130 @@
     "de": "German",
     "it": "Italian"
   },
+  "home": {
+    "hero": {
+      "taglineLine1Prefix": "Your",
+      "taglineLine1Highlight": "privacy-first",
+      "taglineLine1Suffix": "AI companion.",
+      "taglineLine2Accent": "Always floating by your side.",
+      "taglineLine2Primary": "Never exposing your data.",
+      "activate": "ACTIVATE ATHENA",
+      "learnMore": "LEARN MORE",
+      "statusOnline": "SYSTEM ONLINE • READY FOR DEPLOYMENT",
+      "statusOffline": "SYSTEM OFFLINE • PLEASE CONFIGURE"
+    },
+    "features": {
+      "title": "WHY CHOOSE ATHENA",
+      "privacy": {
+        "title": "Privacy First",
+        "description": "All conversations encrypted locally. Your data never leaves your device."
+      },
+      "alwaysOn": {
+        "title": "Always On",
+        "description": "Floating companion widget. Interact anytime from any application."
+      },
+      "personalized": {
+        "title": "Personalized",
+        "description": "Train your companion to think and act like you. True digital legacy."
+      },
+      "openSource": {
+        "title": "Open Source",
+        "description": "Community-driven development. Transparent, auditable, and secure."
+      }
+    },
+    "preview": {
+      "title": "YOUR COMPANION AWAITS",
+      "description1": "Your thinking companion. Share your interests, and watch as she learns to understand your perspective.",
+      "description2": "Every conversation encrypted and stored locally. Your thoughts and ideas are yours alone.",
+      "startChatting": "START CHATTING"
+    },
+    "cta": {
+      "title": "READY TO DEPLOY?",
+      "description": "Click the floating button below to activate Athena. No sign-up required. Your privacy is guaranteed.",
+      "launch": "LAUNCH ATHENA"
+    },
+    "footer": {
+      "madeWith": "is made with ❤️ by",
+      "and": "and"
+    },
+    "alerts": {
+      "importFailed": "Import failed. Check console for details.",
+      "fileError": "Error processing file. Check console for details."
+    }
+  },
+  "chat": {
+    "header": {
+      "title": "Chat",
+      "online": "Online",
+      "offline": "Offline",
+      "popOut": "Pop out"
+    },
+    "messages": {
+      "empty": "No messages yet. Start a conversation!",
+      "thinking": "Thinking...",
+      "transcribing": "Transcribing...",
+      "imageAttached": "Image attached",
+      "documentChars": "({count} chars)",
+      "copyMessage": "Copy message",
+      "replayMessage": "Replay message",
+      "stopReplay": "Stop replay",
+      "chatImage": "Chat image",
+      "generatedImage": "Generated image",
+      "downloadImage": "Download generated image"
+    },
+    "input": {
+      "placeholder": "Send a message...",
+      "attachFile": "Attach file",
+      "memoryTooltip": "AI context: {used} / {total} messages",
+      "micUnavailable": "STT not available for this provider",
+      "micStop": "Stop recording",
+      "micTranscribing": "Transcribing...",
+      "micRecord": "Record audio",
+      "voiceOutputEnabled": "Voice output enabled",
+      "voiceOutputDisabled": "Voice output disabled",
+      "sendMessage": "Send message"
+    },
+    "alerts": {
+      "micDenied": "Microphone access denied or unavailable",
+      "transcribeFailed": "Failed to transcribe audio. Please try again."
+    },
+    "errors": {
+      "generic": "Sorry, I encountered an error. Please try again.",
+      "rateLimit": "Rate limit reached. Please wait a moment before trying again.",
+      "payloadTooLarge": "Message too large. Try shortening your input or uploading a smaller file.",
+      "serverError": "Server error. Please try again in a moment.",
+      "tooManyRequests": "Too many requests. Please wait before trying again.",
+      "authError": "Authentication error. Please check your API key."
+    }
+  },
+  "companion": {
+    "popOut": "Pop out",
+    "voiceEnable": "Enable voice",
+    "voiceDisable": "Disable voice",
+    "micUnavailable": "STT not available for this provider",
+    "micTapStop": "Tap to stop",
+    "micTranscribing": "Transcribing...",
+    "micProcessing": "Processing...",
+    "micTapSpeak": "Tap to speak",
+    "voiceModeEnable": "Enable voice mode",
+    "voiceModeDisable": "Disable voice mode",
+    "chatOpen": "Open the chat window",
+    "chatClose": "Close the chat window",
+    "voiceModeButton": "Voice Mode",
+    "startChat": "Start Chat",
+    "hideChat": "Hide Chat",
+    "tabCompanion": "Companion",
+    "tabChat": "Chat",
+    "live": "Live",
+    "insufficientCredits": "Insufficient credits",
+    "connectionFailed": "Connection failed",
+    "connecting": "Connecting...",
+    "liveAvatarLabel": "{name} live avatar",
+    "info": {
+      "personality": "Personality",
+      "created": "Created"
+    }
+  },
   "settings": {
     "title": "Settings",
     "save": "Save Settings",

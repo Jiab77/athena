@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/tooltip'
 import { AnimatedCharacter } from '@/components/animated-character'
 import { StatusBadge } from '@/components/status-badge'
+import { useTranslation } from '@/hooks/use-translation'
 import type {
   CompanionData,
   PersonalityType,
@@ -93,6 +94,7 @@ export function CompanionWindow({
   tabbed = false,
 }: CompanionWindowProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const { t } = useTranslation()
 
   // Attach Decart WebRTC stream to video element when stream arrives
   useEffect(() => {
@@ -130,7 +132,7 @@ export function CompanionWindow({
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Pop out</p>
+                <p>{t('companion.popOut')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -171,7 +173,7 @@ export function CompanionWindow({
                       playsInline
                       muted={false}
                       className="w-full h-full object-cover"
-                      aria-label={`${companion.name} live avatar`}
+                      aria-label={t('companion.liveAvatarLabel', { name: companion.name })}
                     />
                   ) : (
                     // Fallback — static avatar while connecting or on error
@@ -186,7 +188,7 @@ export function CompanionWindow({
                 <div className={`absolute bottom-1 right-1 z-10 flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border shadow-md ${decartError ? 'border-destructive/40' : 'border-primary/30'}`}>
                   <div className={`h-2 w-2 rounded-full flex-shrink-0 ${decartStream ? 'bg-green-500 animate-pulse' : decartError ? 'bg-destructive' : 'bg-amber-500 animate-pulse'}`} />
                   <span className="text-xs font-medium text-foreground truncate max-w-[140px]">
-                    {decartStream ? 'Live' : decartError ? (decartError.toLowerCase().includes('credit') ? 'Insufficient credits' : 'Connection failed') : 'Connecting...'}
+                    {decartStream ? t('companion.live') : decartError ? (decartError.toLowerCase().includes('credit') ? t('companion.insufficientCredits') : t('companion.connectionFailed')) : t('companion.connecting')}
                   </span>
                 </div>
               </>
@@ -256,7 +258,7 @@ export function CompanionWindow({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="left">
-                    <p>{voiceOutputEnabled ? 'Disable voice' : 'Enable voice'}</p>
+                    <p>{voiceOutputEnabled ? t('companion.voiceDisable') : t('companion.voiceEnable')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -290,14 +292,14 @@ export function CompanionWindow({
                 <TooltipContent side="bottom">
                   <p>
                     {!sttSupported
-                      ? 'STT not available for this provider'
+                      ? t('companion.micUnavailable')
                       : voiceState === 'recording'
-                        ? 'Tap to stop'
+                        ? t('companion.micTapStop')
                         : voiceState === 'transcribing'
-                          ? 'Transcribing...'
+                          ? t('companion.micTranscribing')
                           : voiceState === 'processing'
-                            ? 'Processing...'
-                            : 'Tap to speak'}
+                            ? t('companion.micProcessing')
+                            : t('companion.micTapSpeak')}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -309,7 +311,7 @@ export function CompanionWindow({
         <div className="mt-auto p-4 bg-muted/30 border-t border-border">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Personality</p>
+              <p className="text-xs text-muted-foreground font-medium">{t('companion.info.personality')}</p>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -322,7 +324,7 @@ export function CompanionWindow({
               </TooltipProvider>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Created</p>
+              <p className="text-xs text-muted-foreground font-medium">{t('companion.info.created')}</p>
               <p className="text-foreground text-xs">
                 {new Date(companion.createdAt).toLocaleDateString()}
               </p>
@@ -349,11 +351,11 @@ export function CompanionWindow({
                   onClick={onVoiceModeToggle}
                 >
                   <Mic2 className="h-4 w-4" />
-                  <span className="text-xs">Voice Mode</span>
+                  <span className="text-xs">{t('companion.voiceModeButton')}</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>{isVoiceMode ? 'Disable voice mode' : 'Enable voice mode'}</p>
+                <p>{isVoiceMode ? t('companion.voiceModeDisable') : t('companion.voiceModeEnable')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -376,11 +378,11 @@ export function CompanionWindow({
                 ].join(' ')}
               >
                 <Keyboard className="h-4 w-4" />
-                <span className="text-xs">{isChatVisible ? 'Hide Chat' : 'Start Chat'}</span>
+                <span className="text-xs">{isChatVisible ? t('companion.hideChat') : t('companion.startChat')}</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p>{isChatVisible ? 'Close the chat window' : 'Open the chat window'}</p>
+              <p>{isChatVisible ? t('companion.chatClose') : t('companion.chatOpen')}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

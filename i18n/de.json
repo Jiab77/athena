@@ -23,6 +23,130 @@
     "de": "Deutsch",
     "it": "Italienisch"
   },
+  "home": {
+    "hero": {
+      "taglineLine1Prefix": "Ihr",
+      "taglineLine1Highlight": "datenschutzorientierter",
+      "taglineLine1Suffix": "KI-Begleiter.",
+      "taglineLine2Accent": "Immer schwebend an Ihrer Seite.",
+      "taglineLine2Primary": "Niemals werden Ihre Daten preisgegeben.",
+      "activate": "ATHENA AKTIVIEREN",
+      "learnMore": "MEHR ERFAHREN",
+      "statusOnline": "SYSTEM ONLINE • BEREIT FÜR DEN EINSATZ",
+      "statusOffline": "SYSTEM OFFLINE • BITTE KONFIGURIEREN"
+    },
+    "features": {
+      "title": "WARUM ATHENA WÄHLEN",
+      "privacy": {
+        "title": "Datenschutz zuerst",
+        "description": "Alle Konversationen lokal verschlüsselt. Ihre Daten verlassen niemals Ihr Gerät."
+      },
+      "alwaysOn": {
+        "title": "Immer verfügbar",
+        "description": "Schwebendes Begleiter-Widget. Interagieren Sie jederzeit aus jeder Anwendung."
+      },
+      "personalized": {
+        "title": "Personalisiert",
+        "description": "Trainieren Sie Ihren Begleiter, wie Sie zu denken und zu handeln. Ein wahres digitales Erbe."
+      },
+      "openSource": {
+        "title": "Open Source",
+        "description": "Community-getriebene Entwicklung. Transparent, prüfbar und sicher."
+      }
+    },
+    "preview": {
+      "title": "IHR BEGLEITER WARTET",
+      "description1": "Ihr Denkbegleiter. Teilen Sie Ihre Interessen und beobachten Sie, wie sie lernt, Ihre Perspektive zu verstehen.",
+      "description2": "Jede Konversation lokal verschlüsselt und gespeichert. Ihre Gedanken und Ideen gehören Ihnen allein.",
+      "startChatting": "GESPRÄCH STARTEN"
+    },
+    "cta": {
+      "title": "BEREIT FÜR DEN EINSATZ?",
+      "description": "Klicken Sie auf den schwebenden Button unten, um Athena zu aktivieren. Keine Anmeldung erforderlich. Ihre Privatsphäre ist garantiert.",
+      "launch": "ATHENA STARTEN"
+    },
+    "footer": {
+      "madeWith": "wird mit ❤️ entwickelt von",
+      "and": "und"
+    },
+    "alerts": {
+      "importFailed": "Import fehlgeschlagen. Details siehe Konsole.",
+      "fileError": "Fehler bei der Dateiverarbeitung. Details siehe Konsole."
+    }
+  },
+  "chat": {
+    "header": {
+      "title": "Chat",
+      "online": "Online",
+      "offline": "Offline",
+      "popOut": "Ablösen"
+    },
+    "messages": {
+      "empty": "Noch keine Nachrichten. Starten Sie ein Gespräch!",
+      "thinking": "Denkt nach...",
+      "transcribing": "Transkribiert...",
+      "imageAttached": "Bild angehängt",
+      "documentChars": "({count} Zeichen)",
+      "copyMessage": "Nachricht kopieren",
+      "replayMessage": "Nachricht erneut abspielen",
+      "stopReplay": "Wiedergabe stoppen",
+      "chatImage": "Chat-Bild",
+      "generatedImage": "Generiertes Bild",
+      "downloadImage": "Generiertes Bild herunterladen"
+    },
+    "input": {
+      "placeholder": "Nachricht senden...",
+      "attachFile": "Datei anhängen",
+      "memoryTooltip": "KI-Kontext: {used} / {total} Nachrichten",
+      "micUnavailable": "Spracherkennung für diesen Anbieter nicht verfügbar",
+      "micStop": "Aufnahme stoppen",
+      "micTranscribing": "Transkribiert...",
+      "micRecord": "Audio aufnehmen",
+      "voiceOutputEnabled": "Sprachausgabe aktiviert",
+      "voiceOutputDisabled": "Sprachausgabe deaktiviert",
+      "sendMessage": "Nachricht senden"
+    },
+    "alerts": {
+      "micDenied": "Mikrofonzugriff verweigert oder nicht verfügbar",
+      "transcribeFailed": "Audio-Transkription fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "errors": {
+      "generic": "Entschuldigung, ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "rateLimit": "Anfragelimit erreicht. Bitte warten Sie einen Moment, bevor Sie es erneut versuchen.",
+      "payloadTooLarge": "Nachricht zu groß. Versuchen Sie, Ihre Eingabe zu kürzen oder eine kleinere Datei hochzuladen.",
+      "serverError": "Serverfehler. Bitte versuchen Sie es in einem Moment erneut.",
+      "tooManyRequests": "Zu viele Anfragen. Bitte warten Sie, bevor Sie es erneut versuchen.",
+      "authError": "Authentifizierungsfehler. Bitte überprüfen Sie Ihren API-Schlüssel."
+    }
+  },
+  "companion": {
+    "popOut": "Ablösen",
+    "voiceEnable": "Stimme aktivieren",
+    "voiceDisable": "Stimme deaktivieren",
+    "micUnavailable": "Spracherkennung für diesen Anbieter nicht verfügbar",
+    "micTapStop": "Zum Stoppen tippen",
+    "micTranscribing": "Transkribiert...",
+    "micProcessing": "Verarbeitet...",
+    "micTapSpeak": "Zum Sprechen tippen",
+    "voiceModeEnable": "Sprachmodus aktivieren",
+    "voiceModeDisable": "Sprachmodus deaktivieren",
+    "chatOpen": "Chat-Fenster öffnen",
+    "chatClose": "Chat-Fenster schließen",
+    "voiceModeButton": "Sprachmodus",
+    "startChat": "Chat starten",
+    "hideChat": "Chat ausblenden",
+    "tabCompanion": "Begleiter",
+    "tabChat": "Chat",
+    "live": "Live",
+    "insufficientCredits": "Nicht genügend Guthaben",
+    "connectionFailed": "Verbindung fehlgeschlagen",
+    "connecting": "Verbindet...",
+    "liveAvatarLabel": "Live-Avatar von {name}",
+    "info": {
+      "personality": "Persönlichkeit",
+      "created": "Erstellt"
+    }
+  },
   "settings": {
     "title": "Einstellungen",
     "save": "Einstellungen speichern",

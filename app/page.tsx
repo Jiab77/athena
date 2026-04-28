@@ -210,7 +210,7 @@ export default function Home() {
     try {
       fileInputRef.current?.click()
     } catch (error) {
-      alert('Import failed. Check console for details.')
+      alert(t('home.alerts.importFailed'))
     }
   }
 
@@ -227,7 +227,7 @@ export default function Home() {
         fileInputRef.current.value = ''
       }
     } catch (error) {
-      alert('Error processing file. Check console for details.')
+      alert(t('home.alerts.fileError'))
     }
   }
 
@@ -238,30 +238,26 @@ export default function Home() {
   const features = [
     {
       icon: <Lock className="h-6 w-6" />,
-      title: 'Privacy First',
-      description:
-        'All conversations encrypted locally. Your data never leaves your device.',
+      title: t('home.features.privacy.title'),
+      description: t('home.features.privacy.description'),
       color: 'from-primary/20 to-primary/5',
     },
     {
       icon: <Zap className="h-6 w-6" />,
-      title: 'Always On',
-      description:
-        'Floating companion widget. Interact anytime from any application.',
+      title: t('home.features.alwaysOn.title'),
+      description: t('home.features.alwaysOn.description'),
       color: 'from-accent/20 to-accent/5',
     },
     {
       icon: <Users className="h-6 w-6" />,
-      title: 'Personalized',
-      description:
-        'Train your companion to think and act like you. True digital legacy.',
+      title: t('home.features.personalized.title'),
+      description: t('home.features.personalized.description'),
       color: 'from-primary/20 to-accent/20',
     },
     {
       icon: <Code className="h-6 w-6" />,
-      title: 'Open Source',
-      description:
-        'Community-driven development. Transparent, auditable, and secure.',
+      title: t('home.features.openSource.title'),
+      description: t('home.features.openSource.description'),
       color: 'from-accent/20 to-primary/20',
     },
   ]
@@ -295,8 +291,8 @@ export default function Home() {
           </div>
 
           <p className="mx-auto max-w-3xl text-lg sm:text-2xl font-light text-foreground/90 mb-12 leading-relaxed">
-            Your <span className="text-primary font-semibold">privacy-first</span> AI companion.<br />
-            <span className="text-accent">Always floating by your side.</span> <span className="text-primary">Never exposing your data.</span>
+            {t('home.hero.taglineLine1Prefix')} <span className="text-primary font-semibold">{t('home.hero.taglineLine1Highlight')}</span> {t('home.hero.taglineLine1Suffix')}<br />
+            <span className="text-accent">{t('home.hero.taglineLine2Accent')}</span> <span className="text-primary">{t('home.hero.taglineLine2Primary')}</span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -305,7 +301,7 @@ export default function Home() {
               onClick={() => setShowCompanion(true)}
               className="bg-primary hover:bg-primary/80 text-foreground font-bold px-8 py-6 text-lg rounded-lg border-2 border-primary/50 shadow-lg shadow-primary/50 hover:shadow-primary/70 transition-all cursor-pointer"
             >
-              ⚡ ACTIVATE ATHENA
+              <span aria-hidden="true">⚡</span> {t('home.hero.activate')}
             </Button>
             <Button
               size="lg"
@@ -313,7 +309,7 @@ export default function Home() {
               onClick={scrollToFeatures}
               className="border-2 border-accent text-accent hover:text-accent font-bold px-8 py-6 text-lg rounded-lg hover:shadow-accent/50 hover:shadow-lg transition-all bg-transparent cursor-pointer hover:bg-accent/5"
             >
-              LEARN MORE
+              {t('home.hero.learnMore')}
             </Button>
           </div>
 
@@ -321,7 +317,7 @@ export default function Home() {
           <div className="mt-12 flex items-center justify-center gap-2 text-sm">
             <div className={`w-2 h-2 rounded-full animate-pulse ${isOnline ? 'bg-primary' : 'bg-gray-500'}`} />
             <span className={isOnline ? 'text-muted-foreground' : 'text-gray-500'}>
-              {isOnline ? 'SYSTEM ONLINE • READY FOR DEPLOYMENT' : 'SYSTEM OFFLINE • PLEASE CONFIGURE'}
+              {isOnline ? t('home.hero.statusOnline') : t('home.hero.statusOffline')}
             </span>
           </div>
         </div>
@@ -332,7 +328,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl sm:text-5xl font-black text-center mb-20 tracking-tight">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-              WHY CHOOSE ATHENA
+              {t('home.features.title')}
             </span>
           </h2>
 
@@ -367,7 +363,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl sm:text-5xl font-black mb-20 text-center tracking-tight">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-              YOUR COMPANION AWAITS
+              {t('home.preview.title')}
             </span>
           </h2>
 
@@ -399,15 +395,11 @@ export default function Home() {
               <div className="space-y-4 text-muted-foreground">
                 <div className="flex gap-3">
                   <div className="w-1 bg-primary rounded-full flex-shrink-0 mt-1" />
-                  <p>
-                    Your thinking companion. Share your interests, and watch as she learns to understand your perspective.
-                  </p>
+                  <p>{t('home.preview.description1')}</p>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-1 bg-accent rounded-full flex-shrink-0 mt-1" />
-                  <p>
-                    Every conversation encrypted and stored locally. Your thoughts and ideas are yours alone.
-                  </p>
+                  <p>{t('home.preview.description2')}</p>
                 </div>
               </div>
 
@@ -419,7 +411,7 @@ export default function Home() {
                   }}
                   className="bg-primary hover:bg-primary/80 text-foreground font-bold px-6 py-3 rounded-lg border border-primary/50 shadow-lg shadow-primary/50 hover:shadow-primary/70 transition-all cursor-pointer"
                 >
-                  💬 START CHATTING
+                  <span aria-hidden="true">💬</span> {t('home.preview.startChatting')}
                 </Button>
               </div>
             </div>
@@ -434,17 +426,17 @@ export default function Home() {
             <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 rounded-2xl blur-3xl opacity-40" />
             <div className="relative bg-background border-2 border-primary/30 rounded-2xl px-4 py-6">
               <h2 className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-8 tracking-tight">
-                READY TO DEPLOY?
+                {t('home.cta.title')}
               </h2>
               <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-                Click the floating button below to activate Athena. No sign-up required. Your privacy is guaranteed.
+                {t('home.cta.description')}
               </p>
               <Button
                 size="lg"
                 onClick={() => setShowCompanion(true)}
                 className="bg-accent hover:bg-accent/80 text-foreground font-bold px-4 sm:px-8 py-6 text-lg rounded-lg border-2 border-accent/50 shadow-lg shadow-accent/50 hover:shadow-accent/70 transition-all cursor-pointer"
               >
-                🚀 LAUNCH ATHENA
+                <span aria-hidden="true">🚀</span> {t('home.cta.launch')}
               </Button>
             </div>
           </div>
@@ -548,7 +540,7 @@ export default function Home() {
           >
             Athena
           </a>
-          {' '}is made with ❤️ by{' '}
+          {' '}{t('home.footer.madeWith')}{' '}
           <a
             href="https://github.com/Jiab77"
             target="_blank"
@@ -557,7 +549,7 @@ export default function Home() {
           >
             Jiab77
           </a>
-          {' '}and{' '}
+          {' '}{t('home.footer.and')}{' '}
           <a
             href="https://v0.dev"
             target="_blank"
