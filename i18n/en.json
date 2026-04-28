@@ -56,7 +56,10 @@
     },
     "preview": {
       "title": "YOUR COMPANION AWAITS",
-      "description1": "Your thinking companion. Share your interests, and watch as she learns to understand your perspective.",
+      "description1": {
+        "default": "Your thinking companion. Share your interests, and watch as she learns to understand your perspective.",
+        "m": "Your thinking companion. Share your interests, and watch as he learns to understand your perspective."
+      },
       "description2": "Every conversation encrypted and stored locally. Your thoughts and ideas are yours alone.",
       "startChatting": "START CHATTING"
     },

@@ -26,7 +26,7 @@
   "home": {
     "hero": {
       "taglineLine1Prefix": "Il tuo",
-      "taglineLine1Highlight": "compagno IA",
+      "taglineLine1Highlight": { "default": "compagna IA", "m": "compagno IA" },
       "taglineLine1Suffix": "orientato alla privacy.",
       "taglineLine2Accent": "Sempre fluttuante al tuo fianco.",
       "taglineLine2Primary": "Senza mai esporre i tuoi dati.",
@@ -47,7 +47,10 @@
       },
       "personalized": {
         "title": "Personalizzato",
-        "description": "Insegna al tuo compagno a pensare e agire come te. Un vero patrimonio digitale."
+        "description": {
+          "default": "Insegna alla tua compagna a pensare e agire come te. Un vero patrimonio digitale.",
+          "m": "Insegna al tuo compagno a pensare e agire come te. Un vero patrimonio digitale."
+        }
       },
       "openSource": {
         "title": "Open source",
@@ -55,8 +58,11 @@
       }
     },
     "preview": {
-      "title": "IL TUO COMPAGNO TI ATTENDE",
-      "description1": "Il tuo compagno di pensiero. Condividi i tuoi interessi e osservala mentre impara a comprendere il tuo punto di vista.",
+      "title": { "default": "LA TUA COMPAGNA TI ATTENDE", "m": "IL TUO COMPAGNO TI ATTENDE" },
+      "description1": {
+        "default": "La tua compagna di pensiero. Condividi i tuoi interessi e osservala mentre impara a comprendere il tuo punto di vista.",
+        "m": "Il tuo compagno di pensiero. Condividi i tuoi interessi e osservalo mentre impara a comprendere il tuo punto di vista."
+      },
       "description2": "Ogni conversazione crittografata e archiviata localmente. I tuoi pensieri e le tue idee appartengono solo a te.",
       "startChatting": "INIZIA LA CHAT"
     },

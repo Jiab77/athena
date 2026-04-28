@@ -26,9 +26,12 @@
   "home": {
     "hero": {
       "taglineLine1Prefix": "Votre",
-      "taglineLine1Highlight": "compagnon IA",
+      "taglineLine1Highlight": { "default": "compagne IA", "m": "compagnon IA" },
       "taglineLine1Suffix": "respectueux de la vie privée.",
-      "taglineLine2Accent": "Toujours flottant à vos côtés.",
+      "taglineLine2Accent": {
+        "default": "Toujours flottante à vos côtés.",
+        "m": "Toujours flottant à vos côtés."
+      },
       "taglineLine2Primary": "Sans jamais exposer vos données.",
       "activate": "ACTIVER ATHENA",
       "learnMore": "EN SAVOIR PLUS",
@@ -43,11 +46,17 @@
       },
       "alwaysOn": {
         "title": "Toujours actif",
-        "description": "Compagnon flottant. Interagissez à tout moment depuis n'importe quelle application."
+        "description": {
+          "default": "Compagne flottante. Interagissez à tout moment depuis n'importe quelle application.",
+          "m": "Compagnon flottant. Interagissez à tout moment depuis n'importe quelle application."
+        }
       },
       "personalized": {
         "title": "Personnalisé",
-        "description": "Apprenez à votre compagnon à penser et agir comme vous. Un véritable héritage numérique."
+        "description": {
+          "default": "Apprenez à votre compagne à penser et agir comme vous. Un véritable héritage numérique.",
+          "m": "Apprenez à votre compagnon à penser et agir comme vous. Un véritable héritage numérique."
+        }
       },
       "openSource": {
         "title": "Open source",
@@ -55,8 +64,11 @@
       }
     },
     "preview": {
-      "title": "VOTRE COMPAGNON VOUS ATTEND",
-      "description1": "Votre compagnon de réflexion. Partagez vos centres d'intérêt et observez-la apprendre à comprendre votre perspective.",
+      "title": { "default": "VOTRE COMPAGNE VOUS ATTEND", "m": "VOTRE COMPAGNON VOUS ATTEND" },
+      "description1": {
+        "default": "Votre compagne de réflexion. Partagez vos centres d'intérêt et observez-la apprendre à comprendre votre perspective.",
+        "m": "Votre compagnon de réflexion. Partagez vos centres d'intérêt et observez-le apprendre à comprendre votre perspective."
+      },
       "description2": "Chaque conversation chiffrée et stockée localement. Vos pensées et idées vous appartiennent.",
       "startChatting": "DÉMARRER LA DISCUSSION"
     },

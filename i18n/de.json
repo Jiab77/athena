@@ -27,7 +27,7 @@
     "hero": {
       "taglineLine1Prefix": "Ihr",
       "taglineLine1Highlight": "datenschutzorientierter",
-      "taglineLine1Suffix": "KI-Begleiter.",
+      "taglineLine1Suffix": { "default": "KI-Begleiterin.", "m": "KI-Begleiter." },
       "taglineLine2Accent": "Immer schwebend an Ihrer Seite.",
       "taglineLine2Primary": "Niemals werden Ihre Daten preisgegeben.",
       "activate": "ATHENA AKTIVIEREN",
@@ -47,7 +47,10 @@
       },
       "personalized": {
         "title": "Personalisiert",
-        "description": "Trainieren Sie Ihren Begleiter, wie Sie zu denken und zu handeln. Ein wahres digitales Erbe."
+        "description": {
+          "default": "Trainieren Sie Ihre Begleiterin, wie Sie zu denken und zu handeln. Ein wahres digitales Erbe.",
+          "m": "Trainieren Sie Ihren Begleiter, wie Sie zu denken und zu handeln. Ein wahres digitales Erbe."
+        }
       },
       "openSource": {
         "title": "Open Source",
@@ -55,8 +58,11 @@
       }
     },
     "preview": {
-      "title": "IHR BEGLEITER WARTET",
-      "description1": "Ihr Denkbegleiter. Teilen Sie Ihre Interessen und beobachten Sie, wie sie lernt, Ihre Perspektive zu verstehen.",
+      "title": { "default": "IHRE BEGLEITERIN WARTET", "m": "IHR BEGLEITER WARTET" },
+      "description1": {
+        "default": "Ihre Denkbegleiterin. Teilen Sie Ihre Interessen und beobachten Sie, wie sie lernt, Ihre Perspektive zu verstehen.",
+        "m": "Ihr Denkbegleiter. Teilen Sie Ihre Interessen und beobachten Sie, wie er lernt, Ihre Perspektive zu verstehen."
+      },
       "description2": "Jede Konversation lokal verschlüsselt und gespeichert. Ihre Gedanken und Ideen gehören Ihnen allein.",
       "startChatting": "GESPRÄCH STARTEN"
     },
