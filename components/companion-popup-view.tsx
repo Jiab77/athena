@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AnimatedCharacter } from '@/components/animated-character'
 import type { CompanionData, VisualFormat, ExpressionState, EmotionState, VoiceState } from '@/lib/types'
 import { DEFAULT_VISUAL_FORMAT, DEFAULT_IDLE_EMOJI, EMOTION_EMOJIS } from '@/lib/constants'
+import { useTranslation } from '@/hooks/use-translation'
 
 const Avatar25D = lazy(() => import('@/components/avatar-2-5d').then(m => ({ default: m.Avatar25D })))
 
@@ -42,6 +43,7 @@ export function CompanionPopupView({
   onOpenChat,
 }: CompanionPopupViewProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (videoRef.current && decartStream) {
@@ -50,8 +52,8 @@ export function CompanionPopupView({
   }, [decartStream])
 
   const statusLabel = visualFormat === 'live-avatar'
-    ? decartStream ? 'Live' : decartError ? 'Connection failed' : 'Connecting...'
-    : isOnline ? 'Online' : 'Offline'
+    ? decartStream ? t('companion.live') : decartError ? t('companion.connectionFailed') : t('companion.connecting')
+    : isOnline ? t('companion.online') : t('companion.offline')
 
   const statusColor = visualFormat === 'live-avatar'
     ? decartStream ? 'bg-green-500 animate-pulse' : decartError ? 'bg-destructive' : 'bg-amber-500 animate-pulse'
@@ -68,7 +70,7 @@ export function CompanionPopupView({
             autoPlay
             playsInline
             className="w-full h-full object-cover"
-            aria-label={`${companion.name} live avatar`}
+            aria-label={t('companion.liveAvatarLabel', { name: companion.name })}
           />
         ) : (
           <img
@@ -135,7 +137,7 @@ export function CompanionPopupView({
                 <MessageSquare className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom"><p>Open chat</p></TooltipContent>
+            <TooltipContent side="bottom"><p>{t('companion.openChat')}</p></TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>
@@ -165,7 +167,7 @@ export function CompanionPopupView({
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>{voiceState === 'recording' ? 'Tap to stop' : voiceState === 'transcribing' ? 'Transcribing...' : voiceState === 'processing' ? 'Processing...' : 'Tap to speak'}</p>
+                <p>{voiceState === 'recording' ? t('companion.micTapStop') : voiceState === 'transcribing' ? t('companion.micTranscribing') : voiceState === 'processing' ? t('companion.micProcessing') : t('companion.micTapSpeak')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -188,7 +190,7 @@ export function CompanionPopupView({
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>{voiceOutputEnabled ? 'Disable voice' : 'Enable voice'}</p>
+                <p>{voiceOutputEnabled ? t('companion.voiceDisable') : t('companion.voiceEnable')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

@@ -145,7 +145,51 @@
     "info": {
       "personality": "Personnalité",
       "created": "Créé"
-    }
+    },
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "openChat": "Ouvrir le chat"
+  },
+  "history": {
+    "newConversation": "Nouvelle conversation",
+    "title": "Historique des conversations",
+    "loading": "Chargement...",
+    "empty": "Aucune conversation",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "il y a {count} jours",
+    "emptyConversation": "Conversation vide",
+    "moreConversations": "+{count} autres conversations",
+    "moreConversationsOne": "+1 autre conversation"
+  },
+  "export": {
+    "title": "Exporter les conversations",
+    "description": "Choisissez un format pour exporter votre historique de conversation avec Athena.",
+    "json": {
+      "title": "Format JSON",
+      "description": "Export complet avec structure complète. Idéal pour la sauvegarde et la réimportation."
+    },
+    "markdown": {
+      "title": "Format Markdown",
+      "description": "Transcription lisible. Facile à lire et à partager."
+    },
+    "exporting": "Exportation...",
+    "export": "Exporter",
+    "errorFallback": "Échec de l'export"
+  },
+  "import": {
+    "title": "Importer des conversations",
+    "description": "Vérifiez le contenu avant l'importation dans votre base de données.",
+    "format": "Format",
+    "fileSize": "Taille du fichier",
+    "conversations": "Conversations",
+    "exported": "Exporté",
+    "markdownWarning": "Les imports Markdown sont en mode aperçu uniquement. Utilisez JSON pour une récupération complète.",
+    "loadFailed": "Impossible de charger le fichier",
+    "errorFallback": "Échec de l'import",
+    "importing": "Importation...",
+    "import": "Importer",
+    "successAlert": "Import réussi : {imported} importées, {skipped} ignorées"
   },
   "settings": {
     "title": "Paramètres",

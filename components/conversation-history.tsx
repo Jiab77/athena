@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDB } from '@/lib/db-context'
+import { useTranslation } from '@/hooks/use-translation'
 import { decryptData } from '@/lib/crypto'
 import type { ConversationData } from '@/lib/types'
 
@@ -26,6 +27,7 @@ export function ConversationHistory({
   onNewConversation,
 }: ConversationHistoryProps) {
   const { db, dbReady } = useDB()
+  const { t, locale } = useTranslation()
   const [conversations, setConversations] = useState<ConversationData[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -106,14 +108,14 @@ export function ConversationHistory({
     const diffMs = now.getTime() - date.getTime()
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
-    if (diffDays === 0) return 'Today'
-    if (diffDays === 1) return 'Yesterday'
-    if (diffDays < 7) return `${diffDays} days ago`
-    return date.toLocaleDateString()
+    if (diffDays === 0) return t('history.today')
+    if (diffDays === 1) return t('history.yesterday')
+    if (diffDays < 7) return t('history.daysAgo', { count: diffDays })
+    return date.toLocaleDateString(locale === 'en' ? 'en-US' : locale)
   }
 
   const getPreview = (conv: ConversationData) => {
-    if (conv.messages.length === 0) return 'Empty conversation'
+    if (conv.messages.length === 0) return t('history.emptyConversation')
     const lastMsg = conv.messages[conv.messages.length - 1]
     const preview = lastMsg.content.slice(0, 40)
     return preview.length < lastMsg.content.length ? `${preview}...` : preview
@@ -125,7 +127,7 @@ export function ConversationHistory({
         variant="ghost"
         size="icon"
         onClick={onNewConversation}
-        title="New conversation"
+        title={t('history.newConversation')}
         className="h-8 w-8 cursor-pointer"
       >
         <MessageSquarePlus className="h-4 w-4" />
@@ -136,7 +138,7 @@ export function ConversationHistory({
           <Button
             variant="ghost"
             size="icon"
-            title="Conversation history"
+            title={t('history.title')}
             className="h-8 w-8 cursor-pointer"
           >
             <History className="h-4 w-4" />
@@ -145,11 +147,11 @@ export function ConversationHistory({
         <DropdownMenuContent align="end" className="w-64">
           {isLoading ? (
             <DropdownMenuItem disabled>
-              <span className="text-muted-foreground">Loading...</span>
+              <span className="text-muted-foreground">{t('history.loading')}</span>
             </DropdownMenuItem>
           ) : conversations.length === 0 ? (
             <DropdownMenuItem disabled>
-              <span className="text-muted-foreground">No conversations yet</span>
+              <span className="text-muted-foreground">{t('history.empty')}</span>
             </DropdownMenuItem>
           ) : (
             <>
@@ -184,7 +186,12 @@ export function ConversationHistory({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem disabled>
                     <span className="text-xs text-muted-foreground">
-                      +{conversations.length - 10} more conversations
+                      {t(
+                        conversations.length - 10 === 1
+                          ? 'history.moreConversationsOne'
+                          : 'history.moreConversations',
+                        { count: conversations.length - 10 }
+                      )}
                     </span>
                   </DropdownMenuItem>
                 </>

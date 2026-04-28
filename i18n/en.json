@@ -145,7 +145,51 @@
     "info": {
       "personality": "Personality",
       "created": "Created"
-    }
+    },
+    "online": "Online",
+    "offline": "Offline",
+    "openChat": "Open chat"
+  },
+  "history": {
+    "newConversation": "New conversation",
+    "title": "Conversation history",
+    "loading": "Loading...",
+    "empty": "No conversations yet",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count} days ago",
+    "emptyConversation": "Empty conversation",
+    "moreConversations": "+{count} more conversations",
+    "moreConversationsOne": "+1 more conversation"
+  },
+  "export": {
+    "title": "Export Conversations",
+    "description": "Choose a format for exporting your conversation history with Athena.",
+    "json": {
+      "title": "JSON Format",
+      "description": "Complete export with full structure. Best for backup and re-import."
+    },
+    "markdown": {
+      "title": "Markdown Format",
+      "description": "Human-readable transcript. Easy to read and share."
+    },
+    "exporting": "Exporting...",
+    "export": "Export",
+    "errorFallback": "Export failed"
+  },
+  "import": {
+    "title": "Import Conversations",
+    "description": "Review the contents before importing to your database.",
+    "format": "Format",
+    "fileSize": "File Size",
+    "conversations": "Conversations",
+    "exported": "Exported",
+    "markdownWarning": "Markdown imports are preview-only. Use JSON for full recovery.",
+    "loadFailed": "Failed to load file",
+    "errorFallback": "Import failed",
+    "importing": "Importing...",
+    "import": "Import",
+    "successAlert": "Import successful: {imported} imported, {skipped} skipped"
   },
   "settings": {
     "title": "Settings",

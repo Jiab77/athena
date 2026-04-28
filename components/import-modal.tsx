@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { detectFormatFromExtension, importFromJSON, importFromMarkdown } from '@/lib/import'
 import { handleFileImport } from '@/lib/import'
+import { useTranslation } from '@/hooks/use-translation'
 
 interface ImportModalProps {
   isOpen: boolean
@@ -31,6 +32,7 @@ export function ImportModal({ isOpen, onClose, file }: ImportModalProps) {
   const [isImporting, setIsImporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [summary, setSummary] = useState<ImportSummary | null>(null)
+  const { t, locale } = useTranslation()
 
   // Load file summary when file changes
   useState(() => {
@@ -56,7 +58,7 @@ export function ImportModal({ isOpen, onClose, file }: ImportModalProps) {
       } else if (format === 'markdown') {
         const conversationMatches = fileContent.match(/## Conversation \d+/g)
         conversationCount = conversationMatches?.length || 0
-        warning = 'Markdown imports are preview-only. Use JSON for full recovery.'
+        warning = t('import.markdownWarning')
       }
 
       const fileSizeKB = (file.size / 1024).toFixed(2)
@@ -70,7 +72,7 @@ export function ImportModal({ isOpen, onClose, file }: ImportModalProps) {
       })
       setError(null)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load file'
+      const message = err instanceof Error ? err.message : t('import.loadFailed')
       setError(message)
       setSummary(null)
     }
@@ -84,10 +86,10 @@ export function ImportModal({ isOpen, onClose, file }: ImportModalProps) {
 
     try {
       const result = await handleFileImport(file)
-      alert(`Import successful: ${result.imported} imported, ${result.skipped} skipped`)
+      alert(t('import.successAlert', { imported: result.imported, skipped: result.skipped }))
       onClose()
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Import failed'
+      const message = err instanceof Error ? err.message : t('import.errorFallback')
       setError(message)
     } finally {
       setIsImporting(false)
@@ -98,9 +100,9 @@ export function ImportModal({ isOpen, onClose, file }: ImportModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Import Conversations</DialogTitle>
+          <DialogTitle>{t('import.title')}</DialogTitle>
           <DialogDescription>
-            Review the contents before importing to your database.
+            {t('import.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -114,22 +116,22 @@ export function ImportModal({ isOpen, onClose, file }: ImportModalProps) {
           <Card className="p-4 space-y-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-muted-foreground text-xs font-semibold">Format</p>
+                <p className="text-muted-foreground text-xs font-semibold">{t('import.format')}</p>
                 <p className="font-medium capitalize">{summary.format}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-xs font-semibold">File Size</p>
+                <p className="text-muted-foreground text-xs font-semibold">{t('import.fileSize')}</p>
                 <p className="font-medium">{summary.fileSize}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-xs font-semibold">Conversations</p>
+                <p className="text-muted-foreground text-xs font-semibold">{t('import.conversations')}</p>
                 <p className="font-medium">{summary.conversationCount}</p>
               </div>
               {summary.exportDate && (
                 <div>
-                  <p className="text-muted-foreground text-xs font-semibold">Exported</p>
+                  <p className="text-muted-foreground text-xs font-semibold">{t('import.exported')}</p>
                   <p className="font-medium text-xs">
-                    {new Date(summary.exportDate).toLocaleDateString()}
+                    {new Date(summary.exportDate).toLocaleDateString(locale === 'en' ? 'en-US' : locale)}
                   </p>
                 </div>
               )}
@@ -150,14 +152,14 @@ export function ImportModal({ isOpen, onClose, file }: ImportModalProps) {
             disabled={isImporting}
             className="cursor-pointer"
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleImport}
             disabled={!summary || isImporting}
             className="cursor-pointer"
           >
-            {isImporting ? 'Importing...' : 'Import'}
+            {isImporting ? t('import.importing') : t('import.import')}
           </Button>
         </div>
       </DialogContent>

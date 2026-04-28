@@ -145,7 +145,51 @@
     "info": {
       "personality": "Persönlichkeit",
       "created": "Erstellt"
-    }
+    },
+    "online": "Online",
+    "offline": "Offline",
+    "openChat": "Chat öffnen"
+  },
+  "history": {
+    "newConversation": "Neue Unterhaltung",
+    "title": "Unterhaltungsverlauf",
+    "loading": "Wird geladen...",
+    "empty": "Noch keine Unterhaltungen",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "daysAgo": "vor {count} Tagen",
+    "emptyConversation": "Leere Unterhaltung",
+    "moreConversations": "+{count} weitere Unterhaltungen",
+    "moreConversationsOne": "+1 weitere Unterhaltung"
+  },
+  "export": {
+    "title": "Unterhaltungen exportieren",
+    "description": "Wählen Sie ein Format für den Export Ihres Unterhaltungsverlaufs mit Athena.",
+    "json": {
+      "title": "JSON-Format",
+      "description": "Vollständiger Export mit kompletter Struktur. Optimal für Backup und Re-Import."
+    },
+    "markdown": {
+      "title": "Markdown-Format",
+      "description": "Lesbarer Transkriptionstext. Einfach zu lesen und zu teilen."
+    },
+    "exporting": "Exportiere...",
+    "export": "Exportieren",
+    "errorFallback": "Export fehlgeschlagen"
+  },
+  "import": {
+    "title": "Unterhaltungen importieren",
+    "description": "Überprüfen Sie den Inhalt, bevor Sie in Ihre Datenbank importieren.",
+    "format": "Format",
+    "fileSize": "Dateigröße",
+    "conversations": "Unterhaltungen",
+    "exported": "Exportiert am",
+    "markdownWarning": "Markdown-Importe sind nur eine Vorschau. Verwenden Sie JSON für die vollständige Wiederherstellung.",
+    "loadFailed": "Datei konnte nicht geladen werden",
+    "errorFallback": "Import fehlgeschlagen",
+    "importing": "Importiere...",
+    "import": "Importieren",
+    "successAlert": "Import erfolgreich: {imported} importiert, {skipped} übersprungen"
   },
   "settings": {
     "title": "Einstellungen",

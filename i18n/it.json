@@ -145,7 +145,51 @@
     "info": {
       "personality": "Personalità",
       "created": "Creato"
-    }
+    },
+    "online": "Online",
+    "offline": "Offline",
+    "openChat": "Apri chat"
+  },
+  "history": {
+    "newConversation": "Nuova conversazione",
+    "title": "Cronologia conversazioni",
+    "loading": "Caricamento...",
+    "empty": "Nessuna conversazione",
+    "today": "Oggi",
+    "yesterday": "Ieri",
+    "daysAgo": "{count} giorni fa",
+    "emptyConversation": "Conversazione vuota",
+    "moreConversations": "+{count} altre conversazioni",
+    "moreConversationsOne": "+1 altra conversazione"
+  },
+  "export": {
+    "title": "Esporta conversazioni",
+    "description": "Scegli un formato per esportare la cronologia delle conversazioni con Athena.",
+    "json": {
+      "title": "Formato JSON",
+      "description": "Export completo con struttura integrale. Ideale per backup e re-import."
+    },
+    "markdown": {
+      "title": "Formato Markdown",
+      "description": "Trascrizione leggibile. Facile da leggere e condividere."
+    },
+    "exporting": "Esportazione...",
+    "export": "Esporta",
+    "errorFallback": "Esportazione fallita"
+  },
+  "import": {
+    "title": "Importa conversazioni",
+    "description": "Rivedi il contenuto prima di importarlo nel database.",
+    "format": "Formato",
+    "fileSize": "Dimensione file",
+    "conversations": "Conversazioni",
+    "exported": "Esportato",
+    "markdownWarning": "Gli import Markdown sono in modalità anteprima. Usa JSON per il ripristino completo.",
+    "loadFailed": "Impossibile caricare il file",
+    "errorFallback": "Import fallito",
+    "importing": "Importazione...",
+    "import": "Importa",
+    "successAlert": "Import riuscito: {imported} importate, {skipped} ignorate"
   },
   "settings": {
     "title": "Impostazioni",
