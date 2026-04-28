@@ -13,7 +13,7 @@ import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey
 const CHAT_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
 /** Static site title sent in the optional X-OpenRouter-Title header for OpenRouter's attribution leaderboard. */
-const ATTRIBUTION_TITLE = 'Athena'
+const ATTRIBUTION_TITLE = DEFAULT_COMPANION_NAME
 
 /**
  * Build the optional attribution headers OpenRouter consumes for their public
