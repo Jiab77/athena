@@ -1,0 +1,20 @@
+{
+  "fab": {
+    "install": "App installieren",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "companion": "Begleiter",
+    "settings": "Einstellungen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "languageDescription": "Wählen Sie Ihre bevorzugte Oberflächensprache"
+  },
+  "languages": {
+    "en": "Englisch",
+    "fr": "Französisch",
+    "de": "Deutsch",
+    "it": "Italienisch"
+  }
+}

@@ -12,6 +12,7 @@ import { ExportModal } from '@/components/export-modal'
 import { ImportModal } from '@/components/import-modal'
 import { useConnectionStatus } from '@/hooks/use-connection-status'
 import { usePWAInstall } from '@/hooks/use-pwa-install'
+import { useTranslation } from '@/hooks/use-translation'
 import {
   DEFAULT_COMPANION,
   DEFAULT_PERSONALITY,
@@ -47,6 +48,7 @@ export default function Home() {
   const { db, dbReady } = useDB()
   const { isOnline, refresh: refreshConnectionStatus } = useConnectionStatus()
   const { canInstall, install } = usePWAInstall()
+  const { t } = useTranslation()
   const featuresRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -459,7 +461,7 @@ export default function Home() {
             ? [
                 {
                   id: 'install',
-                  label: 'Install App',
+                  label: t('fab.install'),
                   icon: <MonitorDown className="h-5 w-5" />,
                   onClick: () => {
                     void install()
@@ -469,25 +471,25 @@ export default function Home() {
             : []),
           {
             id: 'export',
-            label: 'Export',
+            label: t('fab.export'),
             icon: <Download className="h-5 w-5" />,
             onClick: () => setShowExportModal(true),
           },
           {
             id: 'import',
-            label: 'Import',
+            label: t('fab.import'),
             icon: <Upload className="h-5 w-5" />,
             onClick: handleImport,
           },
           {
             id: 'companion',
-            label: 'Companion',
+            label: t('fab.companion'),
             icon: <MessageCircle className="h-5 w-5" />,
             onClick: () => setShowCompanion(true),
           },
           {
             id: 'settings',
-            label: 'Settings',
+            label: t('fab.settings'),
             icon: <Settings className="h-5 w-5" />,
             onClick: () => setShowSettings(true),
           },

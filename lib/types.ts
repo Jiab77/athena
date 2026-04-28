@@ -181,6 +181,7 @@ export interface StoredSettings {
   hasSTTSupport?: boolean // For custom providers, indicates if STT is supported
   customSTTModelName?: string // For custom providers, the STT model name
   customSTTUrl?: string // For custom providers, the STT API endpoint URL
+  locale?: 'en' | 'fr' | 'de' | 'it' // UI language preference — falls back to browser detection if unset
   updatedAt: string
 }
 
