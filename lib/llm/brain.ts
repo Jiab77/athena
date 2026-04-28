@@ -25,6 +25,7 @@ import { encryptData, decryptData } from '../crypto'
 import {
   DEFAULT_COMPANION_ID,
   DEFAULT_AUDIO_TYPE,
+  DEFAULT_MODEL_PROVIDER,
   LIVE_AVATAR_IDLE_TIMEOUT,
   LIVE_AVATAR_CONNECTION_TIMEOUT,
 } from '../constants'
@@ -360,7 +361,7 @@ export function useBrain({
       const history = await loadConversation()
       const allMessages = [...history, userMessage]
       const settings = await db?.getSettings()
-      const selectedProvider = settings?.selectedProvider || 'groq'
+      const selectedProvider = settings?.selectedProvider || DEFAULT_MODEL_PROVIDER
       const result = await callLLM(allMessages, selectedProvider)
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 

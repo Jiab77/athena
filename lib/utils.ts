@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import type { PersonalityType, GenderType, DocumentFormat, AudioControls } from './types'
+import type { PersonalityType, GenderType, DocumentFormat, AudioControls, TTSProvider } from './types'
 import {
   PERSONALITY_TRAITS,
   PERSONALITY_VOICES,
@@ -309,14 +309,34 @@ export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: ()
 }
 
 /**
- * Generate TTS audio based on voice settings stored in DB
- * Fetches voice provider and voice ID from settings, then generates and plays audio
- * Returns audio controls for playback management
- * @param text - The text to convert to speech
- * @param onPlay - Optional callback when audio starts playing
- * @param onEnd - Optional callback when audio finishes playing
- * @returns AudioControls interface for managing playback
+ * Lazy-loaded TTS adapter dispatchers, keyed by `TTSProvider` id.
+ *
+ * Each entry resolves to the adapter's `generateSpeech(text)` function via a
+ * dynamic import, so the bundle only pulls in the adapter that's actually
+ * selected at runtime. Adding a new TTS provider is a two-step change:
+ *   1. Add the entry to `TTS_PROVIDERS` in `lib/constants.ts`.
+ *   2. Add a corresponding loader here pointing at its `lib/voice/*.ts` adapter.
+ *
+ * The uniform contract every adapter must follow is `(text: string) => Promise<Blob>`.
  */
+const TTS_DISPATCHERS: Record<TTSProvider, () => Promise<(text: string) => Promise<Blob>>> = {
+  openai: async () => (await import('./voice/openai')).generateSpeech,
+  'resemble-ai': async () => (await import('./voice/resembleai')).generateSpeech,
+  openrouter: async () => (await import('./voice/openrouter')).generateSpeech,
+}
+
+/**
+ * Resolve and invoke the adapter for the given voice provider, returning the
+ * generated audio blob. Centralised so both `generateTTSBlob` and
+ * `generateAndPlayTTS` share one source of truth for provider routing.
+ */
+async function dispatchTTS(voiceProvider: TTSProvider, text: string): Promise<Blob> {
+  const loader = TTS_DISPATCHERS[voiceProvider]
+  if (!loader) throw new Error(`Unsupported TTS provider: ${voiceProvider}`)
+  const generateSpeech = await loader()
+  return generateSpeech(text)
+}
+
 /**
  * Generate TTS audio blob without playing it.
  * Used when the caller wants to handle playback manually (e.g. Decart live avatar).
@@ -324,38 +344,26 @@ export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: ()
 export async function generateTTSBlob(text: string): Promise<Blob> {
   const db = await getDB()
   const settings = await db.getSettings()
-  const voiceProvider = settings?.voiceProvider || DEFAULT_VOICE_PROVIDER
-
-  if (voiceProvider === 'openai') {
-    const { generateSpeech } = await import('./voice/openai')
-    return generateSpeech(text)
-  } else if (voiceProvider === 'resemble-ai') {
-    const { generateSpeech } = await import('./voice/resembleai')
-    return generateSpeech(text)
-  } else {
-    throw new Error(`Unsupported TTS provider: ${voiceProvider}`)
-  }
+  const voiceProvider = (settings?.voiceProvider || DEFAULT_VOICE_PROVIDER) as TTSProvider
+  return dispatchTTS(voiceProvider, text)
 }
 
+/**
+ * Generate TTS audio based on voice settings stored in DB and play it back.
+ * Fetches voice provider from settings, dispatches to the relevant adapter,
+ * then plays the audio with the provided callbacks.
+ * @param text - The text to convert to speech
+ * @param onPlay - Optional callback when audio starts playing
+ * @param onEnd - Optional callback when audio finishes playing
+ * @returns AudioControls interface for managing playback
+ */
 export async function generateAndPlayTTS(text: string, onPlay?: () => void, onEnd?: () => void): Promise<AudioControls> {
   try {
     const db = await getDB()
     const settings = await db.getSettings()
-    const voiceProvider = settings?.voiceProvider || DEFAULT_VOICE_PROVIDER
-    const selectedVoice = settings?.selectedVoice || DEFAULT_VOICE_ID
-    let audioBlob: Blob
-
-    if (voiceProvider === 'openai') {
-      const { generateSpeech } = await import('./voice/openai')
-      audioBlob = await generateSpeech(text)
-      return await playAudio(audioBlob, onPlay, onEnd)
-    } else if (voiceProvider === 'resemble-ai') {
-      const { generateSpeech } = await import('./voice/resembleai')
-      audioBlob = await generateSpeech(text)
-      return await playAudio(audioBlob, onPlay, onEnd)
-    } else {
-      throw new Error(`Unsupported TTS provider: ${voiceProvider}`)
-    }
+    const voiceProvider = (settings?.voiceProvider || DEFAULT_VOICE_PROVIDER) as TTSProvider
+    const audioBlob = await dispatchTTS(voiceProvider, text)
+    return await playAudio(audioBlob, onPlay, onEnd)
   } catch (error) {
     onEnd?.()
     throw error

@@ -98,9 +98,11 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
 
   // Voice settings logic
   const selectedTTSProvider = TTS_PROVIDERS.find((p) => p.id === voiceProvider)
-  const isOpenAIVoice = voiceProvider === 'openai'
-  const isOpenAIGlobal = provider === 'openai'
-  const shouldAutoPopulateVoiceKey = isOpenAIVoice && isOpenAIGlobal
+  // When chat and voice point at the same provider, share the API key entry
+  // for ergonomics — they're authenticating against the same account. Mix-and-
+  // match (e.g. OpenAI chat + ResembleAI voice) is unaffected and still
+  // requires a separate voice key, exactly as before.
+  const shouldAutoPopulateVoiceKey = voiceProvider === provider
   const displayVoiceApiKey = shouldAutoPopulateVoiceKey ? apiKey : voiceApiKey
 
   // Get available voices based on selected provider and gender

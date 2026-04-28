@@ -6,14 +6,21 @@ import {
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
+  STT_PROVIDERS,
 } from '../constants'
 import { getDB } from '../db'
 import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey } from '../utils'
 
 const CHAT_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
+/** Fallback STT model if the constants entry is somehow missing. Kept aligned with the registry's first model. */
+const DEFAULT_OPENROUTER_STT_MODEL = 'google/gemini-2.5-flash'
+
+/** Strict transcription instruction used as the user-facing text part alongside the audio block. */
+const TRANSCRIPTION_PROMPT = 'Transcribe the attached audio verbatim. Output only the transcription text. Do not add commentary, summaries, language labels, timestamps, or any other text.'
+
 /** Static site title sent in the optional X-OpenRouter-Title header for OpenRouter's attribution leaderboard. */
-const ATTRIBUTION_TITLE = 'Athena'
+const ATTRIBUTION_TITLE = DEFAULT_COMPANION_NAME
 
 /**
  * Build the optional attribution headers OpenRouter consumes for their public
@@ -189,6 +196,132 @@ export async function callOpenRouterAPI(
     }
   } catch (error) {
     console.log('[Athena] callOpenRouterAPI: caught error', error)
+    throw error
+  }
+}
+
+/**
+ * Convert a Blob's binary contents to a base64 string.
+ *
+ * Browser-side `btoa(...)` chokes on raw binary strings beyond a certain size,
+ * so we walk the byte array in chunks. The `input_audio` content block expects
+ * raw base64 (no `data:` URI prefix).
+ */
+async function blobToBase64(blob: Blob): Promise<string> {
+  const arrayBuffer = await blob.arrayBuffer()
+  const bytes = new Uint8Array(arrayBuffer)
+  const chunkSize = 0x8000 // 32KB — well under the call-stack limit for String.fromCharCode.apply
+  let binary = ''
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize)
+    binary += String.fromCharCode.apply(null, Array.from(chunk))
+  }
+  return btoa(binary)
+}
+
+/**
+ * Derive the audio format string OpenRouter expects in `input_audio.format`.
+ *
+ * Browser MediaRecorder typically emits `audio/webm;codecs=opus` (Chromium) or
+ * `audio/mp4` (Safari). We strip the `audio/` prefix and any codec suffix and
+ * map a couple of common aliases. Falls back to `webm` since that matches the
+ * project-wide `DEFAULT_AUDIO_TYPE` constant.
+ */
+function deriveAudioFormat(blobType: string): string {
+  if (!blobType) return 'webm'
+  // e.g. "audio/webm;codecs=opus" → "webm"
+  const subtype = blobType.split('/')[1]?.split(';')[0]?.trim().toLowerCase()
+  if (!subtype) return 'webm'
+  // Common aliases the chat model accepts
+  if (subtype === 'mpeg') return 'mp3'
+  if (subtype === 'x-wav') return 'wav'
+  return subtype
+}
+
+/**
+ * Transcribe audio via OpenRouter's chat completions endpoint.
+ *
+ * OpenRouter does not expose a dedicated Whisper-style `/audio/transcriptions`
+ * endpoint. Instead, transcription is performed by sending the audio as an
+ * `input_audio` content block to a multimodal chat model (e.g. Gemini 2.5
+ * Flash) along with a strict "transcribe verbatim" instruction. The function
+ * signature matches the OpenAI/Groq adapters so the router treats it
+ * identically — only the wire format differs.
+ *
+ * Trade-offs vs Whisper:
+ * - Pro: lets users get STT with the same OpenRouter key already used for chat.
+ * - Con: billed as chat tokens (typically more expensive on long recordings)
+ *   and quality depends on the chat model's audio understanding rather than a
+ *   dedicated speech model.
+ */
+export async function transcribeAudio(audioBlob: Blob): Promise<string> {
+  try {
+    const apiKey = await getAPIKey('openrouter')
+
+    console.log('[Athena] transcribeAudio (OpenRouter): starting', { blobSize: audioBlob.size, blobType: audioBlob.type })
+
+    // Resolve STT model from registry, mirroring the openai/groq adapters
+    const provider = STT_PROVIDERS.find(p => p.id === 'openrouter')
+    const sttModel = provider?.models[0]?.model || DEFAULT_OPENROUTER_STT_MODEL
+
+    const audioBase64 = await blobToBase64(audioBlob)
+    const audioFormat = deriveAudioFormat(audioBlob.type)
+
+    console.log('[Athena] transcribeAudio (OpenRouter): prepared audio', { model: sttModel, format: audioFormat, base64Length: audioBase64.length })
+
+    const reqBody = {
+      model: sttModel,
+      // No JSON mode here — we want raw transcription text, not the companion JSON envelope
+      messages: [
+        {
+          role: 'user' as const,
+          content: [
+            {
+              type: 'text' as const,
+              text: TRANSCRIPTION_PROMPT,
+            },
+            {
+              type: 'input_audio' as const,
+              input_audio: {
+                data: audioBase64,
+                format: audioFormat,
+              },
+            },
+          ],
+        },
+      ],
+    }
+
+    const response = await fetch(CHAT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        ...buildAttributionHeaders(),
+      },
+      body: JSON.stringify(reqBody),
+    })
+
+    console.log('[Athena] transcribeAudio (OpenRouter): HTTP response', { status: response.status, ok: response.ok })
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}))
+      console.log('[Athena] transcribeAudio (OpenRouter): error response', errorBody)
+      throw new Error(`Transcription failed: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    const text = data.choices?.[0]?.message?.content
+
+    console.log('[Athena] transcribeAudio (OpenRouter): result', { textLength: text?.length, hasText: !!text })
+
+    if (!text || typeof text !== 'string') {
+      throw new Error('No transcription text in response')
+    }
+
+    return text.trim()
+  } catch (error) {
+    console.log('[Athena] transcribeAudio (OpenRouter): caught error', error)
     throw error
   }
 }

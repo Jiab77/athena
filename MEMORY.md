@@ -118,7 +118,185 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
-> ## Session 32: PWA fixes, README restructure, AI framework improvements (04/18/2026)
+## Session 33: OpenRouter STT + TTS, multi-provider architectural cleanup (04/28/2026)
+
+### Overview
+
+A long, multi-day session shipped as PR [#33](https://github.com/Jiab77/athena/pull/33) — *"Improve localization, add OpenRouter support, and enhance security"*. 27 files changed, +2598 / -271 lines, 24 commits. Five threads ran in parallel, each substantial enough to be its own session under different circumstances:
+
+1. Comprehensive i18n with gender-aware translations (en, fr, de, it)
+2. OpenRouter as a fully-fledged provider across chat, STT, and TTS
+3. Security headers — CSP and friends — applied at the framework level
+4. PWA install prompt with custom flow
+5. Standardisation pass on UI tooltips and a sweeping multi-provider architectural cleanup
+
+The cleanup thread snowballed late in the session — once OpenRouter joined the registry, the OpenAI/Groq-centric special-cases that had been correct-when-written started looking like real misfits. That triggered a cascade of generalisations covered in detail below.
+
+Heavy emphasis throughout on *discuss before code* — most of the value came from clarifying intent before touching files, not from the edits themselves.
+
+---
+
+### 1. Internationalisation — `en` / `fr` / `de` / `it` with gender awareness
+
+The headline feature. Athena is a *companion*, and that word is gendered in every Romance language and in German. A naive `t('companion.label')` returning the same string regardless of avatar gender breaks immediately on French ("Compagne" vs "Compagnon"), Italian ("Compagna" vs "Compagno"), and German ("Begleiterin" vs "Begleiter").
+
+**Architecture:**
+- `lib/i18n.ts` — runtime helpers: browser detection (`navigator.language` → nearest supported locale, English fallback), nested-key resolution via dot notation, `{placeholder}` interpolation, gender-variant resolution
+- `hooks/use-translation.ts` — React hook that loads the user's locale + gender from IndexedDB on mount, falls back to browser detection, and re-renders consumers via two custom DOM events: `athena:locale-changed` and `athena:gender-changed`
+- `i18n/{en,fr,de,it}.json` — flat translation files, **English is the canonical schema** (the `TranslationDict` type is `typeof enDict`)
+- `lib/constants.ts` — `SUPPORTED_LOCALES`, `DEFAULT_LOCALE`, `LOCALE_LABELS` (always native script, e.g. `Français` not `French`), `TRANSLATIONS` aggregator
+- `lib/types.ts` — `Locale` derived from `SUPPORTED_LOCALES` so the union stays in lockstep, `StoredSettings.locale` field added
+
+**Gender variants** are encoded inline as `{ "default": "Compagne", "m": "Compagnon" }` for keys that need them, plain strings everywhere else. The `t()` helper detects the shape and resolves automatically. This was a deliberate choice over keying by gender at the JSON root — keeps the dictionary flat and lets translators see both forms together where it matters.
+
+**Settings UX:** new "Language" accordion section in `settings-panel.tsx` showing each locale in its native script (`English`, `Français`, `Deutsch`, `Italiano`). Locale persists to IndexedDB; the change event fires synchronously so every consumer hook re-renders without a page reload.
+
+**Adoption:** 22+ components migrated from inline strings to `useTranslation()`. Date formatting in `conversation-history.tsx` now uses the locale: `date.toLocaleDateString(locale === 'en' ? 'en-US' : locale)`.
+
+---
+
+### 2. OpenRouter — chat, STT, TTS, full multi-modality
+
+OpenRouter is a single-key gateway in front of OpenAI, Anthropic, Google, Meta, etc. The pitch is **one API key for everything** — and that framing turned out to drive several decisions later.
+
+**Chat (earlier in the session):**
+- `lib/llm/openrouter.ts` — `callOpenRouterAPI()` using OpenAI-compatible `/v1/chat/completions` (not the Responses API)
+- Optional attribution headers `HTTP-Referer` (origin) + `X-OpenRouter-Title: Athena` for OpenRouter's leaderboard, SSR-guarded
+- Curated 6-model list in `LLM_PROVIDERS` (GPT-5.2, GPT-5 Mini, Claude Opus 4.6, etc.) — deliberately static. Reasoning captured in `docs/OPEN_ROUTER.md`: 300+ raw models is a paralysis dropdown; lazy fetching forks the architecture for low payoff; power users have **Custom** as the escape hatch
+
+**STT (later in the session):**
+- `transcribeAudio()` added to `lib/llm/openrouter.ts`, dispatched via `/chat/completions` with an `input_audio` content block (no dedicated Whisper endpoint exists)
+- Registered in `STT_PROVIDERS` with `google/gemini-2.5-flash` as the model
+- Same function signature as OpenAI/Groq adapters so the registry contract is preserved
+
+**TTS (later in the session):**
+- New `lib/voice/openrouter.ts` mirroring `lib/voice/openai.ts` — OpenRouter proxies OpenAI's `/audio/speech` directly, so the adapter is essentially a different host + key
+- Voice IDs copied verbatim into a new `openrouter` entry of `TTS_VOICES` rather than aliased — each TTS provider stays a self-contained source of truth
+
+**Documentation:** `docs/OPEN_ROUTER.md` (146 lines) captures architectural decisions to avoid re-litigating them — attribution headers, static-vs-dynamic model list, `connect-src` permissiveness rationale.
+
+---
+
+### 3. Security headers — framework-level CSP
+
+Closed the longest-standing OWASP A02:2025 ticket in `docs/SECURITY_REPORT.md`.
+
+**Implementation:** `next.config.mjs` `headers()` function applies six headers to every response:
+
+- `Content-Security-Policy` — strict by default; `connect-src 'self' https:` is intentionally permissive to support user-configured custom provider endpoints, but still blocks `http://`, `data:`, and `blob:` exfiltration channels (the primary XSS exfiltration vectors). `'unsafe-inline'` + `'unsafe-eval'` in `script-src` required by Next.js runtime; `'unsafe-inline'` in `style-src` required by Tailwind.
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: microphone=(self), camera=(), geolocation=()` — camera deliberately disabled; microphone scoped to origin; geolocation off
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
+
+Cross-references updated in `docs/IMPLEMENTATION_STATUS.md`, `docs/REDESIGN.md`, `docs/ROADMAP.md`, `docs/SECURITY_REPORT.md`.
+
+---
+
+### 4. PWA install prompt
+
+Browsers stopped showing the default install mini-infobar reliably; users had to know to click the address-bar icon. Solved by capturing `beforeinstallprompt` and exposing a custom install flow.
+
+- `hooks/use-pwa-install.ts` — captures the event, suppresses the default infobar, exposes `canInstall` boolean + `install()` async function. Listens for `appinstalled` to clear the deferred prompt afterward. Locally typed `BeforeInstallPromptEvent` interface (not in `lib.dom.d.ts`). Documented gotcha: not supported on iOS Safari, where `canInstall` correctly stays `false` — iOS users use the Share menu manually.
+- New "Install App" item added to the FAB menu (`MonitorDown` icon), conditionally rendered when `canInstall === true`.
+
+---
+
+### 5. UI tooltip standardisation + API key UX polish
+
+- All ad-hoc tooltips converted to Radix `Tooltip` / `TooltipProvider` / `TooltipTrigger` / `TooltipContent` for consistent keyboard/screen-reader behaviour. Affected `companion-popup-view.tsx`, `companion-window.tsx`, `conversation-history.tsx`, `merged-companion-chat.tsx`, others.
+- `settings-panel.tsx` gained an `initialSection` prop so the empty-chat-state CTA can deep-link to the Model section when the user has no API key configured.
+- Voice mode badge auto-syncs with chat visibility (centralised in `merged-companion-chat.tsx`).
+
+---
+
+### 6. Multi-provider architectural cleanup (the cascade)
+
+Triggered late in the session when, after OpenRouter wired up, the question became *"what else hardcodes OpenAI/Groq?"*. Each item below was its own discussion before its own edit — we never bundled these.
+
+**a. `hooks/use-connection-status.ts`** — replaced hardcoded `groq | openai | biollm` OR-chain with `LLM_PROVIDERS.map(...)`. The online indicator now reflects every configured provider, not just the original three. Same registry-driven pattern would have caught this bug for any future provider too.
+
+**b. `components/settings-panel.tsx`** — generalised `isOpenAIVoice && isOpenAIGlobal` to `voiceProvider === provider`. Auto-populate-the-voice-key UX now works for OpenRouter and any future provider that does both chat and TTS, with mix-and-match (OpenAI chat + ResembleAI voice etc.) preserved.
+
+**c. `lib/utils.ts` TTS dispatcher** — collapsed two parallel `if/else if/else if` chains (`generateTTSBlob`, `generateAndPlayTTS`) into a single `TTS_DISPATCHERS` lookup table + `dispatchTTS` helper. Adding a future TTS provider is now a one-line map addition.
+
+**d. `lib/llm/router.ts` STT fallback** — collapsed two duplicated BioLLM-specific branches into `STT_FALLBACK_CHAIN` constant + `getNativeSTT()` + `resolveSTTFallback()` helpers. Side effect (intentional, user explicitly approved): Custom providers without `hasSTTSupport` now fall back to Whisper instead of throwing — consistent treatment for "active provider can't transcribe." OpenRouter deliberately excluded from the chain because chat-completions-STT is slower and token-billed than dedicated Whisper endpoints.
+
+**e. `lib/llm/brain.ts:363`** — replaced literal `'groq'` fallback with `DEFAULT_MODEL_PROVIDER` constant. Single source of truth for the boot default.
+
+**f. `lib/llm/emotions.ts` rewrite** — full architectural pass mirroring the STT cleanup. Per-provider `detectEmotion(systemPrompt, userText)` adapters added to `lib/llm/openai.ts` and `lib/llm/groq.ts`. `LLMProvider` interface gained optional `detectEmotion?` field. Router gained `EMOTION_FALLBACK_CHAIN` + `resolveEmotionDetector()` mirroring the STT pattern exactly. `emotions.ts` shrank from ~155 lines to 112 — now `fetch`-free, owns prompt construction + parsing + validation only, and delegates dispatch to the router. The `provider` parameter is finally honoured rather than silently ignored. Verbose logs preserved (user explicitly asked) and now split across coordinator + adapter layers for clearer traces.
+
+---
+
+### Skipped on purpose
+
+- **Groq pre-flight tool detection duplication** (`chat-interface.tsx:383` vs `router.ts:94`) — investigated end to end, before/after diff presented. User correctly called it micro-optimization for a project this young; not worth touching. Filed as "revisit if/when another provider needs pre-flight, or if the Groq vision-bug fires in practice."
+- **Streaming for chat completions** — discussed at length. Conclusion: streaming is a means, not a goal. Current non-streaming UX is well-suited to the chat companion product mode (short JSON-enveloped replies). Streaming becomes relevant when/if real-time voice/video chat ships, and should be a separate code path at that point, not a retrofit.
+- **Typing-speed (reveal pacing) tuning** — interesting tangent during the streaming discussion. User's reference CLI uses 30ms/char (`RENDER_SPEED=0.03`), faster than reading speed so the animation gives a sense of arrival without delaying the reader. Athena's current reveal speed not measured; left as a future polish item rather than a now-fix.
+
+---
+
+### Lessons learned (recurring across the session)
+
+1. **The actual code is the truth.** I was caught multiple times reasoning from memory or a snippet and being wrong. The pattern that worked: read the *full* file or the *full* surrounding context before opining, even when a snippet looks self-explanatory. Skim-reasoning produces confidently wrong answers — and the user noticed every single time.
+
+2. **Two-instance rule for generalisation.** Special-case code (OpenAI-only voice key sharing, hardcoded BioLLM fallback, OpenAI/Groq emotion chain) wasn't wrong at write-time — there was only one instance. The right time to generalise is the moment the second instance appears and the special-case becomes a misfit. OpenRouter's arrival triggered a cascade of small generalisations that were each individually justified.
+
+3. **Single-key UX is the correct framing for OpenRouter.** Initial instinct was to evaluate each capability in isolation ("is OpenRouter STT better than Whisper?" → no, skip). User reframed as "minimize the number of API keys a user must manage" → that flipped the recommendation. Per-request quality is one axis; friction-to-get-started is another, and the second often dominates for hobby/single-user projects.
+
+4. **No users = bias toward clean code, not toward compatibility.** User explicitly noted there are zero users today (project is public on GitHub but unannounced). That collapses the "don't break compatibility" axis. Stop reflexively hedging on "this might surprise users" until users exist to surprise. Still flag *risky* changes (data migrations, destructive ops) because dev/test data still matters.
+
+5. **Discussion before code paid off, every time.** Cadence was: user asks → I read → I propose → user clarifies/corrects → I implement. Several proposed changes were pruned by clarification before any file was touched: the audio-input "blocker" I invented in error; the OpenRouter "model curation" overhead I imagined; the streaming retrofit I worried about; the duplicate Groq pre-flight detector that turned out to be micro-optimization. Saved real time on each.
+
+6. **Document architectural decisions while they're fresh.** `docs/OPEN_ROUTER.md` was written *during* the OpenRouter integration, not after. Future-me reading "why did we curate the model list?" will have the answer in one paragraph instead of having to reconstruct it from commits. Pattern worth repeating for future cross-cutting decisions.
+
+7. **Localisation surfaces hidden coupling.** Adding gender-aware translations meant every component that displayed "companion" had to know about avatar gender. The custom-event broadcast (`athena:gender-changed`) is the right pattern for a single-tab SPA, but it's load-bearing — multi-tab sync would need `BroadcastChannel`. Filed for the day that comes up.
+
+---
+
+### Files touched (PR #33 totals: 27 files, +2598 / −271)
+
+**New files:**
+- `hooks/use-pwa-install.ts` — install prompt hook
+- `hooks/use-translation.ts` — i18n React hook
+- `lib/i18n.ts` — i18n runtime helpers
+- `i18n/en.json` / `fr.json` / `de.json` / `it.json` — translation dictionaries
+- `lib/llm/openrouter.ts` — chat + STT adapter
+- `lib/voice/openrouter.ts` — TTS adapter
+- `docs/OPEN_ROUTER.md` — architectural decisions
+
+**Modified:**
+- `next.config.mjs` — security headers
+- `lib/constants.ts` — i18n constants, OpenRouter provider/STT/TTS/voices entries
+- `lib/types.ts` — `Locale`, `TranslationDict`, `StoredSettings.locale`
+- `lib/llm/router.ts` — OpenRouter registration, STT fallback generalisation, emotion resolver
+- `lib/llm/openai.ts` — `detectEmotion()` added
+- `lib/llm/groq.ts` — `detectEmotion()` added
+- `lib/llm/emotions.ts` — full rewrite as thin coordinator
+- `lib/llm/brain.ts` — `DEFAULT_MODEL_PROVIDER` constant
+- `lib/utils.ts` — `TTS_DISPATCHERS` map + `dispatchTTS` helper
+- `hooks/use-connection-status.ts` — registry-driven key check
+- `components/settings-panel.tsx` — i18n + voice-key generalisation + `initialSection` prop + Language section
+- `components/{companion-popup-view,companion-window,conversation-history,export-modal,import-modal,merged-companion-chat}.tsx` — i18n migration + Radix tooltip standardisation
+- `app/page.tsx` — PWA install integration, i18n, settings deep-link
+- `docs/{IMPLEMENTATION_STATUS,REDESIGN,ROADMAP,SECURITY_REPORT}.md` — CSP closure, references
+- `README.md` — minor updates
+
+---
+
+### Open items for future sessions
+
+- **Emotion detection on OpenRouter** — registry now supports it as a one-line addition to `openrouter.ts` + a registry entry. Not done because the user didn't ask. Same for Custom (would need a `hasEmotionSupport` toggle following the `hasSTTSupport`/`hasTTSSupport` precedent).
+- **Typing-speed UX** — user's reference CLI uses 30ms/char; Athena reveal pacing not yet measured. Future polish item.
+- **`lib/constants.ts` size** — file is approaching ~600 lines after the i18n + OpenRouter additions. Possible future split (per-feature constant modules) if it crosses a comfort threshold.
+- **Groq pre-flight tool detection dedup** — already-investigated micro-optimization. Revisit only if another provider gains pre-flight detection, or if the Groq vision-bug fires in practice.
+- **Multi-tab locale/gender sync** — current custom-event mechanism is single-tab. `BroadcastChannel` upgrade if multi-tab sync becomes a real requirement.
+- **Translation coverage audit** — 22+ components migrated, but no automated check that every user-visible string flows through `t()`. A lint rule or test would catch regressions.
+
+---
+
+## Session 32: PWA fixes, README restructure, AI framework improvements (04/18/2026)
 
 ### Overview
 

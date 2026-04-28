@@ -3,8 +3,6 @@
 import type { EmotionState, EmotionDetectionResult, PersonalityType, GenderType } from '../types'
 import {
   DEFAULT_EMOTION_DETECTION_PROVIDER,
-  DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
-  DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_GENDER,
@@ -12,10 +10,7 @@ import {
   GENDER_MAPPING,
 } from '../constants'
 import { getDB } from '../db'
-import { getAPIKey } from '../utils'
-
-const GROQ_CHAT_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const OPENAI_CHAT_API_URL = 'https://api.openai.com/v1/chat/completions'
+import { resolveEmotionDetector } from './router'
 
 /**
  * Valid emotion states derived from EMOTION_KEYWORDS — single source of truth
@@ -47,13 +42,23 @@ Respond ONLY with valid JSON. Example: {"emotion": "happy"}`
 }
 
 /**
- * Detect the dominant emotion in an AI response
- * Uses llama-3.1-8b-instant and gpt-5.4-nano with JSON mode for fast, structured classification
- * 
- * Only sends the AI response text - no conversation history needed
- * 
+ * Detect the dominant emotion in an AI response.
+ *
+ * High-level coordinator: builds the personality-aware classification prompt,
+ * resolves which provider should run the classification (active provider's
+ * native detector first, otherwise the shared fallback chain in
+ * `lib/llm/router.ts`), then parses and validates the response.
+ *
+ * The provider-specific HTTP plumbing lives in each adapter
+ * (`lib/llm/openai.ts`, `lib/llm/groq.ts`, ...) — this file is intentionally
+ * free of `fetch` calls and provider URLs.
+ *
+ * Only sends the AI response text — no conversation history is needed for
+ * emotion classification.
+ *
  * @param aiResponse - The AI response text to analyze
- * @param provider   - The selected LLM provider ('groq' | 'openai' | other). Defaults to 'openai'.
+ * @param provider   - The active LLM provider; used to pick the native
+ *                     detector when available, otherwise ignored.
  * @returns EmotionDetectionResult with detected emotion or null
  */
 export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTION_DETECTION_PROVIDER): Promise<EmotionDetectionResult> {
@@ -61,97 +66,44 @@ export async function detectEmotion(aiResponse: string, provider = DEFAULT_EMOTI
     const db = await getDB()
     const settings = await db.getSettings()
 
-    // Resolve emotion detection provider — OpenAI (priority) or Groq fallback
-    // Works regardless of the main LLM provider (including BioLLM which has no native emotion detection)
-    const hasOpenAI = !!(await db.checkAPIKey('openai'))
-    const hasGroq = !!(await db.checkAPIKey('groq'))
-
-    if (!hasOpenAI && !hasGroq) {
-      console.warn('[Athena] Emotion detection disabled — no OpenAI or Groq API key configured')
+    const detector = await resolveEmotionDetector(provider)
+    if (!detector) {
+      console.warn('[Athena] Emotion detection disabled — no provider with native support and no fallback API key configured')
       return { emotion: null }
     }
-
-    const isOpenAI = hasOpenAI
-    const apiKey = await getAPIKey(isOpenAI ? 'openai' : 'groq')
 
     const companion = settings?.selectedCompanion || DEFAULT_COMPANION_NAME
     const personality = (settings?.selectedPersonality as PersonalityType) || DEFAULT_PERSONALITY
     const avatarGender = (settings?.avatarGender as GenderType) || DEFAULT_GENDER
-    const emotionSystemPrompt = buildEmotionSystemPrompt(companion, personality, avatarGender)
+    const systemPrompt = buildEmotionSystemPrompt(companion, personality, avatarGender)
 
-    console.log('[Athena] Emotion detection - provider:', isOpenAI ? 'openai' : 'groq', 'companion:', companion, 'personality:', personality)
+    console.log('[Athena] Emotion detection — provider:', detector.providerID, 'companion:', companion, 'personality:', personality)
 
-    const reqBody = {
-      model: isOpenAI ? DEFAULT_OPENAI_EMOTION_DETECTION_MODEL : DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
-      messages: [
-        {
-          role: 'system' as const,
-          content: emotionSystemPrompt,
-        },
-        {
-          role: 'user' as const,
-          content: aiResponse,
-        },
-      ],
-      temperature: 0.3,
-      // Groq uses max_tokens, OpenAI Chat Completions uses max_completion_tokens
-      ...(isOpenAI
-        ? { max_completion_tokens: 64 }
-        : { max_tokens: 64 }
-      ),
-      response_format: { type: 'json_object' },
-    }
+    const content = await detector.detect(systemPrompt, aiResponse)
 
-    console.log('[Athena] Emotion detection request:', reqBody)
-
-    const response = await fetch(isOpenAI ? OPENAI_CHAT_API_URL : GROQ_CHAT_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reqBody),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('[Athena] Emotion detection API error:', error)
-      return { emotion: null }
-    }
-
-    const data = await response.json()
-    console.log('[Athena] Emotion detection - raw response:', data)
-    const content = data.choices?.[0]?.message?.content
-
-    if (!content) {
-      console.log('[Athena] Emotion detection - no content in response')
-      return { emotion: null }
-    }
-
-    // Parse JSON response
+    // Parse and validate the JSON response. Detection adapters return the raw
+    // `content` string; we own parsing here so every provider gets the same
+    // permissive validation.
     try {
       const parsed = JSON.parse(content)
       const emotion = parsed.emotion
 
-      // Validate emotion is in allowed list
       if (emotion === null) {
-        console.log('[Athena] Emotion detection - neutral/no emotion')
+        console.log('[Athena] Emotion detection — neutral/no emotion')
         return { emotion: null }
       }
 
       if (VALID_EMOTIONS.includes(emotion)) {
-        console.log('[Athena] Emotion detection - detected:', emotion)
+        console.log('[Athena] Emotion detection — detected:', emotion)
         return { emotion: emotion as EmotionState }
       }
 
-      console.log('[Athena] Emotion detection - invalid emotion value:', emotion)
+      console.log('[Athena] Emotion detection — invalid emotion value:', emotion)
       return { emotion: null }
-
     } catch (parseError) {
-      console.error('[Athena] Emotion detection - JSON parse error:', parseError)
+      console.error('[Athena] Emotion detection — JSON parse error:', parseError)
       return { emotion: null }
     }
-
   } catch (error) {
     console.error('[Athena] Emotion detection error:', error)
     return { emotion: null }

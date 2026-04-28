@@ -7,6 +7,7 @@ import {
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_AUDIO_FILE,
+  DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
   DEFAULT_GROQ_STT_MODEL,
   DEFAULT_GROQ_URL_CAPABLE_MODEL,
   DEFAULT_GROQ_VISION_MODEL,
@@ -268,4 +269,61 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     console.log('[Athena] transcribeAudio (Groq): caught error', error)
     throw error
   }
+}
+
+/**
+ * Run emotion classification on a piece of model-generated text using Groq's
+ * Chat Completions API in JSON mode.
+ *
+ * Mirrors `detectEmotion` in `lib/llm/openai.ts` — same narrow contract: take
+ * `(systemPrompt, userText)`, return the raw JSON string from the model.
+ * Differences are limited to the host, the auth, and `max_tokens` vs OpenAI's
+ * `max_completion_tokens`. Prompt construction, parsing, and validation live
+ * in `lib/llm/emotions.ts`.
+ *
+ * Throws on HTTP failures so the caller can decide whether to retry, fall
+ * back, or downgrade gracefully.
+ */
+export async function detectEmotion(systemPrompt: string, userText: string): Promise<string> {
+  const apiKey = await getAPIKey('groq')
+
+  const reqBody = {
+    model: DEFAULT_GROQ_EMOTION_DETECTION_MODEL,
+    messages: [
+      { role: 'system' as const, content: systemPrompt },
+      { role: 'user' as const, content: userText },
+    ],
+    temperature: 0.3,
+    max_tokens: 64,
+    response_format: { type: 'json_object' as const },
+  }
+
+  console.log('[Athena] detectEmotion (Groq): request', reqBody)
+
+  const response = await fetch(CHAT_API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(reqBody),
+  })
+
+  console.log('[Athena] detectEmotion (Groq): HTTP response', { status: response.status, ok: response.ok })
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    console.error('[Athena] detectEmotion (Groq): API error', error)
+    throw new Error(error?.error?.message || `Groq emotion detection failed: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  console.log('[Athena] detectEmotion (Groq): raw response', data)
+
+  const content = data.choices?.[0]?.message?.content
+  if (!content) {
+    throw new Error('No content in Groq emotion detection response')
+  }
+
+  return content
 }
