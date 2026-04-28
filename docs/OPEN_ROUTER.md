@@ -129,3 +129,18 @@ feature. Possibly a build-time tool later.
 - [ ] Verify PDF passthrough end-to-end
 - [ ] TTS provider entry using `/api/v1/audio/speech`
 - [ ] User-facing review of curated slugs / descriptions
+
+---
+
+## References
+
+Upstream OpenRouter documentation, grouped by capability so future revisits land on the right page directly.
+
+- [Multimodal overview](https://openrouter.ai/docs/guides/overview/multimodal/overview)
+- [Image inputs (vision)](https://openrouter.ai/docs/guides/overview/multimodal/images)
+- [Image generation](https://openrouter.ai/docs/guides/overview/multimodal/image-generation)
+- [PDF inputs](https://openrouter.ai/docs/guides/overview/multimodal/pdfs)
+- [Audio inputs](https://openrouter.ai/docs/guides/overview/multimodal/audio)
+- [Video inputs](https://openrouter.ai/docs/guides/overview/multimodal/videos)
+- [Video generation](https://openrouter.ai/docs/guides/overview/multimodal/video-generation)
+- [Text-to-speech](https://openrouter.ai/docs/guides/overview/multimodal/tts)
