@@ -342,8 +342,8 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
         updatedAt: new Date().toISOString(),
       })
       toast({
-        title: 'Settings Saved',
-        description: 'Your settings and customizations have been saved.',
+        title: t('settings.saved'),
+        description: t('settings.savedDescription'),
       })
 
       // Dispatch event so other components can react to settings changes
@@ -353,8 +353,8 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
       onClose()
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to save settings. Please try again.',
+        title: t('common.error'),
+        description: t('settings.saveFailed'),
         variant: 'destructive',
       })
     }
@@ -367,7 +367,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
     <Card className="w-full h-120 -py-6 shadow-2xl border border-border overflow-hidden flex flex-col">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-4 border-b border-border flex items-center justify-between flex-shrink-0">
-        <h3 className="font-semibold text-foreground">⚙️ SETTINGS</h3>
+        <h3 className="font-semibold text-foreground">⚙️ {t('settings.title').toUpperCase()}</h3>
         <Button variant="ghost" size="icon" onClick={onClose} className="cursor-pointer">
           <span className="text-xl leading-none">×</span>
         </Button>
@@ -379,7 +379,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 1. Companion Section */}
           <AccordionItem value="companion" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              👧 COMPANION
+              👧 {t('settings.sections.companion').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="space-y-4">
@@ -399,7 +399,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {/* Category Dropdown */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Category
+                    {t('settings.companion.category')}
                   </label>
                   <Select value={avatarCategory} onValueChange={(val: (typeof AVATAR_CATEGORIES)[number]) => setAvatarCategory(val)}>
                     <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
@@ -418,7 +418,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {/* Gender Dropdown */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Gender
+                    {t('settings.companion.gender')}
                   </label>
                   <Select value={avatarGender} onValueChange={(val: GenderType) => setAvatarGender(val)}>
                     <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
@@ -427,7 +427,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                     <SelectContent>
                       {GENDERS.map((gender) => (
                         <SelectItem key={gender} value={gender} className="focus:bg-secondary/50">
-                          {gender === 'F' ? 'Female' : 'Male'}
+                          {gender === 'F' ? t('settings.companion.female') : t('settings.companion.male')}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -437,7 +437,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {/* Color Scheme Dropdown */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Color Scheme
+                    {t('settings.companion.colorScheme')}
                   </label>
                   <Select value={avatarColorScheme} onValueChange={(val: (typeof COLOR_SCHEMES)[number]) => setAvatarColorScheme(val)}>
                     <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
@@ -456,10 +456,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {/* Companion Name */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Name
+                    {t('settings.companion.name')}
                   </label>
                   <Input
-                    placeholder="Enter companion name"
+                    placeholder={t('settings.companion.namePlaceholder')}
                     value={companionName}
                     onChange={(e) => setCompanionName(e.target.value)}
                     className="w-full bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -472,13 +472,13 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 2. Customize Section */}
           <AccordionItem value="customize" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              🪄 CUSTOMIZE
+              🪄 {t('settings.sections.customize').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Personality Type
+                    {t('settings.customize.personalityType')}
                   </label>
                   <Select value={personalityType} onValueChange={(value) => setPersonalityType(value as PersonalityType)}>
                     <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
@@ -496,10 +496,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
 
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Custom Traits
+                    {t('settings.customize.customTraits')}
                   </label>
                   <textarea
-                    placeholder="Add personality traits and characteristics..."
+                    placeholder={t('settings.customize.customTraitsPlaceholder')}
                     value={personalityTraits}
                     onChange={(e) => setPersonalityTraits(e.target.value)}
                     onKeyDown={() => {
@@ -510,13 +510,13 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                     className="w-full h-20 bg-primary/20 border border-primary/50 text-foreground placeholder:text-muted-foreground text-sm rounded-md p-2 resize-none"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Describe how your companion should behave and interact
+                    {t('settings.customize.customTraitsHelp')}
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Visual Format
+                    {t('settings.customize.visualFormat')}
                   </label>
                   <Select value={visualFormat} onValueChange={(val: VisualFormat) => setVisualFormat(val)}>
                     <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
@@ -549,12 +549,12 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                   {isLiveAvatar && (
                     <div className="mt-3 space-y-2 p-3 rounded-lg border border-primary/30 bg-primary/5">
                       <label className="block text-xs font-semibold text-foreground">
-                        Decart API Key
+                        {t('settings.customize.decartApiKey')}
                       </label>
                       <div className="flex items-center gap-2">
                         <Input
                           type={showDecartApiKey ? 'text' : 'password'}
-                          placeholder="Enter your Decart API key"
+                          placeholder={t('settings.customize.decartApiKeyPlaceholder')}
                           value={decartApiKey}
                           onChange={(e) => setDecartApiKey(e.target.value)}
                           className="flex-1 bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -570,7 +570,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Get your key at{' '}
+                        {t('settings.customize.decartApiKeyHelpStart')}{' '}
                         <a
                           href="https://platform.decart.ai"
                           target="_blank"
@@ -579,7 +579,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                         >
                           platform.decart.ai
                         </a>
-                        . Stored encrypted on your device.
+                        {t('settings.customize.decartApiKeyHelpEnd')}
                       </p>
                     </div>
                   )}
@@ -591,13 +591,13 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 3. Model Section */}
           <AccordionItem value="model" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              🤖 MODEL
+              🤖 {t('settings.sections.model').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    AI Provider
+                    {t('settings.model.provider')}
                   </label>
                   <Select value={provider} onValueChange={(val) => {
                     setProvider(val)
@@ -610,7 +610,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                   }}>
                     <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
                       <span className="truncate text-left">
-                        {LLM_PROVIDERS.find(p => p.id === provider)?.name ?? (provider === 'custom' ? 'Custom Provider' : provider)}
+                        {LLM_PROVIDERS.find(p => p.id === provider)?.name ?? (provider === 'custom' ? t('settings.model.customProvider') : provider)}
                       </span>
                     </SelectTrigger>
                     <SelectContent>
@@ -618,12 +618,12 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                         <SelectItem key={p.id} value={p.id} className="focus:bg-secondary/50">
                           <div className="flex flex-col">
                             <span>{p.name}</span>
-                            <span className="text-xs text-muted-foreground">{p.models.filter(m => m.visible).length} models</span>
+                            <span className="text-xs text-muted-foreground">{t('settings.model.modelsCount', { count: p.models.filter(m => m.visible).length })}</span>
                           </div>
                         </SelectItem>
                       ))}
                       <SelectItem value="custom" className="focus:bg-secondary/50">
-                        <span className="text-primary font-semibold">+ Custom Provider</span>
+                        <span className="text-primary font-semibold">{t('settings.model.customProviderOption')}</span>
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -634,10 +634,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                   <div className="space-y-3 p-3 rounded-lg border border-primary/30 bg-primary/5">
                     <div>
                       <label className="block text-xs font-semibold text-foreground mb-1">
-                        Provider Name
+                        {t('settings.model.providerName')}
                       </label>
                       <Input
-                        placeholder="e.g., WormGPT"
+                        placeholder={t('settings.model.providerNamePlaceholder')}
                         value={customProviderName}
                         onChange={(e) => setCustomProviderName(e.target.value)}
                         className="w-full bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -645,10 +645,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-foreground mb-1">
-                        Base URL
+                        {t('settings.model.baseUrl')}
                       </label>
                       <Input
-                        placeholder="https://api.example.com/v1"
+                        placeholder={t('settings.model.baseUrlPlaceholder')}
                         value={customProviderUrl}
                         onChange={(e) => setCustomProviderUrl(e.target.value)}
                         className="w-full bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -656,10 +656,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-foreground mb-1">
-                        Model Name
+                        {t('settings.model.modelName')}
                       </label>
                       <Input
-                        placeholder="e.g., wormgpt-v2"
+                        placeholder={t('settings.model.modelNamePlaceholder')}
                         value={customModelName}
                         onChange={(e) => setCustomModelName(e.target.value)}
                         className="w-full bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -667,12 +667,12 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                     </div>
                     <div className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/30">
                       <label className="text-xs font-semibold text-foreground">
-                        Supports Speech-to-Text
+                        {t('settings.model.supportsSTT')}
                       </label>
                       <button
                         onClick={() => setHasSTTSupport(!hasSTTSupport)}
                         className={`w-12 h-7 rounded-full transition-colors cursor-pointer ${hasSTTSupport ? 'bg-primary' : 'bg-muted'}`}
-                        title="Enable if this custom provider supports audio transcription"
+                        title={t('settings.model.supportsSTTHelp')}
                       >
                         <div className={`w-6 h-6 rounded-full bg-foreground transition-transform ${hasSTTSupport ? 'translate-x-5' : 'translate-x-0'}`} />
                       </button>
@@ -681,10 +681,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                       <div className="space-y-2">
                         <div>
                           <label className="block text-xs font-semibold text-foreground mb-1">
-                            STT Model Name
+                            {t('settings.model.sttModelName')}
                           </label>
                           <Input
-                            placeholder="e.g., whisper-1"
+                            placeholder={t('settings.model.sttModelNamePlaceholder')}
                             value={customSTTModelName}
                             onChange={(e) => setCustomSTTModelName(e.target.value)}
                             className="w-full bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -692,10 +692,10 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-foreground mb-1">
-                            STT API URL
+                            {t('settings.model.sttApiUrl')}
                           </label>
                           <Input
-                            placeholder="e.g., https://api.example.com/v1/audio/transcriptions"
+                            placeholder={t('settings.model.sttApiUrlPlaceholder')}
                             value={customSTTUrl}
                             onChange={(e) => setCustomSTTUrl(e.target.value)}
                             className="w-full bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -710,7 +710,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {availableModels.length > 0 && (
                   <div>
                     <label className="block text-xs font-semibold text-foreground mb-2">
-                      Model
+                      {t('settings.model.model')}
                     </label>
                     <Select value={model} onValueChange={setModel}>
                       <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
@@ -736,11 +736,11 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {isBioLLM && (
                   <div>
                     <label className="block text-xs font-semibold text-foreground mb-2">
-                      API Endpoint
+                      {t('settings.model.apiEndpoint')}
                     </label>
                     <Input
                       type="text"
-                      placeholder="Enter provided API endpoint"
+                      placeholder={t('settings.model.apiEndpointPlaceholder')}
                       value={customProviderUrl}
                       onChange={(e) => setCustomProviderUrl(e.target.value)}
                       className="bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -751,12 +751,12 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {/* API Key */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    API Key
+                    {t('settings.model.apiKey')}
                   </label>
                   <div className="flex gap-2">
                     <Input
                       type={showApiKey ? 'text' : 'password'}
-                      placeholder={`Enter your ${isCustomProvider ? customProviderName || 'custom provider' : selectedProvider?.name || 'API'} key`}
+                      placeholder={t('settings.model.apiKeyPlaceholder', { provider: isCustomProvider ? customProviderName || t('settings.model.customProvider') : selectedProvider?.name || t('settings.model.apiKeyFallback') })}
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       className="flex-1 bg-primary/20 border-primary/50 text-foreground placeholder:text-muted-foreground text-sm"
@@ -772,7 +772,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     <Lock className="inline h-3 w-3 mr-1" />
-                    Encrypted locally, sent only to API providers for authentication
+                    {t('settings.model.encryptionNotice')}
                   </p>
                 </div>
               </div>
@@ -782,15 +782,15 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 4. Tuning Section */}
           <AccordionItem value="tuning" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              🧠 TUNING
+              🧠 {t('settings.sections.tuning').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="space-y-4">
                 {/* Memory Window */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Memory Window
-                    <span className="ml-2 text-primary font-bold">{memoryWindowSize} messages</span>
+                    {t('settings.tuning.memoryWindow')}
+                    <span className="ml-2 text-primary font-bold">{memoryWindowSize} {t('settings.tuning.memoryWindowUnit')}</span>
                   </label>
                   <input
                     type="range"
@@ -806,7 +806,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                     <span>50</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Number of recent messages included in each LLM request
+                    {t('settings.tuning.memoryWindowHelp')}
                   </p>
                 </div>
 
@@ -814,9 +814,9 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 <div className="pt-3 border-t border-border/50 opacity-50">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Streaming Mode</p>
+                      <p className="text-sm font-medium text-foreground">{t('settings.tuning.streamingMode')}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Coming in the next release
+                        {t('settings.tuning.streamingModeHelp')}
                       </p>
                     </div>
                     <button
@@ -834,13 +834,13 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 5. Voice Section */}
           <AccordionItem value="voice" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              🗣️ VOICE
+              🗣️ {t('settings.sections.voice').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    TTS Provider
+                    {t('settings.voice.ttsProvider')}
                   </label>
                   <Select value={voiceProvider} onValueChange={setVoiceProvider}>
                     <SelectTrigger className="w-full border-primary/50 bg-primary/20 text-foreground text-sm cursor-pointer">
@@ -864,7 +864,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {/* Voice Selection */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    Voice
+                    {t('settings.voice.voice')}
                   </label>
                   <Select
                     value={selectedVoice || defaultVoice}
@@ -878,30 +878,36 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                         availableVoices.map((voice) => (
                           <SelectItem key={voice.id} value={voice.id} className="focus:bg-secondary/50">
                             <span>{voice.name}</span>
-                            {voice.isDefault && <span className="text-muted-foreground text-xs ml-2">(Default)</span>}
+                            {voice.isDefault && <span className="text-muted-foreground text-xs ml-2">({t('common.default')})</span>}
                           </SelectItem>
                         ))
                       ) : (
                         <SelectItem value="none" disabled>
-                          No voices available for this gender
+                          {t('settings.voice.noVoices')}
                         </SelectItem>
                       )}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-2">
-                    {availableVoices.length} voice{availableVoices.length !== 1 ? 's' : ''} available for {avatarGender === 'F' ? 'female' : 'male'}
+                    {t(
+                      availableVoices.length === 1 ? 'settings.voice.voiceAvailable' : 'settings.voice.voicesAvailable',
+                      {
+                        count: availableVoices.length,
+                        gender: avatarGender === 'F' ? t('settings.companion.female').toLowerCase() : t('settings.companion.male').toLowerCase(),
+                      },
+                    )}
                   </p>
                 </div>
 
                 {/* API Key */}
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
-                    API Key
+                    {t('settings.voice.apiKey')}
                   </label>
                   <div className="flex gap-2">
                     <Input
                       type={showVoiceApiKey ? 'text' : 'password'}
-                      placeholder={shouldAutoPopulateVoiceKey ? 'Using Global OpenAI Key' : `Enter your ${selectedTTSProvider?.name || 'TTS'} key`}
+                      placeholder={shouldAutoPopulateVoiceKey ? t('settings.voice.globalKeyPlaceholder') : t('settings.voice.apiKeyPlaceholder', { provider: selectedTTSProvider?.name || t('settings.voice.apiKeyFallback') })}
                       value={displayVoiceApiKey}
                       onChange={(e) => {
                         if (!shouldAutoPopulateVoiceKey) {
@@ -922,7 +928,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     <Lock className="inline h-3 w-3 mr-1" />
-                    {shouldAutoPopulateVoiceKey ? 'Using your global OpenAI API key' : 'Encrypted locally, sent only to API providers for authentication'}
+                    {shouldAutoPopulateVoiceKey ? t('settings.voice.globalKeyNotice') : t('settings.voice.encryptionNotice')}
                   </p>
                 </div>
 
@@ -930,9 +936,9 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 <div className="pt-3 border-t border-border/50">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Voice Output</p>
+                      <p className="text-sm font-medium text-foreground">{t('settings.voice.voiceOutput')}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Generate speech from responses
+                        {t('settings.voice.voiceOutputHelp')}
                       </p>
                     </div>
                     <button
@@ -954,17 +960,17 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 6. Privacy Section */}
           <AccordionItem value="privacy" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              🔒 PRIVACY
+              🔒 {t('settings.sections.privacy').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Privacy Mode</p>
+                    <p className="text-sm font-medium text-foreground">{t('settings.privacy.privacyMode')}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {privacyMode
-                        ? 'Usage analytics disabled — no telemetry data is collected'
-                        : 'Anonymous usage analytics enabled to help improve Athena'
+                        ? t('settings.privacy.enabledHelp')
+                        : t('settings.privacy.disabledHelp')
                       }
                     </p>
                   </div>
@@ -982,7 +988,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {!privacyMode && (
                   <div className="p-2 rounded bg-muted/40 border border-border">
                     <p className="text-xs text-muted-foreground">
-                      Anonymous usage data helps prioritise features and fix issues. No conversations, personal data, or API keys are ever collected.
+                      {t('settings.privacy.infoBox')}
                     </p>
                   </div>
                 )}
@@ -1033,7 +1039,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 8. Summary Section */}
           <AccordionItem value="summary" className="border-b border-border/50">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              🔮 SUMMARY
+              🔮 {t('settings.sections.summary').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="space-y-3">
@@ -1042,25 +1048,25 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                   <h4 className="text-sm font-semibold text-foreground">{companionName}</h4>
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Avatar:</span>
+                      <span className="text-muted-foreground">{t('settings.summary.avatar')}:</span>
                       <span className="font-medium text-foreground capitalize">
                         {avatarCategory} {avatarGender === 'F' ? '♀' : '♂'} ({avatarColorScheme})
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Personality:</span>
+                      <span className="text-muted-foreground">{t('settings.summary.personality')}:</span>
                       <span className="font-medium text-foreground">{personalityType}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Visual Format:</span>
+                      <span className="text-muted-foreground">{t('settings.summary.visualFormat')}:</span>
                       <span className="font-medium text-foreground">
                         {visualFormat === 'static-2d' ? 'Static 2D' : visualFormat === 'animated-2d' ? 'Animated 2D' : 'Animated 3D'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Created:</span>
+                      <span className="text-muted-foreground">{t('settings.summary.created')}:</span>
                       <span className="font-medium text-foreground">
-                        {new Date().toLocaleDateString()}
+                        {new Date().toLocaleDateString(locale === 'en' ? 'en-US' : locale)}
                       </span>
                     </div>
                   </div>
@@ -1068,43 +1074,43 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
 
                 {/* AI Configuration */}
                 <div className="pt-2 border-t border-border/50">
-                  <h4 className="text-xs font-semibold text-foreground mb-2">AI Configuration</h4>
+                  <h4 className="text-xs font-semibold text-foreground mb-2">{t('settings.summary.aiConfiguration')}</h4>
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Provider:</span>
-                      <span className="font-medium text-foreground">{isCustomProvider ? customProviderName || 'Custom' : selectedProvider?.name || 'None'}</span>
+                      <span className="text-muted-foreground">{t('settings.summary.provider')}:</span>
+                      <span className="font-medium text-foreground">{isCustomProvider ? customProviderName || t('common.custom') : selectedProvider?.name || t('common.none')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Model:</span>
-                      <span className="font-medium text-foreground text-xs">{isCustomProvider ? customModelName || 'Custom' : availableModels.find(m => m.id === model)?.name || 'N/A'}</span>
+                      <span className="text-muted-foreground">{t('settings.summary.model')}:</span>
+                      <span className="font-medium text-foreground text-xs">{isCustomProvider ? customModelName || t('common.custom') : availableModels.find(m => m.id === model)?.name || 'N/A'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Memory:</span>
-                      <span className="font-medium text-foreground">{memoryWindowSize} messages</span>
+                      <span className="text-muted-foreground">{t('settings.summary.memory')}:</span>
+                      <span className="font-medium text-foreground">{memoryWindowSize} {t('settings.summary.memoryUnit')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Privacy Mode:</span>
-                      <span className="font-medium text-foreground">{privacyMode ? 'Enabled' : 'Disabled'}</span>
+                      <span className="text-muted-foreground">{t('settings.summary.privacyMode')}:</span>
+                      <span className="font-medium text-foreground">{privacyMode ? t('common.enabled') : t('common.disabled')}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Voice Configuration */}
                 <div className="pt-2 border-t border-border/50">
-                  <h4 className="text-xs font-semibold text-foreground mb-2">Voice Configuration</h4>
+                  <h4 className="text-xs font-semibold text-foreground mb-2">{t('settings.summary.voiceConfiguration')}</h4>
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">TTS Provider:</span>
-                      <span className="font-medium text-foreground">{selectedTTSProvider?.name || 'None'}</span>
+                      <span className="text-muted-foreground">{t('settings.summary.ttsProvider')}:</span>
+                      <span className="font-medium text-foreground">{selectedTTSProvider?.name || t('common.none')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Model:</span>
+                      <span className="text-muted-foreground">{t('settings.summary.model')}:</span>
                       <span className="font-medium text-foreground">{selectedTTSProvider?.models[0]?.name || 'N/A'}</span>
                     </div>
                     {shouldAutoPopulateVoiceKey && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">API Key:</span>
-                        <span className="font-medium text-accent text-xs">Using Global OpenAI Key</span>
+                        <span className="text-muted-foreground">{t('settings.summary.apiKey')}:</span>
+                        <span className="font-medium text-accent text-xs">{t('settings.summary.globalKey')}</span>
                       </div>
                     )}
                   </div>
@@ -1113,7 +1119,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
                 {/* Traits Preview */}
                 {personalityTraits && (
                   <div className="pt-2 border-t border-border/50">
-                    <h4 className="text-xs font-semibold text-foreground mb-1">Traits</h4>
+                    <h4 className="text-xs font-semibold text-foreground mb-1">{t('settings.summary.traits')}</h4>
                     <p className="text-xs text-muted-foreground line-clamp-2">{personalityTraits}</p>
                   </div>
                 )}
@@ -1125,18 +1131,18 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           {/* 7. About Section */}
           <AccordionItem value="about" className="border-b-0">
             <AccordionTrigger className="hover:bg-secondary/20 px-2 py-2 rounded text-sm font-semibold cursor-pointer">
-              ✨ ABOUT
+              ✨ {t('settings.sections.about').toUpperCase()}
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 pt-2">
               <div className="flex items-start gap-2">
                 <Info className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="text-sm font-semibold text-foreground">ATHENA v0.1</h4>
+                  <h4 className="text-sm font-semibold text-foreground">{t('settings.about.version')}</h4>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Privacy-first AI companion. Open source, locally encrypted.
+                    {t('settings.about.tagline')}
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
-                    © 2026 Athena Project
+                    {t('settings.about.copyright')}
                   </p>
                 </div>
               </div>
@@ -1151,7 +1157,7 @@ export function SettingsPanel({ onClose, onSettingsSaved }: SettingsPanelProps) 
           onClick={handleSaveSettings}
           className="w-full hover:bg-accent/80 text-foreground font-bold cursor-pointer"
         >
-          💾 SAVE SETTINGS
+          💾 {t('settings.save').toUpperCase()}
         </Button>
       </div>
     </Card>

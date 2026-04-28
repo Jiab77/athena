@@ -1,20 +1,151 @@
 {
   "fab": {
-    "install": "Installa app",
+    "install": "Installa l'app",
     "export": "Esporta",
     "import": "Importa",
     "companion": "Compagno",
     "settings": "Impostazioni"
   },
-  "settings": {
-    "title": "Impostazioni",
-    "language": "Lingua",
-    "languageDescription": "Scegli la lingua dell'interfaccia"
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "error": "Errore",
+    "default": "Predefinito",
+    "none": "Nessuno",
+    "custom": "Personalizzato",
+    "enabled": "Attivato",
+    "disabled": "Disattivato"
   },
   "languages": {
     "en": "Inglese",
     "fr": "Francese",
     "de": "Tedesco",
     "it": "Italiano"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "save": "Salva impostazioni",
+    "saved": "Impostazioni salvate",
+    "savedDescription": "Le tue impostazioni e personalizzazioni sono state salvate.",
+    "saveFailed": "Impossibile salvare le impostazioni. Riprova.",
+
+    "language": "Lingua",
+    "languageDescription": "Scegli la lingua dell'interfaccia preferita. Le modifiche vengono applicate immediatamente.",
+
+    "sections": {
+      "companion": "Compagno",
+      "customize": "Personalizza",
+      "model": "Modello",
+      "tuning": "Regolazione",
+      "voice": "Voce",
+      "privacy": "Privacy",
+      "language": "Lingua",
+      "summary": "Riepilogo",
+      "about": "Informazioni"
+    },
+
+    "companion": {
+      "category": "Categoria",
+      "gender": "Genere",
+      "female": "Femminile",
+      "male": "Maschile",
+      "colorScheme": "Schema colori",
+      "name": "Nome",
+      "namePlaceholder": "Inserisci il nome del compagno"
+    },
+
+    "customize": {
+      "personalityType": "Tipo di personalità",
+      "customTraits": "Tratti personalizzati",
+      "customTraitsPlaceholder": "Aggiungi tratti di personalità e caratteristiche...",
+      "customTraitsHelp": "Descrivi come dovrebbe comportarsi e interagire il tuo compagno",
+      "visualFormat": "Formato visivo",
+      "decartApiKey": "Chiave API Decart",
+      "decartApiKeyPlaceholder": "Inserisci la tua chiave API Decart",
+      "decartApiKeyHelpStart": "Ottieni la tua chiave su",
+      "decartApiKeyHelpEnd": ". Memorizzata crittografata sul tuo dispositivo."
+    },
+
+    "model": {
+      "provider": "Fornitore IA",
+      "customProvider": "Fornitore personalizzato",
+      "customProviderOption": "+ Fornitore personalizzato",
+      "providerName": "Nome del fornitore",
+      "providerNamePlaceholder": "es. WormGPT",
+      "baseUrl": "URL di base",
+      "baseUrlPlaceholder": "https://api.esempio.com/v1",
+      "modelName": "Nome del modello",
+      "modelNamePlaceholder": "es. wormgpt-v2",
+      "supportsSTT": "Supporta il riconoscimento vocale",
+      "supportsSTTHelp": "Attiva se questo fornitore personalizzato supporta la trascrizione audio",
+      "sttModelName": "Nome del modello STT",
+      "sttModelNamePlaceholder": "es. whisper-1",
+      "sttApiUrl": "URL API STT",
+      "sttApiUrlPlaceholder": "es. https://api.esempio.com/v1/audio/transcriptions",
+      "model": "Modello",
+      "apiEndpoint": "Endpoint API",
+      "apiEndpointPlaceholder": "Inserisci l'endpoint API fornito",
+      "apiKey": "Chiave API",
+      "apiKeyPlaceholder": "Inserisci la tua chiave {provider}",
+      "apiKeyFallback": "API",
+      "encryptionNotice": "Crittografata localmente, inviata solo ai fornitori API per l'autenticazione",
+      "modelsCount": "{count} modelli"
+    },
+
+    "tuning": {
+      "memoryWindow": "Finestra di memoria",
+      "memoryWindowUnit": "messaggi",
+      "memoryWindowHelp": "Numero di messaggi recenti inclusi in ogni richiesta al LLM",
+      "streamingMode": "Modalità streaming",
+      "streamingModeHelp": "Disponibile nella prossima versione"
+    },
+
+    "voice": {
+      "ttsProvider": "Fornitore TTS",
+      "voice": "Voce",
+      "voicesAvailable": "{count} voci disponibili per {gender}",
+      "voiceAvailable": "{count} voce disponibile per {gender}",
+      "noVoices": "Nessuna voce disponibile per questo genere",
+      "apiKey": "Chiave API",
+      "globalKeyPlaceholder": "Utilizzo della chiave OpenAI globale",
+      "apiKeyPlaceholder": "Inserisci la tua chiave {provider}",
+      "apiKeyFallback": "TTS",
+      "globalKeyNotice": "Utilizzo della tua chiave API OpenAI globale",
+      "encryptionNotice": "Crittografata localmente, inviata solo ai fornitori API per l'autenticazione",
+      "voiceOutput": "Output vocale",
+      "voiceOutputHelp": "Genera voce dalle risposte"
+    },
+
+    "privacy": {
+      "privacyMode": "Modalità privacy",
+      "enabledHelp": "Statistiche di utilizzo disattivate — nessun dato di telemetria viene raccolto",
+      "disabledHelp": "Statistiche di utilizzo anonime attivate per aiutare a migliorare Athena",
+      "infoBox": "I dati di utilizzo anonimi aiutano a dare priorità alle funzionalità e correggere problemi. Nessuna conversazione, dato personale o chiave API viene mai raccolto."
+    },
+
+    "summary": {
+      "avatar": "Avatar",
+      "personality": "Personalità",
+      "visualFormat": "Formato visivo",
+      "created": "Creato",
+      "aiConfiguration": "Configurazione IA",
+      "provider": "Fornitore",
+      "model": "Modello",
+      "memory": "Memoria",
+      "memoryUnit": "messaggi",
+      "privacyMode": "Modalità privacy",
+      "voiceConfiguration": "Configurazione vocale",
+      "ttsProvider": "Fornitore TTS",
+      "apiKey": "Chiave API",
+      "globalKey": "Utilizzo della chiave OpenAI globale",
+      "traits": "Tratti"
+    },
+
+    "about": {
+      "version": "ATHENA v0.1",
+      "tagline": "Compagno IA orientato alla privacy. Open source, crittografato localmente.",
+      "copyright": "© 2026 Progetto Athena"
+    }
   }
 }

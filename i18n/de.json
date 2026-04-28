@@ -6,15 +6,146 @@
     "companion": "Begleiter",
     "settings": "Einstellungen"
   },
-  "settings": {
-    "title": "Einstellungen",
-    "language": "Sprache",
-    "languageDescription": "Wählen Sie Ihre bevorzugte Oberflächensprache"
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "error": "Fehler",
+    "default": "Standard",
+    "none": "Keine",
+    "custom": "Benutzerdefiniert",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert"
   },
   "languages": {
     "en": "Englisch",
     "fr": "Französisch",
     "de": "Deutsch",
     "it": "Italienisch"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "save": "Einstellungen speichern",
+    "saved": "Einstellungen gespeichert",
+    "savedDescription": "Ihre Einstellungen und Anpassungen wurden gespeichert.",
+    "saveFailed": "Einstellungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+
+    "language": "Sprache",
+    "languageDescription": "Wählen Sie Ihre bevorzugte Oberflächensprache. Änderungen werden sofort angewendet.",
+
+    "sections": {
+      "companion": "Begleiter",
+      "customize": "Anpassen",
+      "model": "Modell",
+      "tuning": "Feinabstimmung",
+      "voice": "Stimme",
+      "privacy": "Datenschutz",
+      "language": "Sprache",
+      "summary": "Zusammenfassung",
+      "about": "Über"
+    },
+
+    "companion": {
+      "category": "Kategorie",
+      "gender": "Geschlecht",
+      "female": "Weiblich",
+      "male": "Männlich",
+      "colorScheme": "Farbschema",
+      "name": "Name",
+      "namePlaceholder": "Begleiternamen eingeben"
+    },
+
+    "customize": {
+      "personalityType": "Persönlichkeitstyp",
+      "customTraits": "Eigene Eigenschaften",
+      "customTraitsPlaceholder": "Persönlichkeitsmerkmale und Eigenschaften hinzufügen...",
+      "customTraitsHelp": "Beschreiben Sie, wie sich Ihr Begleiter verhalten und interagieren soll",
+      "visualFormat": "Visuelles Format",
+      "decartApiKey": "Decart API-Schlüssel",
+      "decartApiKeyPlaceholder": "Geben Sie Ihren Decart API-Schlüssel ein",
+      "decartApiKeyHelpStart": "Holen Sie sich Ihren Schlüssel auf",
+      "decartApiKeyHelpEnd": ". Verschlüsselt auf Ihrem Gerät gespeichert."
+    },
+
+    "model": {
+      "provider": "KI-Anbieter",
+      "customProvider": "Benutzerdefinierter Anbieter",
+      "customProviderOption": "+ Benutzerdefinierter Anbieter",
+      "providerName": "Anbietername",
+      "providerNamePlaceholder": "z. B. WormGPT",
+      "baseUrl": "Basis-URL",
+      "baseUrlPlaceholder": "https://api.beispiel.com/v1",
+      "modelName": "Modellname",
+      "modelNamePlaceholder": "z. B. wormgpt-v2",
+      "supportsSTT": "Unterstützt Sprache-zu-Text",
+      "supportsSTTHelp": "Aktivieren, wenn dieser benutzerdefinierte Anbieter Audio-Transkription unterstützt",
+      "sttModelName": "STT-Modellname",
+      "sttModelNamePlaceholder": "z. B. whisper-1",
+      "sttApiUrl": "STT-API-URL",
+      "sttApiUrlPlaceholder": "z. B. https://api.beispiel.com/v1/audio/transcriptions",
+      "model": "Modell",
+      "apiEndpoint": "API-Endpunkt",
+      "apiEndpointPlaceholder": "Bereitgestellten API-Endpunkt eingeben",
+      "apiKey": "API-Schlüssel",
+      "apiKeyPlaceholder": "Geben Sie Ihren {provider}-Schlüssel ein",
+      "apiKeyFallback": "API",
+      "encryptionNotice": "Lokal verschlüsselt, nur zur Authentifizierung an API-Anbieter gesendet",
+      "modelsCount": "{count} Modelle"
+    },
+
+    "tuning": {
+      "memoryWindow": "Speicherfenster",
+      "memoryWindowUnit": "Nachrichten",
+      "memoryWindowHelp": "Anzahl der letzten Nachrichten, die in jede LLM-Anfrage einbezogen werden",
+      "streamingMode": "Streaming-Modus",
+      "streamingModeHelp": "Verfügbar in der nächsten Version"
+    },
+
+    "voice": {
+      "ttsProvider": "TTS-Anbieter",
+      "voice": "Stimme",
+      "voicesAvailable": "{count} Stimmen verfügbar für {gender}",
+      "voiceAvailable": "{count} Stimme verfügbar für {gender}",
+      "noVoices": "Keine Stimmen für dieses Geschlecht verfügbar",
+      "apiKey": "API-Schlüssel",
+      "globalKeyPlaceholder": "Verwendung des globalen OpenAI-Schlüssels",
+      "apiKeyPlaceholder": "Geben Sie Ihren {provider}-Schlüssel ein",
+      "apiKeyFallback": "TTS",
+      "globalKeyNotice": "Verwendung Ihres globalen OpenAI API-Schlüssels",
+      "encryptionNotice": "Lokal verschlüsselt, nur zur Authentifizierung an API-Anbieter gesendet",
+      "voiceOutput": "Sprachausgabe",
+      "voiceOutputHelp": "Sprache aus Antworten generieren"
+    },
+
+    "privacy": {
+      "privacyMode": "Datenschutzmodus",
+      "enabledHelp": "Nutzungsanalyse deaktiviert — keine Telemetriedaten werden gesammelt",
+      "disabledHelp": "Anonyme Nutzungsanalyse aktiviert, um Athena zu verbessern",
+      "infoBox": "Anonyme Nutzungsdaten helfen, Funktionen zu priorisieren und Probleme zu beheben. Keine Konversationen, persönlichen Daten oder API-Schlüssel werden jemals gesammelt."
+    },
+
+    "summary": {
+      "avatar": "Avatar",
+      "personality": "Persönlichkeit",
+      "visualFormat": "Visuelles Format",
+      "created": "Erstellt",
+      "aiConfiguration": "KI-Konfiguration",
+      "provider": "Anbieter",
+      "model": "Modell",
+      "memory": "Speicher",
+      "memoryUnit": "Nachrichten",
+      "privacyMode": "Datenschutzmodus",
+      "voiceConfiguration": "Sprachkonfiguration",
+      "ttsProvider": "TTS-Anbieter",
+      "apiKey": "API-Schlüssel",
+      "globalKey": "Verwendung des globalen OpenAI-Schlüssels",
+      "traits": "Eigenschaften"
+    },
+
+    "about": {
+      "version": "ATHENA v0.1",
+      "tagline": "Datenschutzorientierter KI-Begleiter. Open Source, lokal verschlüsselt.",
+      "copyright": "© 2026 Athena-Projekt"
+    }
   }
 }

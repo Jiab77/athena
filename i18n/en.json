@@ -6,15 +6,146 @@
     "companion": "Companion",
     "settings": "Settings"
   },
-  "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "languageDescription": "Choose your preferred interface language"
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "error": "Error",
+    "default": "Default",
+    "none": "None",
+    "custom": "Custom",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "languages": {
     "en": "English",
     "fr": "French",
     "de": "German",
     "it": "Italian"
+  },
+  "settings": {
+    "title": "Settings",
+    "save": "Save Settings",
+    "saved": "Settings Saved",
+    "savedDescription": "Your settings and customizations have been saved.",
+    "saveFailed": "Failed to save settings. Please try again.",
+
+    "language": "Language",
+    "languageDescription": "Choose your preferred interface language. Changes apply immediately.",
+
+    "sections": {
+      "companion": "Companion",
+      "customize": "Customize",
+      "model": "Model",
+      "tuning": "Tuning",
+      "voice": "Voice",
+      "privacy": "Privacy",
+      "language": "Language",
+      "summary": "Summary",
+      "about": "About"
+    },
+
+    "companion": {
+      "category": "Category",
+      "gender": "Gender",
+      "female": "Female",
+      "male": "Male",
+      "colorScheme": "Color Scheme",
+      "name": "Name",
+      "namePlaceholder": "Enter companion name"
+    },
+
+    "customize": {
+      "personalityType": "Personality Type",
+      "customTraits": "Custom Traits",
+      "customTraitsPlaceholder": "Add personality traits and characteristics...",
+      "customTraitsHelp": "Describe how your companion should behave and interact",
+      "visualFormat": "Visual Format",
+      "decartApiKey": "Decart API Key",
+      "decartApiKeyPlaceholder": "Enter your Decart API key",
+      "decartApiKeyHelpStart": "Get your key at",
+      "decartApiKeyHelpEnd": ". Stored encrypted on your device."
+    },
+
+    "model": {
+      "provider": "AI Provider",
+      "customProvider": "Custom Provider",
+      "customProviderOption": "+ Custom Provider",
+      "providerName": "Provider Name",
+      "providerNamePlaceholder": "e.g., WormGPT",
+      "baseUrl": "Base URL",
+      "baseUrlPlaceholder": "https://api.example.com/v1",
+      "modelName": "Model Name",
+      "modelNamePlaceholder": "e.g., wormgpt-v2",
+      "supportsSTT": "Supports Speech-to-Text",
+      "supportsSTTHelp": "Enable if this custom provider supports audio transcription",
+      "sttModelName": "STT Model Name",
+      "sttModelNamePlaceholder": "e.g., whisper-1",
+      "sttApiUrl": "STT API URL",
+      "sttApiUrlPlaceholder": "e.g., https://api.example.com/v1/audio/transcriptions",
+      "model": "Model",
+      "apiEndpoint": "API Endpoint",
+      "apiEndpointPlaceholder": "Enter provided API endpoint",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "Enter your {provider} key",
+      "apiKeyFallback": "API",
+      "encryptionNotice": "Encrypted locally, sent only to API providers for authentication",
+      "modelsCount": "{count} models"
+    },
+
+    "tuning": {
+      "memoryWindow": "Memory Window",
+      "memoryWindowUnit": "messages",
+      "memoryWindowHelp": "Number of recent messages included in each LLM request",
+      "streamingMode": "Streaming Mode",
+      "streamingModeHelp": "Coming in the next release"
+    },
+
+    "voice": {
+      "ttsProvider": "TTS Provider",
+      "voice": "Voice",
+      "voicesAvailable": "{count} voices available for {gender}",
+      "voiceAvailable": "{count} voice available for {gender}",
+      "noVoices": "No voices available for this gender",
+      "apiKey": "API Key",
+      "globalKeyPlaceholder": "Using Global OpenAI Key",
+      "apiKeyPlaceholder": "Enter your {provider} key",
+      "apiKeyFallback": "TTS",
+      "globalKeyNotice": "Using your global OpenAI API key",
+      "encryptionNotice": "Encrypted locally, sent only to API providers for authentication",
+      "voiceOutput": "Voice Output",
+      "voiceOutputHelp": "Generate speech from responses"
+    },
+
+    "privacy": {
+      "privacyMode": "Privacy Mode",
+      "enabledHelp": "Usage analytics disabled — no telemetry data is collected",
+      "disabledHelp": "Anonymous usage analytics enabled to help improve Athena",
+      "infoBox": "Anonymous usage data helps prioritise features and fix issues. No conversations, personal data, or API keys are ever collected."
+    },
+
+    "summary": {
+      "avatar": "Avatar",
+      "personality": "Personality",
+      "visualFormat": "Visual Format",
+      "created": "Created",
+      "aiConfiguration": "AI Configuration",
+      "provider": "Provider",
+      "model": "Model",
+      "memory": "Memory",
+      "memoryUnit": "messages",
+      "privacyMode": "Privacy Mode",
+      "voiceConfiguration": "Voice Configuration",
+      "ttsProvider": "TTS Provider",
+      "apiKey": "API Key",
+      "globalKey": "Using Global OpenAI Key",
+      "traits": "Traits"
+    },
+
+    "about": {
+      "version": "ATHENA v0.1",
+      "tagline": "Privacy-first AI companion. Open source, locally encrypted.",
+      "copyright": "© 2026 Athena Project"
+    }
   }
 }
