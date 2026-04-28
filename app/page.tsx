@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Lock, Zap, Users, Code, Download, Upload, MessageCircle, Settings } from 'lucide-react'
+import { Lock, Zap, Users, Code, Download, Upload, MessageCircle, Settings, MonitorDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FloatingActionButton } from '@/components/floating-action-button'
 import { CharacterRender } from '@/components/character-render'
@@ -11,6 +11,7 @@ import { MergedCompanionChat } from '@/components/merged-companion-chat'
 import { ExportModal } from '@/components/export-modal'
 import { ImportModal } from '@/components/import-modal'
 import { useConnectionStatus } from '@/hooks/use-connection-status'
+import { usePWAInstall } from '@/hooks/use-pwa-install'
 import {
   DEFAULT_COMPANION,
   DEFAULT_PERSONALITY,
@@ -45,6 +46,7 @@ export default function Home() {
   const [visualFormat, setVisualFormat] = useState<VisualFormat>(DEFAULT_VISUAL_FORMAT)
   const { db, dbReady } = useDB()
   const { isOnline, refresh: refreshConnectionStatus } = useConnectionStatus()
+  const { canInstall, install } = usePWAInstall()
   const featuresRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -450,6 +452,21 @@ export default function Home() {
       {/* Floating Action Button */}
       <FloatingActionButton
         items={[
+          // Install item only appears when the browser deems the PWA installable
+          // and it has not already been installed. iOS Safari does not fire
+          // beforeinstallprompt, so canInstall stays false there (expected).
+          ...(canInstall
+            ? [
+                {
+                  id: 'install',
+                  label: 'Install App',
+                  icon: <MonitorDown className="h-5 w-5" />,
+                  onClick: () => {
+                    void install()
+                  },
+                },
+              ]
+            : []),
           {
             id: 'export',
             label: 'Export',
