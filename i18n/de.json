@@ -25,8 +25,11 @@
   },
   "home": {
     "hero": {
-      "taglineLine1Prefix": "Ihr",
-      "taglineLine1Highlight": "datenschutzorientierter",
+      "taglineLine1Prefix": { "default": "Ihre", "m": "Ihr" },
+      "taglineLine1Highlight": {
+        "default": "datenschutzorientierte",
+        "m": "datenschutzorientierter"
+      },
       "taglineLine1Suffix": { "default": "KI-Begleiterin.", "m": "KI-Begleiter." },
       "taglineLine2Accent": "Immer schwebend an Ihrer Seite.",
       "taglineLine2Primary": "Niemals werden Ihre Daten preisgegeben.",
@@ -232,14 +235,20 @@
       "male": "Männlich",
       "colorScheme": "Farbschema",
       "name": "Name",
-      "namePlaceholder": "Begleiternamen eingeben"
+      "namePlaceholder": {
+        "default": "Namen der Begleiterin eingeben",
+        "m": "Namen des Begleiters eingeben"
+      }
     },
 
     "customize": {
       "personalityType": "Persönlichkeitstyp",
       "customTraits": "Eigene Eigenschaften",
       "customTraitsPlaceholder": "Persönlichkeitsmerkmale und Eigenschaften hinzufügen...",
-      "customTraitsHelp": "Beschreiben Sie, wie sich Ihr Begleiter verhalten und interagieren soll",
+      "customTraitsHelp": {
+        "default": "Beschreiben Sie, wie sich Ihre Begleiterin verhalten und interagieren soll",
+        "m": "Beschreiben Sie, wie sich Ihr Begleiter verhalten und interagieren soll"
+      },
       "visualFormat": "Visuelles Format",
       "decartApiKey": "Decart API-Schlüssel",
       "decartApiKeyPlaceholder": "Geben Sie Ihren Decart API-Schlüssel ein",
@@ -324,7 +333,10 @@
 
     "about": {
       "version": "ATHENA v0.1",
-      "tagline": "Datenschutzorientierter KI-Begleiter. Open Source, lokal verschlüsselt.",
+      "tagline": {
+        "default": "Datenschutzorientierte KI-Begleiterin. Open Source, lokal verschlüsselt.",
+        "m": "Datenschutzorientierter KI-Begleiter. Open Source, lokal verschlüsselt."
+      },
       "copyright": "© 2026 Athena-Projekt"
     }
   }

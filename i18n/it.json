@@ -25,7 +25,7 @@
   },
   "home": {
     "hero": {
-      "taglineLine1Prefix": "Il tuo",
+      "taglineLine1Prefix": { "default": "La tua", "m": "Il tuo" },
       "taglineLine1Highlight": { "default": "compagna IA", "m": "compagno IA" },
       "taglineLine1Suffix": {
         "default": "orientata alla privacy.",
@@ -235,14 +235,20 @@
       "male": "Maschile",
       "colorScheme": "Schema colori",
       "name": "Nome",
-      "namePlaceholder": "Inserisci il nome del compagno"
+      "namePlaceholder": {
+        "default": "Inserisci il nome della compagna",
+        "m": "Inserisci il nome del compagno"
+      }
     },
 
     "customize": {
       "personalityType": "Tipo di personalità",
       "customTraits": "Tratti personalizzati",
       "customTraitsPlaceholder": "Aggiungi tratti di personalità e caratteristiche...",
-      "customTraitsHelp": "Descrivi come dovrebbe comportarsi e interagire il tuo compagno",
+      "customTraitsHelp": {
+        "default": "Descrivi come dovrebbe comportarsi e interagire la tua compagna",
+        "m": "Descrivi come dovrebbe comportarsi e interagire il tuo compagno"
+      },
       "visualFormat": "Formato visivo",
       "decartApiKey": "Chiave API Decart",
       "decartApiKeyPlaceholder": "Inserisci la tua chiave API Decart",
@@ -327,7 +333,10 @@
 
     "about": {
       "version": "ATHENA v0.1",
-      "tagline": "Compagno IA orientato alla privacy. Open source, crittografato localmente.",
+      "tagline": {
+        "default": "Compagna IA orientata alla privacy. Open source, crittografata localmente.",
+        "m": "Compagno IA orientato alla privacy. Open source, crittografato localmente."
+      },
       "copyright": "© 2026 Progetto Athena"
     }
   }
