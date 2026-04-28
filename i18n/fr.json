@@ -27,7 +27,10 @@
     "hero": {
       "taglineLine1Prefix": "Votre",
       "taglineLine1Highlight": { "default": "compagne IA", "m": "compagnon IA" },
-      "taglineLine1Suffix": "respectueux de la vie privée.",
+      "taglineLine1Suffix": {
+        "default": "respectueuse de la vie privée.",
+        "m": "respectueux de la vie privée."
+      },
       "taglineLine2Accent": {
         "default": "Toujours flottante à vos côtés.",
         "m": "Toujours flottant à vos côtés."

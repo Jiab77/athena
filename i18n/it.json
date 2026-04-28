@@ -27,7 +27,10 @@
     "hero": {
       "taglineLine1Prefix": "Il tuo",
       "taglineLine1Highlight": { "default": "compagna IA", "m": "compagno IA" },
-      "taglineLine1Suffix": "orientato alla privacy.",
+      "taglineLine1Suffix": {
+        "default": "orientata alla privacy.",
+        "m": "orientato alla privacy."
+      },
       "taglineLine2Accent": "Sempre fluttuante al tuo fianco.",
       "taglineLine2Primary": "Senza mai esporre i tuoi dati.",
       "activate": "ATTIVA ATHENA",
