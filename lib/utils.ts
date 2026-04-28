@@ -332,6 +332,9 @@ export async function generateTTSBlob(text: string): Promise<Blob> {
   } else if (voiceProvider === 'resemble-ai') {
     const { generateSpeech } = await import('./voice/resembleai')
     return generateSpeech(text)
+  } else if (voiceProvider === 'openrouter') {
+    const { generateSpeech } = await import('./voice/openrouter')
+    return generateSpeech(text)
   } else {
     throw new Error(`Unsupported TTS provider: ${voiceProvider}`)
   }
@@ -351,6 +354,10 @@ export async function generateAndPlayTTS(text: string, onPlay?: () => void, onEn
       return await playAudio(audioBlob, onPlay, onEnd)
     } else if (voiceProvider === 'resemble-ai') {
       const { generateSpeech } = await import('./voice/resembleai')
+      audioBlob = await generateSpeech(text)
+      return await playAudio(audioBlob, onPlay, onEnd)
+    } else if (voiceProvider === 'openrouter') {
+      const { generateSpeech } = await import('./voice/openrouter')
       audioBlob = await generateSpeech(text)
       return await playAudio(audioBlob, onPlay, onEnd)
     } else {
