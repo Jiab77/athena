@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useDB } from '@/lib/db-context'
+import { LLM_PROVIDERS } from '@/lib/constants'
 
 export function useConnectionStatus() {
   const [isOnline, setIsOnline] = useState(false)
@@ -14,11 +15,16 @@ export function useConnectionStatus() {
     const checkStatus = async () => {
       try {
         const settings = await db.getSettings()
-        const apiKey = await db.checkAPIKey('groq') || await db.checkAPIKey('openai') || await db.checkAPIKey('biollm')
 
-        // Online only if settings exist AND API key is configured
-        const result = !!settings && !!apiKey
-        setIsOnline(result)
+        // Online if settings exist AND at least one configured provider has an
+        // API key. Derive the list from `LLM_PROVIDERS` so future providers are
+        // picked up automatically — see lib/constants.ts.
+        const keyChecks = await Promise.all(
+          LLM_PROVIDERS.map(provider => db.checkAPIKey(provider.id))
+        )
+        const hasAnyKey = keyChecks.some(Boolean)
+
+        setIsOnline(!!settings && hasAnyKey)
       } catch {
         setIsOnline(false)
       }
