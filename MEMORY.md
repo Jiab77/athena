@@ -181,6 +181,71 @@ Reviewed [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpath
 
 ---
 
+## Session 32: OpenRouter STT + TTS, multi-provider architectural cleanup (04/28/2026)
+
+### Overview
+
+A long, dialogue-heavy session that started with completing OpenRouter coverage across all three modalities (chat was already done; STT and TTS were the gap) and snowballed into a sweeping cleanup of the OpenAI/Groq-centric special-cases that had quietly accumulated when those were the only multi-capability providers. Heavy emphasis on "discuss before code" — most of the value came from clarifying intent before touching files, not from the edits themselves.
+
+### What was built
+
+1. **OpenRouter STT** — `transcribeAudio()` in `lib/llm/openrouter.ts`, dispatched via `/chat/completions` with an `input_audio` content block (OpenRouter has no dedicated Whisper endpoint). Registered in `STT_PROVIDERS` with `google/gemini-2.5-flash` as the model. Same function signature as the OpenAI/Groq adapters so the registry contract is preserved.
+
+2. **OpenRouter TTS** — new `lib/voice/openrouter.ts` mirroring `lib/voice/openai.ts` since OpenRouter proxies OpenAI's `/audio/speech` directly. Voice IDs copied verbatim into a new `openrouter` entry of `TTS_VOICES` — each provider stays a self-contained source of truth rather than aliasing.
+
+### Architectural cleanups (in execution order, each triggered by "what else hardcodes OpenAI/Groq?")
+
+3. **`hooks/use-connection-status.ts`** — replaced hardcoded `groq | openai | biollm` OR-chain with `LLM_PROVIDERS.map(...)`. The online indicator now reflects every configured provider, not just the original three.
+
+4. **`components/settings-panel.tsx`** — generalized `isOpenAIVoice && isOpenAIGlobal` to `voiceProvider === provider`. Auto-populate-the-voice-key UX now works for OpenRouter and any future provider that does both chat and TTS, with mix-and-match (OpenAI chat + ResembleAI voice etc.) preserved.
+
+5. **`lib/utils.ts` TTS dispatcher** — collapsed two parallel `if/else if/else if` chains (`generateTTSBlob`, `generateAndPlayTTS`) into a single `TTS_DISPATCHERS` lookup table + `dispatchTTS` helper. Adding a future TTS provider is now a one-line map addition.
+
+6. **`lib/llm/router.ts` STT fallback** — collapsed two duplicated BioLLM-specific branches into `STT_FALLBACK_CHAIN` constant + `getNativeSTT()` + `resolveSTTFallback()` helpers. Side effect (intentional, user explicitly approved): Custom providers without `hasSTTSupport` now fall back to Whisper instead of throwing — consistent treatment for "active provider can't transcribe." OpenRouter deliberately excluded from the chain because chat-completions-STT is slower and token-billed.
+
+7. **`lib/llm/brain.ts:363`** — replaced literal `'groq'` fallback with `DEFAULT_MODEL_PROVIDER`. Single source of truth for the boot default.
+
+8. **`lib/llm/emotions.ts` rewrite** — full architectural pass mirroring the STT cleanup. Per-provider `detectEmotion(systemPrompt, userText)` adapters added to `lib/llm/openai.ts` and `lib/llm/groq.ts`. `LLMProvider` interface gained optional `detectEmotion?` field. Router gained `EMOTION_FALLBACK_CHAIN` + `resolveEmotionDetector()` mirroring the STT pattern exactly. `emotions.ts` shrank from ~155 lines to 112 — now `fetch`-free, owns prompt construction + parsing + validation only, and delegates dispatch to the router. The `provider` parameter is finally honoured rather than silently ignored. All verbose logs preserved (user explicitly asked) and now split across coordinator + adapter layers for clearer traces.
+
+### Skipped on purpose
+
+- **Groq pre-flight tool detection duplication** (`chat-interface.tsx:383` vs `router.ts:94`) — investigated end to end, before/after diff presented. User correctly called it micro-optimization for a project this young; not worth touching. Filed as "revisit if/when another provider needs pre-flight, or if the Groq vision-bug fires in practice."
+- **Streaming for chat completions** — discussed at length. Conclusion: streaming is a means, not a goal. Current non-streaming UX is well-suited to the chat companion product mode (short JSON-enveloped replies). Streaming becomes relevant when/if real-time voice/video chat ships, and should be a separate code path at that point, not a retrofit.
+
+### Lessons learned (recurring across the session)
+
+1. **The actual code is the truth.** I was caught multiple times reasoning from memory or a snippet and being wrong. The pattern that worked: read the *full* file or the *full* surrounding context before opining, even when a snippet looks self-explanatory. Skim-reasoning produces confidently wrong answers — and the user noticed every single time.
+
+2. **Two-instance rule for generalization.** Special-case code (OpenAI-only voice key sharing, hardcoded BioLLM fallback, OpenAI/Groq emotion chain) wasn't wrong at write-time — there was only one instance. The right time to generalize is the moment the second instance appears and the special-case becomes a misfit. OpenRouter's arrival triggered a cascade of small generalizations that were each individually justified.
+
+3. **Single-key UX is the correct framing for OpenRouter.** Initial instinct was to evaluate each capability in isolation ("is OpenRouter STT better than Whisper?" → no, skip). User reframed as "minimize the number of API keys a user must manage" → that flipped the recommendation. Per-request quality is one axis; friction-to-get-started is another, and the second often dominates for hobby/single-user projects.
+
+4. **No users = bias toward clean code, not toward compatibility.** User explicitly noted there are zero users today (project is public on GitHub but unannounced). That collapses the "don't break compatibility" axis. Stop reflexively hedging on "this might surprise users" until users exist to surprise. Still flag *risky* changes (data migrations, destructive ops) because dev/test data still matters.
+
+5. **Discussion before code paid off, every time.** Cadence was: user asks → I read → I propose → user clarifies/corrects → I implement. Several proposed changes were pruned by clarification before any file was touched: the audio-input "blocker" I invented in error; the OpenRouter "model curation" overhead I imagined; the streaming retrofit I worried about. Saved real time.
+
+### Files touched
+
+- `lib/constants.ts` — STT_PROVIDERS / TTS_PROVIDERS / TTS_VOICES openrouter entries
+- `lib/llm/openrouter.ts` — `transcribeAudio()` added
+- `lib/voice/openrouter.ts` — new file (TTS adapter)
+- `lib/llm/openai.ts` — `detectEmotion()` added
+- `lib/llm/groq.ts` — `detectEmotion()` added
+- `lib/llm/router.ts` — STT fallback generalization, emotion resolver, registry updates
+- `lib/llm/emotions.ts` — full rewrite as thin coordinator
+- `lib/llm/brain.ts` — `DEFAULT_MODEL_PROVIDER` constant + import
+- `lib/utils.ts` — TTS dispatcher table + `dispatchTTS` helper
+- `hooks/use-connection-status.ts` — registry-driven key check
+- `components/settings-panel.tsx` — generalized voice-key sharing
+
+### Open items for future sessions
+
+- **Emotion detection on OpenRouter** — registry now supports it as a one-line addition to `openrouter.ts` + a registry entry. Not done because the user didn't ask. Same for Custom (would need a `hasEmotionSupport` toggle following the `hasSTTSupport`/`hasTTSSupport` precedent).
+- **Typing-speed UX** (off-topic discussion during the streaming convo): user's reference CLI script uses 30ms/char; current Athena reveal-pacing not yet measured. Not a current ask, but noted as a future polish item.
+- **`lib/constants.ts` size** — file is approaching ~600 lines. Possible future split (per-feature constant modules) if it crosses a comfort threshold.
+
+---
+
 ## Session 31: Kai-inspired redesign discussion, REDESIGN.md created (04/17/2026)
 
 ### Overview
