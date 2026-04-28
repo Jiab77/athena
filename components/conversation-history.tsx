@@ -10,6 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useDB } from '@/lib/db-context'
 import { useTranslation } from '@/hooks/use-translation'
 import { decryptData } from '@/lib/crypto'
@@ -123,27 +129,45 @@ export function ConversationHistory({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onNewConversation}
-        title={t('history.newConversation')}
-        className="h-8 w-8 cursor-pointer"
-      >
-        <MessageSquarePlus className="h-4 w-4" />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onNewConversation}
+              aria-label={t('history.newConversation')}
+              className="h-8 w-8 cursor-pointer"
+            >
+              <MessageSquarePlus className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p>{t('history.newConversation')}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            title={t('history.title')}
-            className="h-8 w-8 cursor-pointer"
-          >
-            <History className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t('history.title')}
+                  className="h-8 w-8 cursor-pointer"
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{t('history.title')}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <DropdownMenuContent align="end" className="w-64">
           {isLoading ? (
             <DropdownMenuItem disabled>
