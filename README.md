@@ -131,7 +131,7 @@ All keys are configured inside the app under **Settings > Model** — encrypted 
 | Phase | Status | Focus |
 |---|---|---|
 | Phase 1 — MVP | ✅ Complete | Core architecture, LLM, voice, avatars, encryption, PWA |
-| Phase 2 — Quality & Hardening | 🔄 In Progress | UX fixes, state conflicts, CSP, KISS refactor |
+| Phase 2 — Quality & Hardening | 🔄 In Progress | UX fixes, state conflicts, KISS refactor |
 | Phase 3 — Advanced Features | 📋 Planned | Runway avatar, BroadcastChannel sync, RAG, Claude, offline STT/TTS |
 | Phase 4 — Desktop & Local AI | 🔮 Future | Tauri app, Ollama, fine-tuning, federated learning |
 

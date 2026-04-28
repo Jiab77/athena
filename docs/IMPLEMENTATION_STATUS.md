@@ -71,7 +71,7 @@ Last updated: 2026-04-03 — Session 27
 - [ ] `/app/companion/[id]/page.tsx` full review / rewrite
 - [ ] Visual formats logic / rendering full review / rewrite
 - [ ] `DEBUG_MODE` constant + `debugLog()` utility (`constants.ts` + `lib/utils.ts`)
-- [ ] Content Security Policy (CSP) header
+- [x] Content Security Policy (CSP) header — implemented Session 33 via `next.config.mjs` `headers()`
 - [ ] Input validation on user message content (Zero Trust gap)
 - [ ] `chat-interface.tsx` refactor — 1100+ lines, KISS violation
 - [ ] Remove try/catch control flow in `parseCompanionJSON()` and `import.ts`

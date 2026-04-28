@@ -46,7 +46,7 @@ The following remain relevant regardless:
 - `lib/llm/brain.ts` state extraction (item 2) — still needed
 - Mic disabled while AI speaks (item 6) — UI behavior, independent of layout
 - Speaker becomes Stop while AI speaks (item 7) — UI behavior, independent of layout
-- CSP header (item 11) — infrastructure, independent of layout
+- ~~CSP header (item 11) — infrastructure, independent of layout~~ ✅ Done (Session 33)
 - `DEBUG_MODE` utility (item 13) — infrastructure, independent of layout
 - `thinking` state (item 14) — behavior, independent of layout
 - Model capabilities display (item 15) — independent of layout

@@ -21,7 +21,7 @@ Fixing known UX and architecture issues before adding new features:
 - `/app/companion/[id]/page.tsx` full rewrite
 - Visual formats logic consolidation
 - `DEBUG_MODE` toggle for development logging
-- Content Security Policy (CSP) header
+- ~~Content Security Policy (CSP) header~~ ✅ Done (Session 33)
 - Input validation (Zero Trust gap)
 - `chat-interface.tsx` refactor (KISS)
 - Dependency hardening (`tweetnacl` replacement, SBOM)

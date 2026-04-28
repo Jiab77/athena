@@ -24,11 +24,11 @@ The one relevant concern from this category:
 
 ## A02:2025 — Security Misconfiguration
 
-**Status: Medium severity — CSP still missing.**
+**Status: Low severity — CSP and security headers implemented in Session 33.**
 
 This category replaces A05:2021 Misconfiguration and moves up to #2 in 2025. It now explicitly covers missing security headers (CWE-16).
 
-- [ ] **[MEDIUM] No Content Security Policy (CSP)** — `app/layout.tsx` sets no `Content-Security-Policy` header and no `<meta http-equiv>` equivalent. A strict CSP (`default-src 'self'`, `connect-src` limited to known API origins) would significantly reduce XSS blast radius. API keys in IndexedDB are accessible to any script on the origin if XSS is achieved. This is the highest remaining unfixed issue in the codebase. Carried from the 2021 audit.
+- [x] ~~**[MEDIUM] No Content Security Policy (CSP)**~~ Fixed in Session 33: CSP and five additional security headers added at the framework level via `next.config.mjs` `headers()` function. Headers applied to every response. CSP directives: `default-src 'self'`, `script-src 'self' 'unsafe-inline' 'unsafe-eval'` (Next.js requires), `style-src 'self' 'unsafe-inline'` (Tailwind requires), `img-src 'self' data: blob: https:`, `font-src 'self' data:`, `connect-src 'self' https:`, `worker-src 'self' blob:`, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests`. `connect-src 'self' https:` is intentionally permissive to support user-configured custom provider endpoints, but still blocks `http://`, `data:`, and `blob:` exfiltration channels — the primary XSS exfiltration vectors. Additional headers: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: microphone=(self), camera=(self), geolocation=()`, `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`.
 - [ ] **[INFO] `generator: 'v0.app'` in metadata** — `app/layout.tsx` includes `generator: 'v0.app'` in the Next.js metadata object. This leaks information about the toolchain used to build the app (CWE-497). Low risk but trivially removable.
 - [x] **[PASS] No debug code in production** — `CWE-489`: All `[v0]` debug console statements were removed across 18 files in Session 26. `[Athena]` debug statements remain but log operational data only, not secrets.
 - [x] **[PASS] No hardcoded secrets** — No API keys, passwords, or cryptographic material are hardcoded anywhere in the codebase (CWE-547).
@@ -83,7 +83,7 @@ Injection drops to #5 in 2025. OWASP 2025 explicitly calls out LLM prompt inject
 
 Insecure Design drops to #6 in 2025. All fixable items from the 2021 audit are resolved.
 
-- [ ] **[MEDIUM] API keys decrypted at runtime client-side** — Unavoidable for a pure client-side app. Any XSS on the origin can extract keys from memory after decryption. Encryption provides data-at-rest protection only. Mitigated by: (1) no backend to attack with stolen keys, (2) keys only work from the user's own accounts, (3) the missing CSP (A02) being the main leverage point for XSS. Accepted risk for a local-first architecture (CWE-522).
+- [ ] **[MEDIUM] API keys decrypted at runtime client-side** — Unavoidable for a pure client-side app. Any XSS on the origin can extract keys from memory after decryption. Encryption provides data-at-rest protection only. Mitigated by: (1) no backend to attack with stolen keys, (2) keys only work from the user's own accounts, (3) CSP now in place (A02) significantly reducing XSS exfiltration channels. Accepted risk for a local-first architecture (CWE-522).
 - [x] ~~**[MEDIUM] `registerProvider()` publicly callable**~~ Fixed: unexported, unreachable from browser console.
 - [x] ~~**[MEDIUM] Import pipeline trusts raw JSON structure**~~ Fixed: `isValidConversationData()` validates every conversation object in `lib/import.ts`.
 - [ ] **[INFO] `store: false` on OpenAI requests** — Correctly set. Conversations are not retained on OpenAI servers. Design decision documented in `README.md`.
@@ -141,7 +141,6 @@ This is a new entry replacing A10:2021 (Server-Side Request Forgery). It covers 
 
 | Priority | ID | File | Issue |
 |---|---|---|---|
-| **Medium** | A02 | `app/layout.tsx` | No Content Security Policy header |
 | **Medium** | A03 | `package.json` | No automated dependency audit / SBOM process |
 | **Low** | A10 | `lib/llm/custom.ts` + UI | API error messages may leak provider config hints |
 | **Low** | A10 | `lib/export.ts` | Bare re-throw exposes raw exceptions to UI |
@@ -151,6 +150,7 @@ This is a new entry replacing A10:2021 (Server-Side Request Forgery). It covers 
 | **Info** | A03 | `package.json` | `@decartai/sdk` pre-1.0 — monitor for security updates |
 | **Info** | A04 | `lib/crypto.ts` | PQC readiness — track, no action needed before 2030 |
 | ~~Info~~ | ~~A10~~ | ~~`app/`~~ | ~~No global `error.tsx` boundary~~ — **Fixed** |
+| ~~Medium~~ | ~~A02~~ | ~~`app/layout.tsx`~~ | ~~No Content Security Policy header~~ — **Fixed (Session 33)** |
 | ~~High~~ | ~~A04~~ | ~~`lib/device-id.ts`~~ | ~~Silent ephemeral device ID on DB error~~ — **Fixed** |
 | ~~Medium~~ | ~~A05~~ | ~~`lib/import.ts`~~ | ~~No schema validation on import~~ — **Fixed** |
 | ~~Medium~~ | ~~A04/A06~~ | ~~`lib/llm/router.ts`~~ | ~~`registerProvider()` publicly callable~~ — **Fixed** |
