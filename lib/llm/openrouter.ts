@@ -16,7 +16,7 @@ import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey
 const CHAT_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
 /** Fallback STT model if the constants entry is somehow missing. Kept aligned with the registry's first model. */
-const DEFAULT_OPENROUTER_STT_MODEL = 'google/gemini-2.5-flash'
+const DEFAULT_OPENROUTER_STT_MODEL = 'openai/whisper-1'
 
 /** Strict transcription instruction used as the user-facing text part alongside the audio block. */
 const TRANSCRIPTION_PROMPT = 'Transcribe the attached audio verbatim. Output only the transcription text. Do not add commentary, summaries, language labels, timestamps, or any other text.'
