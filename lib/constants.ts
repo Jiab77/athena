@@ -3,7 +3,9 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, EmotionConfig, EmotionProvider, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import type {
+  Avatar, EmotionConfig, EmotionProvider, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider
+} from './types'
 
 /**
  * i18n
