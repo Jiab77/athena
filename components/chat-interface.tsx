@@ -221,7 +221,10 @@ export function ChatInterface({
     if (isRecording) {
       newState = 'listening'
     } else if (isTranscribing) {
-      newState = 'listening'
+      // STT in flight (audio → text) is a wait state, not a listen state.
+      // Mic is closed at this point; we're awaiting the STT API response.
+      // Matches what brain.ts does when voiceState === 'processing'.
+      newState = 'thinking'
     } else if (isSpeaking) {
       newState = 'speaking'
     } else if (isLoading) {
