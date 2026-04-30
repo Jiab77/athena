@@ -468,11 +468,11 @@ export const STT_PROVIDERS: STTProvider[] = [
     name: 'OpenRouter',
     models: [
       {
-        id: 'gemini-2.5-flash',
-        name: 'Gemini 2.5 Flash',
-        model: 'google/gemini-2.5-flash',
-        description: 'Multimodal Gemini model used for transcription via chat completions with audio input. Single OpenRouter key covers chat + STT.',
-        url: 'https://openrouter.ai/google/gemini-2.5-flash',
+        id: 'whisper-1',
+        name: 'Whisper V1',
+        model: 'openai/whisper-1',
+        description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
+        url: 'https://openrouter.ai/openai/whisper-1',
       }
     ],
   },
