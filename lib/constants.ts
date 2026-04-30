@@ -60,7 +60,6 @@ export const MAX_DISPLAY_MESSAGES = 30
  * Single source of truth for LLM services
  */
 export const DEFAULT_EMOTION_DETECTION_PROVIDER = 'openai'
-export const DEFAULT_GROQ_STT_MODEL = 'whisper-large-v3-turbo'
 export const DEFAULT_GROQ_TOOL_DETECTION_MODEL = 'groq/compound-mini'
 export const DEFAULT_GROQ_URL_CAPABLE_MODEL = 'groq/compound'
 export const DEFAULT_GROQ_VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
