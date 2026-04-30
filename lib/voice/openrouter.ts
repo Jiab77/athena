@@ -7,7 +7,6 @@ import {
   GENDER_MAPPING,
   DEFAULT_COMPANION_NAME,
   DEFAULT_GENDER,
-  DEFAULT_VOICE_MODEL,
   DEFAULT_VOICE_ID,
 } from '../constants'
 import { getDB } from '../db'
