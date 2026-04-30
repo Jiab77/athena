@@ -516,9 +516,9 @@ export const TTS_PROVIDERS: TTSProvider[] = [
       {
         id: 'gpt-4o-mini-tts',
         name: 'GPT-4o Mini TTS',
-        model: 'gpt-4o-mini-tts',
+        model: 'openai/gpt-4o-mini-tts-2025-12-15',
         description: "OpenAI's TTS model proxied via OpenRouter. Same voices as OpenAI's direct API, with a single key shared across chat, STT and TTS.",
-        url: 'https://openrouter.ai/openai/gpt-4o-mini-tts',
+        url: 'https://openrouter.ai/openai/gpt-4o-mini-tts-2025-12-15',
       },
     ],
   },
