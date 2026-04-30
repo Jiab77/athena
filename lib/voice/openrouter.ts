@@ -81,7 +81,7 @@ export async function generateSpeech(text: string): Promise<Blob> {
     const selectedVoice = settings?.selectedVoice || fallbackVoiceId
 
     const provider = TTS_PROVIDERS.find(p => p.id === 'openrouter')
-    const model = provider?.models[0]?.model || DEFAULT_VOICE_MODEL
+    const model = provider?.models[0]?.model
 
     const apiKey = await getAPIKey('openrouter')
     const audioFormat = getAudioFormat()
