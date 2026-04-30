@@ -17,7 +17,7 @@ import it from '@/i18n/it.json'
  */
 export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'it'] as const
 
-export const DEFAULT_LOCALE: Locale = 'en'
+
 
 /**
  * Native language labels — always shown in the language's own script
@@ -36,6 +36,7 @@ export const TRANSLATIONS = { en, fr, de, it } as const
  * Default Props
  * Single source of truth for all props
  */
+export const DEFAULT_LOCALE: Locale = 'en'
 export const DEFAULT_COMPANION_ID = 'athena'
 export const DEFAULT_COMPANION_NAME = 'Athena'
 export const DEFAULT_PERSONALITY: PersonalityType = 'Sarcastic'
