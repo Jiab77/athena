@@ -303,10 +303,10 @@
       "voiceAvailable": "{count} voix disponible pour {gender}",
       "noVoices": "Aucune voix disponible pour ce genre",
       "apiKey": "Clé API",
-      "globalKeyPlaceholder": "Utilisation de la clé OpenAI globale",
+      "globalKeyPlaceholder": "Utilisation de la clé {provider} globale",
       "apiKeyPlaceholder": "Entrez votre clé {provider}",
       "apiKeyFallback": "TTS",
-      "globalKeyNotice": "Utilisation de votre clé API OpenAI globale",
+      "globalKeyNotice": "Utilisation de votre clé API {provider} globale",
       "encryptionNotice": "Chiffrée localement, envoyée uniquement aux fournisseurs d'API pour l'authentification",
       "voiceOutput": "Sortie vocale",
       "voiceOutputHelp": "Générer de la parole à partir des réponses"
@@ -333,7 +333,9 @@
       "voiceConfiguration": "Configuration vocale",
       "ttsProvider": "Fournisseur TTS",
       "apiKey": "Clé API",
-      "globalKey": "Utilisation de la clé OpenAI globale",
+      "globalKey": "Utilisation de la clé {provider} globale",
+      "apiKeyConfigured": "Configurée",
+      "apiKeyNotConfigured": "Non configurée",
       "traits": "Traits"
     },
 

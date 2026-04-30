@@ -920,7 +920,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                   <div className="flex gap-2">
                     <Input
                       type={showVoiceApiKey ? 'text' : 'password'}
-                      placeholder={shouldAutoPopulateVoiceKey ? t('settings.voice.globalKeyPlaceholder') : t('settings.voice.apiKeyPlaceholder', { provider: selectedTTSProvider?.name || t('settings.voice.apiKeyFallback') })}
+                      placeholder={shouldAutoPopulateVoiceKey ? t('settings.voice.globalKeyPlaceholder', { provider: selectedTTSProvider?.name || t('settings.voice.apiKeyFallback') }) : t('settings.voice.apiKeyPlaceholder', { provider: selectedTTSProvider?.name || t('settings.voice.apiKeyFallback') })}
                       value={displayVoiceApiKey}
                       onChange={(e) => {
                         if (!shouldAutoPopulateVoiceKey) {
@@ -941,7 +941,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     <Lock className="inline h-3 w-3 mr-1" />
-                    {shouldAutoPopulateVoiceKey ? t('settings.voice.globalKeyNotice') : t('settings.voice.encryptionNotice')}
+                    {shouldAutoPopulateVoiceKey ? t('settings.voice.globalKeyNotice', { provider: selectedTTSProvider?.name || t('settings.voice.apiKeyFallback') }) : t('settings.voice.encryptionNotice')}
                   </p>
                 </div>
 
@@ -1120,12 +1120,28 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                       <span className="text-muted-foreground">{t('settings.summary.model')}:</span>
                       <span className="font-medium text-foreground">{selectedTTSProvider?.models[0]?.name || 'N/A'}</span>
                     </div>
-                    {shouldAutoPopulateVoiceKey && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t('settings.summary.apiKey')}:</span>
-                        <span className="font-medium text-accent text-xs">{t('settings.summary.globalKey')}</span>
-                      </div>
-                    )}
+                    {/* API Key — always rendered. Three states:
+                        1. Voice provider matches chat provider AND a key is set →
+                           "Using Global {provider} Key" (shared-key affordance, accent colour)
+                        2. A voice-specific key is set → "Configured" (accent colour)
+                        3. No key for the active TTS provider → "Not Configured"
+                           (destructive colour to flag that voice will fail without one) */}
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('settings.summary.apiKey')}:</span>
+                      {shouldAutoPopulateVoiceKey && displayVoiceApiKey ? (
+                        <span className="font-medium text-accent text-xs">
+                          {t('settings.summary.globalKey', { provider: selectedTTSProvider?.name || t('settings.voice.apiKeyFallback') })}
+                        </span>
+                      ) : displayVoiceApiKey ? (
+                        <span className="font-medium text-accent text-xs">
+                          {t('settings.summary.apiKeyConfigured')}
+                        </span>
+                      ) : (
+                        <span className="font-medium text-destructive text-xs">
+                          {t('settings.summary.apiKeyNotConfigured')}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
