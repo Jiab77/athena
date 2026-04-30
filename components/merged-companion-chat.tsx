@@ -75,6 +75,7 @@ export function MergedCompanionChat({
     handleMicClick,
     playWithDecart,
     handleExpressionChange,
+    handleResponseReceived,
   } = useBrain({ companion, visualFormat, voiceOutputEnabled, isOpen })
 
   const isMobile = useIsMobile()
@@ -306,6 +307,7 @@ export function MergedCompanionChat({
                 onVoiceOutputToggle={onVoiceOutputToggle}
                 onExpressionChange={handleExpressionChange}
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
+                onResponseReceived={handleResponseReceived}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
                 sttSupported={sttSupported}
                 onConfigureApiKey={onConfigureApiKey}
@@ -341,6 +343,7 @@ export function MergedCompanionChat({
                 onVoiceOutputToggle={onVoiceOutputToggle}
                 onExpressionChange={handleExpressionChange}
                 onEmotionDetected={(emotion) => { setLastDetectedEmotion(emotion) }}
+                onResponseReceived={handleResponseReceived}
                 onTTSReady={isLiveAvatar ? (blob) => playWithDecart(blob) : undefined}
                 sttSupported={sttSupported}
                 onConfigureApiKey={onConfigureApiKey}

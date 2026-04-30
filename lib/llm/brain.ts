@@ -26,6 +26,7 @@ import {
   DEFAULT_COMPANION_ID,
   DEFAULT_AUDIO_TYPE,
   DEFAULT_MODEL_PROVIDER,
+  EMOTION_DISPLAY_DURATION,
   LIVE_AVATAR_IDLE_TIMEOUT,
   LIVE_AVATAR_CONNECTION_TIMEOUT,
 } from '../constants'
@@ -57,6 +58,13 @@ export interface BrainState {
   handleSendMessage: (text: string) => Promise<void>
   playWithDecart: (audioBlob: Blob) => Promise<void>
   handleExpressionChange: (state: ExpressionState) => void
+  /**
+   * Called by chat-interface when its own pipeline has received an LLM
+   * response. Centralises emotion detection + lifecycle so the chat-interface
+   * pipeline and the brain mic pipeline both go through the same code path.
+   * Fire-and-forget — never blocks message render or TTS.
+   */
+  handleResponseReceived: (text: string, provider: string) => void
 }
 
 export function useBrain({
@@ -77,9 +85,74 @@ export function useBrain({
   const audioChunksRef = useRef<Blob[]>([])
   const decartClientRef = useRef<DecartAvatarClient | null>(null)
   const decartIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Tracks the auto-reset timer for the displayed emotion. Cancelled when
+  // emotion is cleared externally (e.g. on TTS end) or when a new emotion
+  // arrives. See `handleResponseReceived` below for the lifecycle.
+  const emotionResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { db, dbReady } = useDB()
   const isLiveAvatar = visualFormat === 'live-avatar'
+
+  // ─── Emotion lifecycle ───────────────────────────────────────────────────────
+  //
+  // Emotion is owned end-to-end by the brain so both send pipelines (typing
+  // via chat-interface and voice via the brain mic) share one implementation.
+  // Lifecycle:
+  //   1. `handleResponseReceived` runs `detectEmotion` on the LLM output.
+  //   2. On success, sets `lastDetectedEmotion` (badge) and `expressionState`
+  //      (avatar pose) to the detected emotion.
+  //   3. Schedules an auto-reset to fire after `EMOTION_DISPLAY_DURATION`
+  //      in case TTS doesn't run (voice off, missing key, no text).
+  //   4. When TTS starts speaking, `expressionState` is overridden to
+  //      `'speaking'` by the conversation-state effect — emotion stays in the
+  //      badge until TTS ends and the consumer calls `setLastDetectedEmotion(null)`.
+  //   5. The "emotion went null" effect below cancels the pending timer so we
+  //      never push a stale `idle` after the consumer has already cleared.
+
+  const clearEmotionResetTimer = useCallback(() => {
+    if (emotionResetTimerRef.current) {
+      clearTimeout(emotionResetTimerRef.current)
+      emotionResetTimerRef.current = null
+    }
+  }, [])
+
+  // Cancel any pending auto-reset timer when emotion is cleared from outside
+  // (e.g. chat-interface's TTS-end handler, or a new emotion arriving).
+  useEffect(() => {
+    if (lastDetectedEmotion === null) {
+      clearEmotionResetTimer()
+    }
+  }, [lastDetectedEmotion, clearEmotionResetTimer])
+
+  // Cleanup on unmount.
+  useEffect(() => {
+    return () => clearEmotionResetTimer()
+  }, [clearEmotionResetTimer])
+
+  const handleResponseReceived = useCallback((text: string, provider: string): void => {
+    console.log('[Brain] handleResponseReceived — running emotion detection')
+    detectEmotion(text, provider).then(({ emotion }) => {
+      console.log('[Brain] Detected emotion:', emotion)
+      if (!emotion) return
+      setLastDetectedEmotion(emotion)
+      setExpressionState(emotion)
+      // Auto-reset in case TTS doesn't fire. If TTS does fire, the
+      // conversation-state effect will overwrite expressionState before
+      // this timer matters; the consumer's `setLastDetectedEmotion(null)`
+      // on TTS end cancels this timer via the effect above.
+      clearEmotionResetTimer()
+      emotionResetTimerRef.current = setTimeout(() => {
+        console.log('[Brain] Emotion display duration expired — resetting')
+        setLastDetectedEmotion(null)
+        // Only reset avatar if it's still showing this emotion — don't clobber
+        // a more recent conversation-state transition.
+        setExpressionState((prev) => (prev === emotion ? 'idle' : prev))
+        emotionResetTimerRef.current = null
+      }, EMOTION_DISPLAY_DURATION)
+    }).catch((err) => {
+      console.error('[Brain] handleResponseReceived: emotion detection failed', err)
+    })
+  }, [clearEmotionResetTimer])
 
   // ─── Decart idle timer ───────────────────────────────────────────────────────
 
@@ -365,12 +438,10 @@ export function useBrain({
       const result = await callLLM(allMessages, selectedProvider)
       console.log('[Brain] LLM response received, provider:', selectedProvider, 'reasoning:', result.reasoning ?? 'none')
 
-      // Fire-and-forget emotion detection — emotions.ts handles graceful degradation
-      // when no OpenAI or Groq key is configured, returning { emotion: null } with a console.warn
-      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
-        console.log('[Brain] Detected emotion:', emotion)
-        if (emotion) setLastDetectedEmotion(emotion)
-      })
+      // Fire-and-forget emotion detection — shared with the chat-interface
+      // pipeline via `handleResponseReceived`. Manages both badge and avatar
+      // pose plus the auto-reset timer in one place.
+      handleResponseReceived(result.response, selectedProvider)
 
       const companionMessage: Message = {
         id: `msg-${Date.now() + 1}`,
@@ -385,7 +456,7 @@ export function useBrain({
       console.error('[Brain] Error in handleSendMessage:', error)
       setExpressionState('idle')
     }
-  }, [loadConversation, saveConversation, handleTTS])
+  }, [loadConversation, saveConversation, handleTTS, handleResponseReceived, db])
 
   // ─── Voice recording ─────────────────────────────────────────────────────────
 
@@ -468,5 +539,6 @@ export function useBrain({
     handleSendMessage,
     playWithDecart,
     handleExpressionChange,
+    handleResponseReceived,
   }
 }
