@@ -7,7 +7,6 @@ import {
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_AUDIO_FILE,
-  DEFAULT_GROQ_STT_MODEL,
   DEFAULT_GROQ_URL_CAPABLE_MODEL,
   DEFAULT_GROQ_VISION_MODEL,
   EMOTION_PROVIDERS,
@@ -236,7 +235,10 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     // Get STT model from constants (Groq provider's first model)
     const providers = STT_PROVIDERS.find(p => p.id === 'groq')
-    const sttModel = providers?.models[0]?.model || DEFAULT_GROQ_STT_MODEL
+    const sttModel = providers?.models[0]?.model
+    if (!sttModel) {
+      throw new Error('No STT model registered for provider \'groq\'')
+    }
     formData.append('model', sttModel)
     // formData.append('language', 'fr')
 

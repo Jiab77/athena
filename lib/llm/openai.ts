@@ -289,7 +289,10 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     // Get STT model from constants (OpenAI provider's first model)
     const providers = STT_PROVIDERS.find(p => p.id === 'openai')
-    const sttModel = providers?.models[0]?.model || 'whisper-1'
+    const sttModel = providers?.models[0]?.model
+    if (!sttModel) {
+      throw new Error('No STT model registered for provider \'openai\'')
+    }
     formData.append('model', sttModel)
     // formData.append('language', 'fr')
 
