@@ -5,6 +5,7 @@ import {
   SECONDARY_AUDIO_TYPE,
   TTS_VOICES,
   GENDER_MAPPING,
+  DEFAULT_COMPANION_NAME,
   DEFAULT_GENDER,
   DEFAULT_VOICE_MODEL,
   DEFAULT_VOICE_ID,
@@ -18,7 +19,7 @@ const SPEECH_API_URL = 'https://openrouter.ai/api/v1/audio/speech'
  * Attribution title sent on `X-OpenRouter-Title` for OpenRouter's app
  * leaderboard. Kept in sync with the chat adapter (see lib/llm/openrouter.ts).
  */
-const ATTRIBUTION_TITLE = 'Athena'
+const ATTRIBUTION_TITLE = DEFAULT_COMPANION_NAME
 
 /**
  * Build the optional attribution headers OpenRouter consumes for analytics
