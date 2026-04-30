@@ -77,20 +77,6 @@ export const SECONDARY_AUDIO_FILE = 'audio.mp3'
 export const ENABLE_VOICE_OUTPUT = false
 
 /**
- * Mobile swipping threshold
- */
-export const MOBILE_SWIPE_THRESHOLD = 50 // px
-
-/** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
-export const ENABLE_BIOLLM_PERSONALITY = true
-
-/** Milliseconds of inactivity before Decart live avatar disconnects to stop consuming credits */
-export const LIVE_AVATAR_IDLE_TIMEOUT = 10000
-
-/** Milliseconds to wait for Decart to connect before aborting and falling back to local audio */
-export const LIVE_AVATAR_CONNECTION_TIMEOUT = 5000
-
-/**
  * Default AI Companion
  * Single source of truth for supported AI companion
  */
@@ -103,6 +89,20 @@ export const DEFAULT_COMPANION = {
   imageUrl: '/avatars/cyberpunk/f-03-vibrant.jpg',
   createdAt: new Date().toISOString()
 }
+
+/**
+ * Mobile swipping threshold
+ */
+export const MOBILE_SWIPE_THRESHOLD = 50 // px
+
+/** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
+export const ENABLE_BIOLLM_PERSONALITY = true
+
+/** Milliseconds of inactivity before Decart live avatar disconnects to stop consuming credits */
+export const LIVE_AVATAR_IDLE_TIMEOUT = 10000
+
+/** Milliseconds to wait for Decart to connect before aborting and falling back to local audio */
+export const LIVE_AVATAR_CONNECTION_TIMEOUT = 5000
 
 /**
  * Avatar configurations
