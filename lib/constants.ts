@@ -5,11 +5,6 @@
 
 import type { Avatar, EmotionConfig, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
 
-import en from '@/i18n/en.json'
-import fr from '@/i18n/fr.json'
-import de from '@/i18n/de.json'
-import it from '@/i18n/it.json'
-
 /**
  * i18n
  * Locale codes, native labels and translation dictionaries.
@@ -28,8 +23,6 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   de: 'Deutsch',
   it: 'Italiano',
 }
-
-export const TRANSLATIONS = { en, fr, de, it } as const
 
 /**
  * Default Props

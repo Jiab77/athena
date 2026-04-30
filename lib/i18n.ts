@@ -12,8 +12,21 @@
  * resolution, interpolation, gender variants).
  */
 
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE, TRANSLATIONS } from './constants'
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from './constants'
 import type { Locale, TranslationDict } from './types'
+
+/**
+ * Translation files
+ */
+import en from '@/i18n/en.json'
+import fr from '@/i18n/fr.json'
+import de from '@/i18n/de.json'
+import it from '@/i18n/it.json'
+
+/**
+ * Translation definitions
+ */
+export const TRANSLATIONS = { en, fr, de, it } as const
 
 /**
  * Detect browser language and map to the nearest supported locale
