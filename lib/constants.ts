@@ -3,7 +3,7 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, EmotionConfig, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import type { Avatar, EmotionConfig, EmotionProvider, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
 
 /**
  * i18n
@@ -58,8 +58,6 @@ export const MAX_DISPLAY_MESSAGES = 30
  * Single source of truth for LLM services
  */
 export const DEFAULT_EMOTION_DETECTION_PROVIDER = 'openai'
-export const DEFAULT_GROQ_EMOTION_DETECTION_MODEL = 'llama-3.1-8b-instant'
-export const DEFAULT_OPENAI_EMOTION_DETECTION_MODEL = 'gpt-5.4-nano'
 export const DEFAULT_GROQ_STT_MODEL = 'whisper-large-v3-turbo'
 export const DEFAULT_GROQ_TOOL_DETECTION_MODEL = 'groq/compound-mini'
 export const DEFAULT_GROQ_URL_CAPABLE_MODEL = 'groq/compound'
@@ -427,6 +425,60 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Free open-source flagship from Meta. Rate-limited; great for trying OpenRouter at zero cost.',
         url: 'https://openrouter.ai/meta-llama/llama-4-maverick:free',
         visible: true,
+      },
+    ],
+  },
+]
+
+/**
+ * Emotion Detection Provider configurations.
+ *
+ * Each provider exposes the smallest/fastest model it offers — emotion
+ * detection runs on every assistant response, so latency and cost matter
+ * more than flagship accuracy on a single-token classification task.
+ *
+ * Adapters in `lib/llm/{provider}.ts` resolve their model from this registry
+ * via `getEmotionModel()` in `lib/llm/router.ts`. Order here is informational
+ * only — runtime resolution order is controlled by `EMOTION_FALLBACK_CHAIN`
+ * inside the router.
+ */
+export const EMOTION_PROVIDERS: EmotionProvider[] = [
+  {
+    id: 'groq',
+    name: 'Groq',
+    models: [
+      {
+        id: 'llama-3.1-8b-instant',
+        name: 'Llama 3.1 8B Instant',
+        model: 'llama-3.1-8b-instant',
+        description: 'Fast 8B model. Used post-response for sentiment classification.',
+        url: 'https://console.groq.com/docs/models',
+      },
+    ],
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI',
+    models: [
+      {
+        id: 'gpt-5.4-nano',
+        name: 'GPT-5.4 Nano',
+        model: 'gpt-5.4-nano',
+        description: 'Smallest GPT-5.4 model. Reliable JSON-mode output for emotion classification.',
+        url: 'https://platform.openai.com/docs/models',
+      },
+    ],
+  },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gpt-5.4-nano',
+        name: 'GPT-5.4 Nano',
+        model: 'openai/gpt-5.4-nano',
+        description: 'OpenAI GPT-5.4 Nano via OpenRouter. Lets users get emotion detection with the same OpenRouter key already used for chat.',
+        url: 'https://openrouter.ai/openai/gpt-5.4-nano',
       },
     ],
   },

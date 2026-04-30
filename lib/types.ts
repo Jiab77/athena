@@ -197,6 +197,31 @@ export interface TTSProvider {
   models: TTSModel[]
 }
 
+export interface EmotionModel {
+  id: string
+  name: string
+  description?: string
+  url?: string
+  model: string  // Full model identifier (e.g. 'gpt-5.4-nano', 'llama-3.1-8b-instant')
+}
+
+/**
+ * Emotion-detection provider entry. Mirrors `STTProvider` and `TTSProvider`
+ * so the three capability registries can be walked the same way.
+ *
+ * Emotion detection runs on every assistant response, so models here are
+ * deliberately the smallest/fastest variant each provider offers — accuracy
+ * on a single-token classification task is high enough across the board that
+ * paying for a flagship is wasteful. Adapters in `lib/llm/{provider}.ts`
+ * read their model from this registry via `getEmotionModel()` in
+ * `lib/llm/router.ts`, never hardcoded.
+ */
+export interface EmotionProvider {
+  id: string
+  name: string
+  models: EmotionModel[]
+}
+
 /**
  * Settings stored in IndexedDB
  * Persists user preferences and customizations
