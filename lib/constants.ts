@@ -3,7 +3,8 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import type { Avatar, EmotionConfig, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+
 import en from '@/i18n/en.json'
 import fr from '@/i18n/fr.json'
 import de from '@/i18n/de.json'
@@ -16,8 +17,6 @@ import it from '@/i18n/it.json'
  * via `getTranslations(locale)` in `@/lib/i18n`.
  */
 export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'it'] as const
-
-
 
 /**
  * Native language labels — always shown in the language's own script
@@ -459,32 +458,32 @@ export const STT_PROVIDERS: STTProvider[] = [
     ],
   },
   {
-  id: 'openai',
-  name: 'OpenAI',
-  models: [
-  {
-  id: 'whisper-1',
-  name: 'Whisper V1',
-  model: 'whisper-1',
-  description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
-  url: 'https://developers.openai.com/api/docs/models/whisper-1',
-  }
-  ],
+    id: 'openai',
+    name: 'OpenAI',
+    models: [
+      {
+        id: 'whisper-1',
+        name: 'Whisper V1',
+        model: 'whisper-1',
+        description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
+        url: 'https://developers.openai.com/api/docs/models/whisper-1',
+      }
+    ],
   },
   {
-  id: 'openrouter',
-  name: 'OpenRouter',
-  models: [
-  {
-  id: 'gemini-2.5-flash',
-  name: 'Gemini 2.5 Flash',
-  model: 'google/gemini-2.5-flash',
-  description: 'Multimodal Gemini model used for transcription via chat completions with audio input. Single OpenRouter key covers chat + STT.',
-  url: 'https://openrouter.ai/google/gemini-2.5-flash',
-  }
-  ],
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gemini-2.5-flash',
+        name: 'Gemini 2.5 Flash',
+        model: 'google/gemini-2.5-flash',
+        description: 'Multimodal Gemini model used for transcription via chat completions with audio input. Single OpenRouter key covers chat + STT.',
+        url: 'https://openrouter.ai/google/gemini-2.5-flash',
+      }
+    ],
   },
-  ]
+]
 
 /**
  * Text-to-Speech (TTS) Provider configurations
@@ -505,32 +504,32 @@ export const TTS_PROVIDERS: TTSProvider[] = [
     ],
   },
   {
-  id: 'resemble-ai',
-  name: 'ResembleAI',
-  models: [
-  {
-  id: 'chatterbox',
-  name: 'Chatterbox',
-  model: 'chatterbox',
-  description: 'Next-generation TTS model offering improved performance and efficiency. Supports streaming with 250ms latency and maximum 2000 characters.',
-  url: 'https://docs.resemble.ai/getting-started/model-versions',
-  }
-  ],
+    id: 'resemble-ai',
+    name: 'ResembleAI',
+    models: [
+      {
+        id: 'chatterbox',
+        name: 'Chatterbox',
+        model: 'chatterbox',
+        description: 'Next-generation TTS model offering improved performance and efficiency. Supports streaming with 250ms latency and maximum 2000 characters.',
+        url: 'https://docs.resemble.ai/getting-started/model-versions',
+      }
+    ],
   },
   {
-  id: 'openrouter',
-  name: 'OpenRouter',
-  models: [
-  {
-  id: 'gpt-4o-mini-tts',
-  name: 'GPT-4o Mini TTS',
-  model: 'gpt-4o-mini-tts',
-  description: "OpenAI's TTS model proxied via OpenRouter. Same voices as OpenAI's direct API, with a single key shared across chat, STT and TTS.",
-  url: 'https://openrouter.ai/openai/gpt-4o-mini-tts',
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gpt-4o-mini-tts',
+        name: 'GPT-4o Mini TTS',
+        model: 'gpt-4o-mini-tts',
+        description: "OpenAI's TTS model proxied via OpenRouter. Same voices as OpenAI's direct API, with a single key shared across chat, STT and TTS.",
+        url: 'https://openrouter.ai/openai/gpt-4o-mini-tts',
+      },
+    ],
   },
-  ],
-  },
-  ]
+]
 
 /**
  * Text-to-Speech Voices
@@ -557,47 +556,47 @@ export const TTS_VOICES = {
     ],
   },
   'resemble-ai': {
-  'F': [
-  { name: 'Christina', id: '0b15fe25', isDefault: true },
-  { name: 'Ember', id: '55592656' },
-  { name: 'Evelyn', id: '61fcb769' },
-  { name: 'Grace', id: '7213a9ea' },
-  { name: 'Linda', id: '55f5b8dc' },
-  { name: 'Lucy', id: 'fb2d2858' },
-  ],
-  'M': [
-  { name: 'Aaron', id: '38a0b764' },
-  { name: 'Andi', id: 'e8883d33' },
-  { name: 'Archer', id: 'd1959511' },
-  { name: 'Brian', id: 'bec88a80' },
-  { name: 'Ethan', id: 'bee581c1' },
-  { name: 'Gavin', id: '12066e89', isDefault: true },
-  { name: 'Grant', id: '7c4296be' },
-  ],
+    'F': [
+      { name: 'Christina', id: '0b15fe25', isDefault: true },
+      { name: 'Ember', id: '55592656' },
+      { name: 'Evelyn', id: '61fcb769' },
+      { name: 'Grace', id: '7213a9ea' },
+      { name: 'Linda', id: '55f5b8dc' },
+      { name: 'Lucy', id: 'fb2d2858' },
+    ],
+    'M': [
+      { name: 'Aaron', id: '38a0b764' },
+      { name: 'Andi', id: 'e8883d33' },
+      { name: 'Archer', id: 'd1959511' },
+      { name: 'Brian', id: 'bec88a80' },
+      { name: 'Ethan', id: 'bee581c1' },
+      { name: 'Gavin', id: '12066e89', isDefault: true },
+      { name: 'Grant', id: '7c4296be' },
+    ],
   },
   // OpenRouter proxies OpenAI's TTS endpoint, so the underlying voice IDs are
   // identical to the `openai` entry above. Listed verbatim instead of aliased
   // so each TTS provider stays a self-contained source of truth.
   'openrouter': {
-  'F': [
-  { name: 'Ballad', id: 'ballad' },
-  { name: 'Coral', id: 'coral' },
-  { name: 'Nova', id: 'nova' },
-  { name: 'Sage', id: 'sage' },
-  { name: 'Shimmer', id: 'shimmer' },
-  { name: 'Marin', id: 'marin', isDefault: true },
-  ],
-  'M': [
-  { name: 'Alloy', id: 'alloy' },
-  { name: 'Ash', id: 'ash' },
-  { name: 'Echo', id: 'echo' },
-  { name: 'Fable', id: 'fable' },
-  { name: 'Onyx', id: 'onyx' },
-  { name: 'Verse', id: 'verse' },
-  { name: 'Cedar', id: 'cedar', isDefault: true },
-  ],
+    'F': [
+      { name: 'Ballad', id: 'ballad' },
+      { name: 'Coral', id: 'coral' },
+      { name: 'Nova', id: 'nova' },
+      { name: 'Sage', id: 'sage' },
+      { name: 'Shimmer', id: 'shimmer' },
+      { name: 'Marin', id: 'marin', isDefault: true },
+    ],
+    'M': [
+      { name: 'Alloy', id: 'alloy' },
+      { name: 'Ash', id: 'ash' },
+      { name: 'Echo', id: 'echo' },
+      { name: 'Fable', id: 'fable' },
+      { name: 'Onyx', id: 'onyx' },
+      { name: 'Verse', id: 'verse' },
+      { name: 'Cedar', id: 'cedar', isDefault: true },
+    ],
   },
-  } as const
+} as const
 
 /**
  * Emotion keyword dictionaries for sentiment analysis
@@ -626,32 +625,8 @@ export const DEFAULT_IDLE_EMOJI = '😌'
 export const EMOTION_DISPLAY_DURATION = 4000
 
 /**
- * Per-state animation parameters consumed by the R3F avatars
- * (`r3f-animated-character.tsx`, `avatar-2-5d.tsx`).
- *
- * - `tint` / `tintStrength` / `glowColor` drive the colour wash and rim glow.
- * - `breathe*` / `sway*` / `bob*` / `shake*` drive the four mesh-level
- *   motion channels: vertical breathing, side-to-side sway, secondary bob,
- *   and horizontal shake. Amplitude `0` disables the channel.
- *
- * Keyed on the full `ExpressionState` union so the type system enforces
- * coverage when a new state (conversation or emotion) is added.
+ * Visual emotion config
  */
-export interface EmotionConfig {
-  tint: [number, number, number]
-  tintStrength: number
-  glowColor: string
-  // Mesh-level animation params (no UV distortion)
-  breatheAmp: number    // Y translation — breathing up/down
-  breatheSpeed: number  // breathing frequency
-  swayAmp: number       // X rotation — gentle side tilt
-  swaySpeed: number     // sway frequency
-  bobAmp: number        // Y translation secondary — bounce/sink
-  bobSpeed: number      // bob frequency
-  shakeAmp: number      // X translation — horizontal shake (angry)
-  shakeSpeed: number    // shake frequency
-}
-
 export const EMOTION_CONFIG: Record<ExpressionState, EmotionConfig> = {
   idle: {
     tint: [1.0, 1.0, 1.0],

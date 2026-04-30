@@ -91,6 +91,33 @@ export interface CompanionData {
   createdAt: string
 }
 
+/**
+ * Per-state animation parameters consumed by the R3F avatars
+ * (`r3f-animated-character.tsx`, `avatar-2-5d.tsx`).
+ *
+ * - `tint` / `tintStrength` / `glowColor` drive the colour wash and rim glow.
+ * - `breathe*` / `sway*` / `bob*` / `shake*` drive the four mesh-level
+ *   motion channels: vertical breathing, side-to-side sway, secondary bob,
+ *   and horizontal shake. Amplitude `0` disables the channel.
+ *
+ * Keyed on the full `ExpressionState` union so the type system enforces
+ * coverage when a new state (conversation or emotion) is added.
+ */
+export interface EmotionConfig {
+  tint: [number, number, number]
+  tintStrength: number
+  glowColor: string
+  // Mesh-level animation params (no UV distortion)
+  breatheAmp: number    // Y translation — breathing up/down
+  breatheSpeed: number  // breathing frequency
+  swayAmp: number       // X rotation — gentle side tilt
+  swaySpeed: number     // sway frequency
+  bobAmp: number        // Y translation secondary — bounce/sink
+  bobSpeed: number      // bob frequency
+  shakeAmp: number      // X translation — horizontal shake (angry)
+  shakeSpeed: number    // shake frequency
+}
+
 export interface EmotionDetectionResult {
   emotion: EmotionState | null
 }
