@@ -76,6 +76,11 @@ export const SECONDARY_AUDIO_TYPE = 'audio/mp3'
 export const SECONDARY_AUDIO_FILE = 'audio.mp3'
 export const ENABLE_VOICE_OUTPUT = false
 
+/**
+ * Mobile swipping threshold
+ */
+export const MOBILE_SWIPE_THRESHOLD = 50 // px
+
 /** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
 export const ENABLE_BIOLLM_PERSONALITY = true
 
@@ -755,8 +760,3 @@ export const EMOTION_CONFIG: Record<ExpressionState, EmotionConfig> = {
     shakeAmp: 0.0, shakeSpeed: 0.0,
   },
 }
-
-/**
- * Mobile swipping threshold
- */
-export const MOBILE_SWIPE_THRESHOLD = 50 // px
