@@ -92,9 +92,7 @@ export const DEFAULT_COMPANION = {
   createdAt: new Date().toISOString()
 }
 
-/**
- * Mobile swipping threshold
- */
+/** Mobile swipping threshold */
 export const MOBILE_SWIPE_THRESHOLD = 50 // px
 
 /** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
