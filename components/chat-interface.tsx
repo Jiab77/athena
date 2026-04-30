@@ -14,7 +14,6 @@ import type { Message, ImageFormat, DocumentFormat, ConversationData, Expression
 import { callLLM, transcribeAudio } from '@/lib/llm/router'
 import { detectTools } from '@/lib/llm/tools'
 import type { LLMResponse } from '@/lib/types'
-import { detectEmotion } from '@/lib/llm/emotions'
 import {
   generateAndPlayTTS,
   extractTextFromFile,
@@ -32,7 +31,6 @@ import {
   DEFAULT_MODEL_PROVIDER,
   DOCUMENT_FORMAT_MIME_TYPES,
   DOCUMENT_FORMAT_EXTENSIONS,
-  EMOTION_DISPLAY_DURATION,
   MAX_DISPLAY_MESSAGES,
 } from '@/lib/constants'
 import { MarkdownMessage } from './markdown-message'
@@ -69,6 +67,13 @@ interface ChatInterfaceProps {
   onVoiceOutputToggle: () => Promise<void>
   onExpressionChange?: (state: ExpressionState) => void
   onEmotionDetected?: (emotion: EmotionState | null) => void
+  /**
+   * Called after `callLLM` returns. The brain runs emotion detection and
+   * manages the avatar/badge lifecycle — this component no longer touches
+   * emotion state directly. Optional so the standalone chat popup
+   * (`/chat/[id]`) can ignore emotion detection entirely.
+   */
+  onResponseReceived?: (text: string, provider: string) => void
   /** When set, TTS blob is passed here instead of played locally — used by Decart live avatar */
   onTTSReady?: (blob: Blob) => Promise<void>
   /** When true, renders in full-screen popup mode — hides pop-out button, closes window on X */
@@ -88,6 +93,7 @@ export function ChatInterface({
   onVoiceOutputToggle,
   onExpressionChange,
   onEmotionDetected,
+  onResponseReceived,
   onTTSReady,
   isPopup = false,
   sttSupported: sttSupportedProp = false,
@@ -215,7 +221,10 @@ export function ChatInterface({
     if (isRecording) {
       newState = 'listening'
     } else if (isTranscribing) {
-      newState = 'listening'
+      // STT in flight (audio → text) is a wait state, not a listen state.
+      // Mic is closed at this point; we're awaiting the STT API response.
+      // Matches what brain.ts does when voiceState === 'processing'.
+      newState = 'thinking'
     } else if (isSpeaking) {
       newState = 'speaking'
     } else if (isLoading) {
@@ -413,23 +422,12 @@ export function ChatInterface({
       // Update memory size (number of messages in context)
       setMemorySize(allMessages.length)
 
-      // Detect emotion from response async (fire-and-forget) — does not block message render or TTS
-      console.log('[Athena] About to call detectEmotion with response:', result.response)
-      console.log('[Athena] onExpressionChange available:', !!onExpressionChange)
-      detectEmotion(result.response, selectedProvider).then(({ emotion }) => {
-        console.log('[Athena] Detected emotion:', emotion)
-        if (emotion) {
-          if (onExpressionChange) {
-            console.log('[Athena] Triggering expression change to:', emotion)
-            onExpressionChange(emotion)
-            setTimeout(() => onExpressionChange('idle'), EMOTION_DISPLAY_DURATION)
-          }
-          if (onEmotionDetected) {
-            onEmotionDetected(emotion)
-            // Reset happens when TTS finishes speaking, not on a fixed timer
-          }
-        }
-      })
+      // Hand off to the brain for emotion detection + avatar/badge lifecycle.
+      // The brain owns everything emotion-related now — the previous inline
+      // `detectEmotion` here was duplicating brain's own implementation and
+      // pushing emotion through `onExpressionChange`, which raced with the
+      // conversation-state derivation effect above. Fire-and-forget.
+      onResponseReceived?.(result.response, selectedProvider)
 
       const companionMessage: Message = {
         id: `msg-${Date.now() + 1}`,
@@ -486,10 +484,10 @@ export function ChatInterface({
           setIsPlayingTTS(false)
           onEmotionDetected?.(null)
         }
-      } else {
-        // No TTS — reset emotion badge after a brief display duration
-        setTimeout(() => onEmotionDetected?.(null), EMOTION_DISPLAY_DURATION)
       }
+      // No-TTS branch intentionally has no emotion-reset timer here —
+      // brain.ts owns the emotion lifecycle and runs its own auto-reset
+      // timer inside `handleResponseReceived` covering exactly this case.
 
       // Encrypt and save conversation to DB (images not included in companion messages anyway)
       if (db) {

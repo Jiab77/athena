@@ -3,11 +3,7 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
-import en from '@/i18n/en.json'
-import fr from '@/i18n/fr.json'
-import de from '@/i18n/de.json'
-import it from '@/i18n/it.json'
+import type { Avatar, EmotionConfig, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
 
 /**
  * i18n
@@ -16,8 +12,6 @@ import it from '@/i18n/it.json'
  * via `getTranslations(locale)` in `@/lib/i18n`.
  */
 export const SUPPORTED_LOCALES = ['en', 'fr', 'de', 'it'] as const
-
-export const DEFAULT_LOCALE: Locale = 'en'
 
 /**
  * Native language labels — always shown in the language's own script
@@ -30,12 +24,11 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   it: 'Italiano',
 }
 
-export const TRANSLATIONS = { en, fr, de, it } as const
-
 /**
  * Default Props
  * Single source of truth for all props
  */
+export const DEFAULT_LOCALE: Locale = 'en'
 export const DEFAULT_COMPANION_ID = 'athena'
 export const DEFAULT_COMPANION_NAME = 'Athena'
 export const DEFAULT_PERSONALITY: PersonalityType = 'Sarcastic'
@@ -458,32 +451,32 @@ export const STT_PROVIDERS: STTProvider[] = [
     ],
   },
   {
-  id: 'openai',
-  name: 'OpenAI',
-  models: [
-  {
-  id: 'whisper-1',
-  name: 'Whisper V1',
-  model: 'whisper-1',
-  description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
-  url: 'https://developers.openai.com/api/docs/models/whisper-1',
-  }
-  ],
+    id: 'openai',
+    name: 'OpenAI',
+    models: [
+      {
+        id: 'whisper-1',
+        name: 'Whisper V1',
+        model: 'whisper-1',
+        description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
+        url: 'https://developers.openai.com/api/docs/models/whisper-1',
+      }
+    ],
   },
   {
-  id: 'openrouter',
-  name: 'OpenRouter',
-  models: [
-  {
-  id: 'gemini-2.5-flash',
-  name: 'Gemini 2.5 Flash',
-  model: 'google/gemini-2.5-flash',
-  description: 'Multimodal Gemini model used for transcription via chat completions with audio input. Single OpenRouter key covers chat + STT.',
-  url: 'https://openrouter.ai/google/gemini-2.5-flash',
-  }
-  ],
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gemini-2.5-flash',
+        name: 'Gemini 2.5 Flash',
+        model: 'google/gemini-2.5-flash',
+        description: 'Multimodal Gemini model used for transcription via chat completions with audio input. Single OpenRouter key covers chat + STT.',
+        url: 'https://openrouter.ai/google/gemini-2.5-flash',
+      }
+    ],
   },
-  ]
+]
 
 /**
  * Text-to-Speech (TTS) Provider configurations
@@ -504,32 +497,32 @@ export const TTS_PROVIDERS: TTSProvider[] = [
     ],
   },
   {
-  id: 'resemble-ai',
-  name: 'ResembleAI',
-  models: [
-  {
-  id: 'chatterbox',
-  name: 'Chatterbox',
-  model: 'chatterbox',
-  description: 'Next-generation TTS model offering improved performance and efficiency. Supports streaming with 250ms latency and maximum 2000 characters.',
-  url: 'https://docs.resemble.ai/getting-started/model-versions',
-  }
-  ],
+    id: 'resemble-ai',
+    name: 'ResembleAI',
+    models: [
+      {
+        id: 'chatterbox',
+        name: 'Chatterbox',
+        model: 'chatterbox',
+        description: 'Next-generation TTS model offering improved performance and efficiency. Supports streaming with 250ms latency and maximum 2000 characters.',
+        url: 'https://docs.resemble.ai/getting-started/model-versions',
+      }
+    ],
   },
   {
-  id: 'openrouter',
-  name: 'OpenRouter',
-  models: [
-  {
-  id: 'gpt-4o-mini-tts',
-  name: 'GPT-4o Mini TTS',
-  model: 'gpt-4o-mini-tts',
-  description: "OpenAI's TTS model proxied via OpenRouter. Same voices as OpenAI's direct API, with a single key shared across chat, STT and TTS.",
-  url: 'https://openrouter.ai/openai/gpt-4o-mini-tts',
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gpt-4o-mini-tts',
+        name: 'GPT-4o Mini TTS',
+        model: 'gpt-4o-mini-tts',
+        description: "OpenAI's TTS model proxied via OpenRouter. Same voices as OpenAI's direct API, with a single key shared across chat, STT and TTS.",
+        url: 'https://openrouter.ai/openai/gpt-4o-mini-tts',
+      },
+    ],
   },
-  ],
-  },
-  ]
+]
 
 /**
  * Text-to-Speech Voices
@@ -556,47 +549,47 @@ export const TTS_VOICES = {
     ],
   },
   'resemble-ai': {
-  'F': [
-  { name: 'Christina', id: '0b15fe25', isDefault: true },
-  { name: 'Ember', id: '55592656' },
-  { name: 'Evelyn', id: '61fcb769' },
-  { name: 'Grace', id: '7213a9ea' },
-  { name: 'Linda', id: '55f5b8dc' },
-  { name: 'Lucy', id: 'fb2d2858' },
-  ],
-  'M': [
-  { name: 'Aaron', id: '38a0b764' },
-  { name: 'Andi', id: 'e8883d33' },
-  { name: 'Archer', id: 'd1959511' },
-  { name: 'Brian', id: 'bec88a80' },
-  { name: 'Ethan', id: 'bee581c1' },
-  { name: 'Gavin', id: '12066e89', isDefault: true },
-  { name: 'Grant', id: '7c4296be' },
-  ],
+    'F': [
+      { name: 'Christina', id: '0b15fe25', isDefault: true },
+      { name: 'Ember', id: '55592656' },
+      { name: 'Evelyn', id: '61fcb769' },
+      { name: 'Grace', id: '7213a9ea' },
+      { name: 'Linda', id: '55f5b8dc' },
+      { name: 'Lucy', id: 'fb2d2858' },
+    ],
+    'M': [
+      { name: 'Aaron', id: '38a0b764' },
+      { name: 'Andi', id: 'e8883d33' },
+      { name: 'Archer', id: 'd1959511' },
+      { name: 'Brian', id: 'bec88a80' },
+      { name: 'Ethan', id: 'bee581c1' },
+      { name: 'Gavin', id: '12066e89', isDefault: true },
+      { name: 'Grant', id: '7c4296be' },
+    ],
   },
   // OpenRouter proxies OpenAI's TTS endpoint, so the underlying voice IDs are
   // identical to the `openai` entry above. Listed verbatim instead of aliased
   // so each TTS provider stays a self-contained source of truth.
   'openrouter': {
-  'F': [
-  { name: 'Ballad', id: 'ballad' },
-  { name: 'Coral', id: 'coral' },
-  { name: 'Nova', id: 'nova' },
-  { name: 'Sage', id: 'sage' },
-  { name: 'Shimmer', id: 'shimmer' },
-  { name: 'Marin', id: 'marin', isDefault: true },
-  ],
-  'M': [
-  { name: 'Alloy', id: 'alloy' },
-  { name: 'Ash', id: 'ash' },
-  { name: 'Echo', id: 'echo' },
-  { name: 'Fable', id: 'fable' },
-  { name: 'Onyx', id: 'onyx' },
-  { name: 'Verse', id: 'verse' },
-  { name: 'Cedar', id: 'cedar', isDefault: true },
-  ],
+    'F': [
+      { name: 'Ballad', id: 'ballad' },
+      { name: 'Coral', id: 'coral' },
+      { name: 'Nova', id: 'nova' },
+      { name: 'Sage', id: 'sage' },
+      { name: 'Shimmer', id: 'shimmer' },
+      { name: 'Marin', id: 'marin', isDefault: true },
+    ],
+    'M': [
+      { name: 'Alloy', id: 'alloy' },
+      { name: 'Ash', id: 'ash' },
+      { name: 'Echo', id: 'echo' },
+      { name: 'Fable', id: 'fable' },
+      { name: 'Onyx', id: 'onyx' },
+      { name: 'Verse', id: 'verse' },
+      { name: 'Cedar', id: 'cedar', isDefault: true },
+    ],
   },
-  } as const
+} as const
 
 /**
  * Emotion keyword dictionaries for sentiment analysis
@@ -623,6 +616,93 @@ export const DEFAULT_IDLE_EMOJI = '😌'
  * Duration in ms to hold an emotion state before reverting to idle
  */
 export const EMOTION_DISPLAY_DURATION = 4000
+
+/**
+ * Visual emotion config
+ */
+export const EMOTION_CONFIG: Record<ExpressionState, EmotionConfig> = {
+  idle: {
+    tint: [1.0, 1.0, 1.0],
+    tintStrength: 0.0,
+    glowColor: 'rgba(139,92,246,0.35)',
+    breatheAmp: 0.012, breatheSpeed: 0.6,
+    swayAmp: 0.008, swaySpeed: 0.4,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  listening: {
+    tint: [0.6, 0.8, 1.0],
+    tintStrength: 0.08,
+    glowColor: 'rgba(59,130,246,0.55)',
+    breatheAmp: 0.014, breatheSpeed: 0.8,
+    swayAmp: 0.012, swaySpeed: 0.5,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  thinking: {
+    tint: [0.7, 0.6, 1.0],
+    tintStrength: 0.1,
+    glowColor: 'rgba(168,85,247,0.55)',
+    breatheAmp: 0.008, breatheSpeed: 0.4,
+    swayAmp: 0.02, swaySpeed: 0.3,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  speaking: {
+    tint: [0.7, 1.0, 0.75],
+    tintStrength: 0.07,
+    glowColor: 'rgba(34,197,94,0.5)',
+    breatheAmp: 0.018, breatheSpeed: 1.4,
+    swayAmp: 0.01, swaySpeed: 0.6,
+    bobAmp: 0.008, bobSpeed: 2.2,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  happy: {
+    tint: [1.0, 0.92, 0.5],
+    tintStrength: 0.12,
+    glowColor: 'rgba(250,204,21,0.65)',
+    breatheAmp: 0.022, breatheSpeed: 1.6,
+    swayAmp: 0.018, swaySpeed: 1.2,
+    bobAmp: 0.018, bobSpeed: 2.4,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  sad: {
+    tint: [0.55, 0.65, 0.9],
+    tintStrength: 0.15,
+    glowColor: 'rgba(100,116,139,0.4)',
+    breatheAmp: 0.006, breatheSpeed: 0.25,
+    swayAmp: 0.005, swaySpeed: 0.2,
+    bobAmp: -0.025, bobSpeed: 0.18,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  angry: {
+    tint: [1.0, 0.45, 0.45],
+    tintStrength: 0.18,
+    glowColor: 'rgba(239,68,68,0.65)',
+    breatheAmp: 0.02, breatheSpeed: 2.0,
+    swayAmp: 0.006, swaySpeed: 0.5,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.028, shakeSpeed: 18.0,
+  },
+  surprised: {
+    tint: [1.0, 0.75, 0.4],
+    tintStrength: 0.14,
+    glowColor: 'rgba(249,115,22,0.65)',
+    breatheAmp: 0.028, breatheSpeed: 3.0,
+    swayAmp: 0.0, swaySpeed: 0.0,
+    bobAmp: 0.03, bobSpeed: 3.5,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  thoughtful: {
+    tint: [0.6, 0.7, 1.0],
+    tintStrength: 0.09,
+    glowColor: 'rgba(99,102,241,0.5)',
+    breatheAmp: 0.01, breatheSpeed: 0.5,
+    swayAmp: 0.025, swaySpeed: 0.35,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+}
 
 /**
  * Mobile swipping threshold
