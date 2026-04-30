@@ -3,7 +3,7 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import type { Avatar, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
 import en from '@/i18n/en.json'
 import fr from '@/i18n/fr.json'
 import de from '@/i18n/de.json'
@@ -623,6 +623,117 @@ export const DEFAULT_IDLE_EMOJI = '😌'
  * Duration in ms to hold an emotion state before reverting to idle
  */
 export const EMOTION_DISPLAY_DURATION = 4000
+
+/**
+ * Per-state animation parameters consumed by the R3F avatars
+ * (`r3f-animated-character.tsx`, `avatar-2-5d.tsx`).
+ *
+ * - `tint` / `tintStrength` / `glowColor` drive the colour wash and rim glow.
+ * - `breathe*` / `sway*` / `bob*` / `shake*` drive the four mesh-level
+ *   motion channels: vertical breathing, side-to-side sway, secondary bob,
+ *   and horizontal shake. Amplitude `0` disables the channel.
+ *
+ * Keyed on the full `ExpressionState` union so the type system enforces
+ * coverage when a new state (conversation or emotion) is added.
+ */
+export interface EmotionConfig {
+  tint: [number, number, number]
+  tintStrength: number
+  glowColor: string
+  // Mesh-level animation params (no UV distortion)
+  breatheAmp: number    // Y translation — breathing up/down
+  breatheSpeed: number  // breathing frequency
+  swayAmp: number       // X rotation — gentle side tilt
+  swaySpeed: number     // sway frequency
+  bobAmp: number        // Y translation secondary — bounce/sink
+  bobSpeed: number      // bob frequency
+  shakeAmp: number      // X translation — horizontal shake (angry)
+  shakeSpeed: number    // shake frequency
+}
+
+export const EMOTION_CONFIG: Record<ExpressionState, EmotionConfig> = {
+  idle: {
+    tint: [1.0, 1.0, 1.0],
+    tintStrength: 0.0,
+    glowColor: 'rgba(139,92,246,0.35)',
+    breatheAmp: 0.012, breatheSpeed: 0.6,
+    swayAmp: 0.008, swaySpeed: 0.4,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  listening: {
+    tint: [0.6, 0.8, 1.0],
+    tintStrength: 0.08,
+    glowColor: 'rgba(59,130,246,0.55)',
+    breatheAmp: 0.014, breatheSpeed: 0.8,
+    swayAmp: 0.012, swaySpeed: 0.5,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  thinking: {
+    tint: [0.7, 0.6, 1.0],
+    tintStrength: 0.1,
+    glowColor: 'rgba(168,85,247,0.55)',
+    breatheAmp: 0.008, breatheSpeed: 0.4,
+    swayAmp: 0.02, swaySpeed: 0.3,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  speaking: {
+    tint: [0.7, 1.0, 0.75],
+    tintStrength: 0.07,
+    glowColor: 'rgba(34,197,94,0.5)',
+    breatheAmp: 0.018, breatheSpeed: 1.4,
+    swayAmp: 0.01, swaySpeed: 0.6,
+    bobAmp: 0.008, bobSpeed: 2.2,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  happy: {
+    tint: [1.0, 0.92, 0.5],
+    tintStrength: 0.12,
+    glowColor: 'rgba(250,204,21,0.65)',
+    breatheAmp: 0.022, breatheSpeed: 1.6,
+    swayAmp: 0.018, swaySpeed: 1.2,
+    bobAmp: 0.018, bobSpeed: 2.4,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  sad: {
+    tint: [0.55, 0.65, 0.9],
+    tintStrength: 0.15,
+    glowColor: 'rgba(100,116,139,0.4)',
+    breatheAmp: 0.006, breatheSpeed: 0.25,
+    swayAmp: 0.005, swaySpeed: 0.2,
+    bobAmp: -0.025, bobSpeed: 0.18,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  angry: {
+    tint: [1.0, 0.45, 0.45],
+    tintStrength: 0.18,
+    glowColor: 'rgba(239,68,68,0.65)',
+    breatheAmp: 0.02, breatheSpeed: 2.0,
+    swayAmp: 0.006, swaySpeed: 0.5,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.028, shakeSpeed: 18.0,
+  },
+  surprised: {
+    tint: [1.0, 0.75, 0.4],
+    tintStrength: 0.14,
+    glowColor: 'rgba(249,115,22,0.65)',
+    breatheAmp: 0.028, breatheSpeed: 3.0,
+    swayAmp: 0.0, swaySpeed: 0.0,
+    bobAmp: 0.03, bobSpeed: 3.5,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+  thoughtful: {
+    tint: [0.6, 0.7, 1.0],
+    tintStrength: 0.09,
+    glowColor: 'rgba(99,102,241,0.5)',
+    breatheAmp: 0.01, breatheSpeed: 0.5,
+    swayAmp: 0.025, swaySpeed: 0.35,
+    bobAmp: 0.0, bobSpeed: 0.0,
+    shakeAmp: 0.0, shakeSpeed: 0.0,
+  },
+}
 
 /**
  * Mobile swipping threshold
