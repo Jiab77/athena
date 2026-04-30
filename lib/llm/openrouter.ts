@@ -15,9 +15,6 @@ import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey
 
 const CHAT_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
-/** Fallback STT model if the constants entry is somehow missing. Kept aligned with the registry's first model. */
-const DEFAULT_OPENROUTER_STT_MODEL = 'openai/whisper-1'
-
 /** Strict transcription instruction used as the user-facing text part alongside the audio block. */
 const TRANSCRIPTION_PROMPT = 'Transcribe the attached audio verbatim. Output only the transcription text. Do not add commentary, summaries, language labels, timestamps, or any other text.'
 
@@ -264,7 +261,10 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     // Resolve STT model from registry, mirroring the openai/groq adapters
     const provider = STT_PROVIDERS.find(p => p.id === 'openrouter')
-    const sttModel = provider?.models[0]?.model || DEFAULT_OPENROUTER_STT_MODEL
+    const sttModel = provider?.models[0]?.model
+    if (!sttModel) {
+      throw new Error('No STT model registered for provider \'openrouter\'')
+    }
 
     const audioBase64 = await blobToBase64(audioBlob)
     const audioFormat = deriveAudioFormat(audioBlob.type)
