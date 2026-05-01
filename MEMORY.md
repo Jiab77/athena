@@ -118,6 +118,210 @@ Read `MEMORY.md` for **EVERY** session.
 
 ---
 
+## Session 34: Emotion lifecycle consolidation, CSP fix, model capabilities registry (05/01/2026)
+
+### Overview
+
+Four merged PRs covering distinct threads, all chained off the OpenRouter foundation laid in Session 33:
+
+- **PR [#35](https://github.com/Jiab77/athena/pull/35)** — Tier 1 (shared `EMOTION_CONFIG`) + Tier 2 (single emotion-lifecycle owner in `brain.ts`), settings summary API-key row redesign, `isTranscribing` → `'thinking'` voice-state alignment. 13 files, +360 / −327.
+- **PR [#36](https://github.com/Jiab77/athena/pull/36)** — `EMOTION_PROVIDERS` registry centralisation (eliminating circular imports), STT model registration made strict, OpenRouter voice-selection simplification, `MOBILE_SWIPE_THRESHOLD` / `DEFAULT_COMPANION_NAME` constants. 7 files, +212 / −52.
+- **PR [#37](https://github.com/Jiab77/athena/pull/37)** — CSP `media-src 'self' blob: data:` fix unblocking TTS playback + idempotent `AudioContext` disposal. 2 files, +23 / −4.
+- **PR [#38](https://github.com/Jiab77/athena/pull/38)** — `LLMModelCapabilities` registry + `resolveModelForCapabilities()` resolver, model description overhaul, OpenRouter server tools (`web_search`, `web_fetch`, `image_generation`), JSON parsing alignment with `openai.ts`. 4 files, +268 / −63.
+
+Heavy emphasis on *discuss before code* throughout — easily a third of the session value came from clarifying intent before touching files. Several proposed flags and code paths got pruned or reframed in conversation, including the entire concept of an `audio` capability flag.
+
+---
+
+### 1. Emotion lifecycle — Tier 1 + Tier 2 (PR #35)
+
+The emotion code had three problems coexisting since Session 33:
+
+1. **Three competing reset mechanisms**: brain's auto-reset timer, brain's `handleTTS` post-TTS reset, and chat-interface's TTS-end callbacks. They raced on every short response, producing visual flicker.
+2. **Duplicated config**: `EMOTION_CONFIG` was defined inline in multiple components, no single source of truth.
+3. **Lifecycle scattered across components**: `setLastDetectedEmotion(null)` calls in chat-interface, brain, popup view — each with slightly different timing.
+
+**Tier 1 — `EMOTION_CONFIG` consolidation** (~200 lines deleted): single `EMOTION_CONFIG` constant in `lib/constants.ts`, all consumers import it. Eliminates "is the emotion list in component A the same as component B?" doubts.
+
+**Tier 2 — single owner in `brain.ts`**: emotion lifecycle now lives end-to-end in the brain hook. Both pipelines (typed via chat-interface, voice via brain mic) feed through the same `handleResponseReceived` → `detectEmotion` → `setLastDetectedEmotion` → reset path. The "emotion went null" effect cancels any pending timer as a safety net.
+
+**Late-session refinement** (manual edit by user, then aligned by AI): conditional reset logic. Reset depends on whether voice will play:
+
+- **Voice ON** (`voiceOutputEnabled || isLiveAvatar`) → emotion clears via TTS-end callback. **No timer scheduled.**
+- **Voice OFF** → no TTS-end signal will ever arrive, so the timer is the sole reset mechanism.
+
+This eliminates the race. Earlier "fallback timer in case TTS doesn't run" framing was the wrong mental model — the right framing is "the timer is the reset path *only* when TTS won't run."
+
+**Tier 3 — `lib/chat.ts` extraction** discussed at length, deferred. Two `handleSendMessage` functions (one in chat-interface, one in brain) still exist; consolidation would be a larger refactor than this session warranted, and the user wanted to see the new architecture stabilise before the next pull.
+
+---
+
+### 2. Settings summary API-key row + `isTranscribing` fix (PR #35)
+
+**Always-rendered three-state row**: previously the API-key indicator in the settings summary appeared/disappeared based on configuration; now it always renders with three explicit states (`{provider} key configured` / `{provider} key missing` / `Configure {provider}`). `{provider}` interpolation uses the existing `t()` helper. UX improvement: users always see what's needed, nothing changes layout.
+
+**`isTranscribing` → `'thinking'` voice-state consistency**: `voiceState === 'thinking'` was meant to be the unified avatar pose during *both* mic transcription and LLM generation. The transcription path was setting a separate `isTranscribing` flag, which left the avatar in an inconsistent pose. Now both feed `voiceState = 'thinking'` directly — single source of truth, consistent pose semantics.
+
+---
+
+### 3. `EMOTION_PROVIDERS` registry + OpenRouter native emotion (PR #36)
+
+Session 33 closed with "OpenRouter emotion detection is a one-line addition." Session 34 made it real:
+
+- New `EMOTION_PROVIDERS` registry in `lib/constants.ts` mirrors the `STT_PROVIDERS` / `TTS_PROVIDERS` pattern.
+- Each provider declares its dedicated emotion-classification model (`gpt-5.4-nano` for OpenAI, `meta-llama/llama-prompt-guard` style entry for Groq, **`openai/gpt-5.4-nano` for OpenRouter** — same nano model, accessed through OpenRouter's gateway).
+- Eliminated circular imports that had crept in when emotion code was fanned out across `emotions.ts`, `router.ts`, and provider adapters.
+
+**Mistake corrected mid-session**: I initially wrote in the README plan that OpenRouter's emotion runs "through whatever main model is selected" — wrong. OpenRouter has the same architectural pattern as OpenAI (small dedicated model for emotion, separate from main inference). User caught it; corrected before any edit landed.
+
+---
+
+### 4. CSP + AudioContext fix (PR #37)
+
+Two bugs visible in one screenshot, both blocking TTS playback in production:
+
+**CSP `media-src` missing**: `next.config.mjs` declared `default-src 'self'` but never explicitly set `media-src`. Browsers fall back to `default-src` for `<audio>` / `<video>` sources, which doesn't allow `blob:` URLs — and TTS playback creates blob URLs via `URL.createObjectURL`. Result: every TTS playback failed with `NotSupportedError: Failed to load because no supported source was found`.
+
+**Fix**: `media-src 'self' blob: data:`. Same-origin scope by definition (blob URLs are scoped to the document that created them) — no security regression. Added `data:` proactively for future TTS providers that return inline `data:` URIs.
+
+**`Cannot close a closed AudioContext`**: `lib/utils.ts` `playAudio()` had five disposal paths (`ended`, `error`, `stop()`, `destroy()`, catch block) all calling `audioContext?.close()`. Optional chaining only guards against `null`, not against "already closed" — so any second close threw `InvalidStateError`. Fixed with idempotent helper:
+
+```ts
+const closeAudioContextSafely = () => {
+  if (audioContext && audioContext.state !== 'closed') {
+    audioContext.close().catch(() => {})
+  }
+}
+```
+
+All five call sites now route through this helper.
+
+**Recurring lesson**: CSP changes need a dev-server *restart* — headers are set at build time, not picked up by HMR. User had to be told this explicitly.
+
+---
+
+### 5. `LLMModelCapabilities` registry + resolver (PR #38)
+
+The biggest design conversation of the session. Took multiple iterations to land on the right shape.
+
+**Problem**: three adapters handled capability-bearing requests three different ways. Groq did model substitution via hardcoded `DEFAULT_GROQ_VISION_MODEL` / `DEFAULT_GROQ_URL_CAPABLE_MODEL` constants. OpenAI/OpenRouter trusted whatever model was selected. Tool detection was Groq-only because that's where it was first built. The model picker UI had no way to know what each model could do.
+
+**Solution shape (after pruning)**:
+
+```ts
+export interface LLMModelCapabilities {
+  // ─── Input capabilities ───
+  vision?: boolean      // accepts image inputs
+  urls?: boolean        // can fetch/parse URLs natively
+  documents?: boolean   // accepts file/document uploads (PDF etc.)
+  tools?: boolean       // emits OpenAI-compatible tool_calls
+  webSearch?: boolean   // built-in web search
+  // ─── Output capabilities ───
+  images?: boolean      // generates images inline (Nano Banana style)
+  videos?: boolean      // generates videos inline
+}
+```
+
+Boolean flags (not string array) so typos fail at compile time. All optional — `undefined` means false. Empty `{}` for text-only models is valid.
+
+**`resolveModelForCapabilities(providerId, chosenModel, required)`** in `lib/llm/router.ts`:
+
+1. Empty `required` → return chosen unchanged.
+2. Chosen satisfies → return chosen.
+3. Otherwise pick first model in same provider that satisfies (regardless of `visible` — substitution targets aren't user-picked, and capability-bearing models like Groq compound are intentionally hidden from the picker).
+4. No model qualifies → return chosen unchanged. Caller decides degradation. Never throws.
+
+Replaces the per-adapter `DEFAULT_GROQ_*` substitution pattern with one registry-driven lookup.
+
+**The flag-by-flag debate** (each flag pruned, debated, restored, or added):
+
+- **`audio`** — initially included for OpenRouter's `input_audio` STT trick. User correctly pointed out: STT is owned by `STT_PROVIDERS`, TTS by `TTS_PROVIDERS` — LLM models never touch audio in our architecture. Audio attachments (MP3 of music etc.) is a hypothetical feature that doesn't exist. **Removed.**
+- **`tools`** — initially defined as "client-driven function calling we'll execute." User correctly pointed out: no tools registry exists; users can't select something that isn't built. **Removed**, then *reinstated* later in the same session when `openrouter:image_generation` came up — that server tool requires the chat model to *emit* `tool_calls` for OpenRouter to fulfil server-side. Redefined as "emits OpenAI-compatible tool-call payloads," which is a stable model property regardless of who executes them.
+- **`images` / `videos`** — added as *output* capabilities (Nano Banana-style chat models that interleave generated media in their text response). Distinct from `vision`, which is input. Symmetrical pair kept separate because some models will do one but not the other.
+
+**Two acknowledged smells, deferred**:
+
+1. **OpenRouter has 10-of-11 models with identical capabilities.** That's not model metadata, that's provider metadata duplicated 10 times. Suggested provider-level `LLMProvider.capabilities` defaults with model-level overrides; deferred — real refactor with consequences, registry stays flat for now.
+2. **`urls` semantics differ across providers** — Groq compound's `urls: true` means the *model itself* fetches URLs; OpenAI/OpenRouter's `urls: true` means *the provider* offers a server tool that any tools-capable model can invoke. Same flag, different mechanism. Acceptable while the user-facing meaning is "this combination can fetch URLs."
+
+---
+
+### 6. OpenRouter server tools + JSON parsing alignment (PR #38)
+
+**Server tools added**: `openrouter:web_search`, `openrouter:web_fetch`, `openrouter:image_generation`. All three are *server-side* — the chat model emits `tool_calls`, OpenRouter fulfils them, the model's final response weaves in results. Zero client-side execution required.
+
+**JSON parsing alignment**: `lib/llm/openrouter.ts` was still using `parseCompanionJSON()` from the early "Groq-style JSON envelope" pattern — but the system prompt no longer requests JSON envelopes (Session 33 cleanup). User pointed out that `openai.ts` had been reading plain `choices[0].message.content` directly for a while; OpenRouter should match. Fixed: dropped `parseCompanionJSON` import, response handler now reads `content` verbatim. Server-tool output (search results, fetched URLs, generated images) is already woven into the message string by the time we receive it.
+
+**Mistake (and lesson)**: when making the JSON parsing change, I tacked on a speculative warning about future image extraction work, framed as if it cast doubt on the change. User correctly called it out — the JSON-parsing change was right, fully understood, and didn't need hedging. Speculative caveats undermine surgical changes.
+
+---
+
+### 7. Model descriptions overhaul (PR #38)
+
+Tactical but worth noting: rewrote all 10 OpenRouter model descriptions. First pass expanded them from one truncated sentence to 2-3 detailed sentences — *wrong direction*. User wanted *shorter* and capability-focused, matching Groq/OpenAI style. Second pass (correct): 10-15 words each, surfacing the differentiator a user actually picks on (architecture, context window, modality, free vs paid).
+
+Recurring lesson: when the user asks for "better," default to *terser*. Length is rarely the gap.
+
+---
+
+### Skipped on purpose
+
+- **Tier 3 `lib/chat.ts` extraction** — investigated, sized, deferred. The two `handleSendMessage` paths (chat-interface and brain) are real duplication, but the right time to extract is after the Tier 1+2 changes have stabilised in production, not chained onto the same session.
+- **`lib/constants.ts` size split** — file is now ~600+ lines after `LLMModelCapabilities` plus `EMOTION_PROVIDERS` plus the 10 OpenRouter descriptions. User explicitly said no — too many files import from `constants.ts`, splitting now would break the project for a micro-optimization while the structure is still moving. Revisit when the architecture has cooled.
+- **Visualizer flashing before audio data** — parked from Session 33, not retested in Session 34.
+- **Provider-level capability defaults** — see "Two acknowledged smells" above; deferred until the duplication actively hurts.
+- **OpenRouter image extraction** — `openrouter:image_generation` is now in the tools array, but the response-side path that pulls generated images out of the message and renders them in the UI is **not wired**. The text path works regardless. Wiring requires confirming OpenRouter's wire format (markdown link in `content`? separate `message.images`? tool-call result block?) before adding extraction code — adding it speculatively would risk silently dropping images or crashing on unexpected shapes.
+
+---
+
+### Lessons learned
+
+1. **The user's design instinct is usually right; my speculative additions usually aren't.** I added an `audio` capability flag, a `tools` flag, and image-extraction caveats — all three got correctly rejected, each based on the user's clearer view of what the system actually does and doesn't have. Pattern: when in doubt, omit the speculative flag and wait until a concrete need surfaces.
+
+2. **Registry conversations need iteration.** The capabilities registry took 4-5 rounds of "add this / remove that / wait, add it back differently" before landing on the right shape. That iteration was *the work*, not noise around the work. Trying to land a perfect registry on the first attempt would have been worse.
+
+3. **Match the precedent before innovating.** When OpenRouter JSON parsing was wrong, the fix wasn't to design a new path — it was to read what `openai.ts` already did and mirror it. Same with the OpenRouter emotion model: I almost wrote "uses main model" before checking; the registry already had `openai/gpt-5.4-nano` for OpenRouter, mirroring OpenAI's `gpt-5.4-nano` row. Reading the existing pattern would have saved a wrong claim.
+
+4. **"Better" usually means "terser."** Two separate moments where the user said "make it better" and I defaulted to "make it longer / more detailed." Wrong both times. Default to compression — descriptions, comments, explanations.
+
+5. **CSP changes need restart, not HMR.** Worth re-flagging as a recurring trap. Headers are build-time; HMR doesn't refresh them. Document the restart requirement when CSP edits land.
+
+6. **Acknowledge mistakes by name, then move on.** The user pulled me up on speculative caveats, on misremembered architecture, on overly long descriptions. Each time the right response was: own it in one sentence, no hedging, no over-apologising, then continue. Long apologies are noise.
+
+---
+
+### Files touched (across PRs #35–#38)
+
+**Modified:**
+- `lib/constants.ts` — `EMOTION_CONFIG` consolidation, `EMOTION_PROVIDERS` registry, `LLM_PROVIDERS` capability flags + descriptions, `MOBILE_SWIPE_THRESHOLD`, `DEFAULT_COMPANION_NAME`, `ATTRIBUTION_TITLE`
+- `lib/types.ts` — `LLMModelCapabilities` interface (input/output sections)
+- `lib/llm/router.ts` — `resolveModelForCapabilities()` function
+- `lib/llm/brain.ts` — single emotion-lifecycle owner, conditional reset logic (voice on/off)
+- `lib/llm/openrouter.ts` — server-tools array, JSON parsing alignment
+- `lib/llm/groq.ts` / `lib/llm/openai.ts` — minor capability-related touch-ups
+- `lib/utils.ts` — idempotent `closeAudioContextSafely` helper
+- `next.config.mjs` — CSP `media-src 'self' blob: data:`
+- `components/chat-interface.tsx` — emotion lifecycle delegation, `isTranscribing` removal
+- `components/settings-panel.tsx` — three-state API-key row with `{provider}` interpolation
+- `i18n/{en,fr,de,it}.json` — translation keys for new API-key row strings
+- `README.md` — OpenRouter in API Keys table, Inference Routing table, References, Web search feature line
+
+---
+
+### Open items for future sessions
+
+- **Tools-detection logic generalisation across providers** — `lib/llm/tools.ts` currently has only `detectToolsGroq`. Now that `LLMModelCapabilities.tools` exists in the registry, the detection layer can route to whichever provider has a tools-capable model. Likely follow-up shape: `detectTools()` resolver mirroring the emotion/STT pattern. Worth scoping before touching code — the user explicitly flagged this for future review based on the new capabilities definitions.
+- **OpenRouter image extraction** — wire response-side parsing once the wire format is confirmed. The text path is unaffected.
+- **Provider-level capability defaults** — `LLMProvider.capabilities` with model-level overrides. Address when adding an 11th OpenRouter model (or when a new provider arrives with similar bulk-identical caps).
+- **Tier 3 `lib/chat.ts` extraction** — deduplicate the two `handleSendMessage` pipelines once the Tier 1+2 changes have settled.
+- **Visualizer flashing before audio data** (still parked from S33).
+- **Typing-speed pacing for assistant messages** (still parked from S33).
+- **Multi-tab locale/gender sync** via `BroadcastChannel` (still parked from S33).
+- **Translation coverage audit** (still parked from S33).
+- **`lib/constants.ts` split** — deferred this session; revisit when architecture has cooled.
+
+---
+
 ## Session 33: OpenRouter STT + TTS, multi-provider architectural cleanup (04/28/2026)
 
 ### Overview
@@ -843,7 +1047,7 @@ The image generation pipeline had multiple issues found and fixed progressively:
 - After image generation, next user turn sent conversation history back to model
 - Companion message with `imageBase64` was being re-assembled with `input_image` content on an `assistant` role message
 - Responses API rejects this: `Invalid value: 'input_text'. Supported values are: 'output_text' and 'refusal'`
-- Fix: assistant messages return early with `[{ type: 'output_text', text: msg.content }]` — no image re-attachment, correct content type
+- Fix: assistant messages return early with `[{ type: 'output_text', text: msg.content }]` �� no image re-attachment, correct content type
 - Generated images are NEVER re-sent back to the model — only the text context matters
 
 **`LLMResponse` type updated:** `imageFormat?: string` added to `lib/types.ts`
