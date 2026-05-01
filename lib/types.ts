@@ -143,6 +143,7 @@ export interface EmotionDetectionResult {
  * fields are optional, but reviewers should). No other code changes needed.
  */
 export interface LLMModelCapabilities {
+  // ─── Input capabilities (what the model can ingest) ────────────────────────
   /** Accepts image inputs via `image_url` / multimodal content blocks. */
   vision?: boolean
   /** Can fetch and parse URLs natively (e.g. Groq compound's built-in browser). */
@@ -155,6 +156,22 @@ export interface LLMModelCapabilities {
   audio?: boolean
   /** Has built-in web search (no separate tool wiring required). */
   webSearch?: boolean
+
+  // ─── Output capabilities (what the model can produce) ──────────────────────
+  /**
+   * Can generate images inline in chat-completion responses (e.g. Nano Banana
+   * / `gemini-3.1-flash-image-preview`). Distinct from `vision`, which is
+   * input-side. Only applies to chat models that interleave images in the
+   * response payload — standalone image-generation APIs belong in their own
+   * registry, not here.
+   */
+  images?: boolean
+  /**
+   * Can generate videos inline in chat-completion responses. Symmetrical to
+   * `images` — same scope, different modality. Kept separate because some
+   * models do one but not the other.
+   */
+  videos?: boolean
 }
 
 export interface LLMModel {
