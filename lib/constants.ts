@@ -671,7 +671,7 @@ export const DEFAULT_IDLE_EMOJI = '😌'
 /**
  * Duration in ms to hold an emotion state before reverting to idle
  */
-export const EMOTION_DISPLAY_DURATION = 4000
+export const EMOTION_DISPLAY_DURATION = 5000
 
 /**
  * Visual emotion config
