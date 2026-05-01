@@ -69,15 +69,7 @@ export async function generateSpeech(text: string): Promise<Blob> {
     const settings = await db.getSettings()
     const { personality, gender } = await getCompanionSettings()
 
-    // Resolve voice from settings, falling back to the gender-appropriate
-    // default in TTS_VOICES['openrouter'] (which mirrors OpenAI's voice list).
-    const genderKey = (gender || DEFAULT_GENDER) as keyof typeof GENDER_MAPPING
-    const voicesForGender = TTS_VOICES['openrouter'][genderKey] ?? []
-    const fallbackVoiceId =
-      voicesForGender.find(v => 'isDefault' in v && v.isDefault)?.id ||
-      voicesForGender[0]?.id ||
-      DEFAULT_VOICE_ID
-    const selectedVoice = settings?.selectedVoice || fallbackVoiceId
+    const selectedVoice = settings?.selectedVoice || DEFAULT_VOICE_ID
 
     const provider = TTS_PROVIDERS.find(p => p.id === 'openrouter')
     const model = provider?.models[0]?.model
