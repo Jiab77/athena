@@ -337,7 +337,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Fast, cost-effective 8B model with 128K context window.',
         url: 'https://console.groq.com/docs/model/llama-3.1-8b-instant',
         visible: false,
-        capabilities: {},
+        capabilities: { tools: true },
       },
       {
         id: 'llama-4-scout',
@@ -348,7 +348,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: true,
         // Currently the auto-fallback target for image-bearing requests on
         // Groq (see DEFAULT_GROQ_VISION_MODEL).
-        capabilities: { vision: true, documents: true },
+        capabilities: { tools: true, vision: true, documents: true },
       },
       {
         id: 'gpt-oss-120b',
@@ -357,7 +357,16 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Frontier-grade agentic MoE model with 120B parameters. Advanced reasoning, and 131K context.',
         url: 'https://console.groq.com/docs/model/openai/gpt-oss-120b',
         visible: true,
-        capabilities: { documents: true },
+        capabilities: { tools: true, documents: true },
+      },
+      {
+        id: 'qwen3-32b',
+        name: 'Qwen3-32B',
+        model: 'qwen/qwen3-32b',
+        description: 'Qwen 3 32B is the latest generation of large language models in the Qwen series, offering groundbreaking advancements in reasoning, instruction-following, agent capabilities, and multilingual support.',
+        url: 'https://console.groq.com/docs/model/qwen/qwen3-32b',
+        visible: true,
+        capabilities: { tools: true, documents: true },
       },
     ],
   },
@@ -374,7 +383,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: false,
         // The whole GPT-5.4 family supports vision, function calling, and
         // document parsing. Audio I/O is reserved for the larger variants.
-        capabilities: { vision: true, documents: true },
+        capabilities: { tools: true, vision: true, documents: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -383,7 +392,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Balanced model offering good performance and efficiency for general-purpose tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini',
         visible: true,
-        capabilities: { vision: true, documents: true },
+        capabilities: { tools: true, vision: true, documents: true },
       },
       {
         id: 'gpt-5.4',
@@ -392,7 +401,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Advanced model with enhanced capabilities for complex reasoning and nuanced tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4',
         visible: true,
-        capabilities: { vision: true, documents: true },
+        capabilities: { tools: true, vision: true, documents: true },
       },
     ],
   },
@@ -427,7 +436,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Google's high-efficiency model for high-volume use. Configurable thinking levels at half the cost of Gemini 3 Flash.",
         url: 'https://openrouter.ai/google/gemini-3.1-flash-lite-preview',
         visible: true,
-        capabilities: { vision: true },
+        capabilities: { vision: true, documents: true },
       },
       {
         id: 'gemma-4-26b-a4b-it:free',
@@ -436,7 +445,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Instruction-tuned MoE model from Google DeepMind with 3.8B active params. Multimodal, 256K context, free tier.',
         url: 'https://openrouter.ai/google/gemma-4-26b-a4b-it:free',
         visible: true,
-        capabilities: { vision: true },
+        capabilities: { vision: true, documents: true },
       },
       {
         id: 'grok-4.3',
@@ -445,7 +454,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'xAI reasoning model with always-on reasoning. Multimodal, 1M context, no output limit.',
         url: 'https://openrouter.ai/x-ai/grok-4.3',
         visible: true,
-        capabilities: { vision: true },
+        capabilities: { vision: true, documents: true },
       },
       {
         id: 'claude-opus-4.7',
@@ -463,7 +472,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Fast, efficient model from Alibaba's Qwen 3.6 series. Text, image, and video input with 1M context.",
         url: 'https://openrouter.ai/qwen/qwen3.6-flash',
         visible: true,
-        capabilities: { vision: true },
+        capabilities: { vision: true, documents: true },
       },
       {
         id: 'llama-4-scout',
@@ -472,7 +481,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Meta MoE with 17B active params (109B total). Multilingual, multimodal, 10M context window.",
         url: 'https://openrouter.ai/meta-llama/llama-4-scout',
         visible: true,
-        capabilities: { vision: true },
+        capabilities: { vision: true, documents: true },
       },
       {
         id: 'llama-4-maverick',
@@ -481,7 +490,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Meta MoE with 128 experts, 17B active params (400B total). Multilingual, multimodal, 1M context.',
         url: 'https://openrouter.ai/meta-llama/llama-4-maverick',
         visible: true,
-        capabilities: { vision: true },
+        capabilities: { vision: true, documents: true },
       },
       {
         id: 'llama-3.3-70b-instruct:free',
@@ -492,7 +501,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: true,
         // Free-tier text-only — function calling / vision not exposed on
         // OpenRouter's free endpoint for this model.
-        capabilities: {},
+        capabilities: { documents: true },
       },
     ],
   },
