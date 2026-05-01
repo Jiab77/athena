@@ -67,7 +67,7 @@ export async function callOpenRouterAPI(
 
     console.log('[Athena] callOpenRouterAPI: settings resolved', { model, personality, companion, memoryWindowSize, avatarGender })
 
-    const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits, true)
+    const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
 
     const windowedMessages = messages.slice(-memoryWindowSize)
 
