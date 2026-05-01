@@ -27,7 +27,7 @@
 - Multi-turn conversation with encrypted persistent memory (IndexedDB, AES-GCM, PBKDF2 600k iterations)
 - Configurable memory window (1–10 messages)
 - Document & image attachments (txt, md, json, csv, pdf, images, code files)
-- Web search — OpenAI via Responses API, Groq via Compound
+- Web search — OpenAI via Responses API, Groq via Compound, OpenRouter via `openrouter:web_search`
 - Image generation — inline via OpenAI `image_generation` tool with download overlay
 - Emotion detection — post-response classification displayed as an emoji badge
 - Token usage display per message
@@ -95,6 +95,7 @@ All keys are configured inside the app under **Settings > Model** — encrypted 
 |---|---|---|
 | [Groq](https://groq.com/) | `GROQ_API_KEY` | LLM + Whisper STT + emotion detection |
 | [OpenAI](https://openai.com/) | `OPENAI_API_KEY` | LLM + STT + TTS + image generation + emotion detection |
+| [OpenRouter](https://openrouter.ai/) | `OPENROUTER_API_KEY` | LLM (multi-vendor gateway) + emotion detection + web search + URL fetching + image generation via server tools |
 | [BioLLM](https://biollm.com) | `BIOLLM_API_KEY` + endpoint URL | Biological neural network inference (experimental) |
 | [ResembleAI](https://www.resemble.ai/) | `RESEMBLEAI_API_KEY` | Chatterbox TTS |
 | [Decart](https://www.decart.ai/) | `DECART_API_KEY` | Real-time WebRTC live avatar |
@@ -200,6 +201,15 @@ See [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md) for the full 
 | STT | `whisper-1` | Voice input |
 | TTS | `gpt-4o-mini-tts` | Voice output |
 
+#### OpenRouter
+
+| Role | Model | When Used |
+|---|---|---|
+| Main inference | `openai/gpt-5.4`, `anthropic/claude-opus-4.7`, `x-ai/grok-4.3`, etc. | OpenRouter provider selected |
+| Tools (server-side) | `openrouter:web_search`, `openrouter:web_fetch`, `openrouter:image_generation` | Every request — fulfilled by OpenRouter, no client wiring |
+| Emotion classification | `openai/gpt-5.4-nano` | Post-response, every message |
+| STT | `whisper-1` via chat-completions `input_audio` | Voice input |
+
 #### BioLLM
 
 | Role | Model | When Used |
@@ -277,7 +287,7 @@ See [`docs/SECURITY_REPORT.md`](docs/SECURITY_REPORT.md) for the full audit.
 [GateBox](https://www.gatebox.ai/gatebox) | [Project AVA](https://www.razer.com/concepts/project-ava) | [VirtuaGirl](https://virtuagirlfullhd.info/)
 
 **LLM Providers:**
-[Groq](https://groq.com/) | [OpenAI](https://openai.com/) | [BioLLM](https://biollm.com) | [Ollama](https://ollama.ai/)
+[Groq](https://groq.com/) | [OpenAI](https://openai.com/) | [OpenRouter](https://openrouter.ai/) | [BioLLM](https://biollm.com) | [Ollama](https://ollama.ai/)
 
 **Voice:**
 [OpenAI TTS](https://platform.openai.com/docs/guides/text-to-speech) | [ResembleAI Chatterbox](https://www.resemble.ai/) | [Groq Whisper](https://groq.com/)
