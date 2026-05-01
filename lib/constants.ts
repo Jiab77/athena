@@ -382,7 +382,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4-nano',
         visible: false,
         // The whole GPT-5.4 family supports vision, function calling, and
-        // document parsing. Audio I/O is reserved for the larger variants.
+        // document parsing.
         capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
       },
       {
