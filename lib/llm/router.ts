@@ -1,7 +1,7 @@
 'use client'
 
-import type { Message, LLMResponse } from '../types'
-import { DEFAULT_MODEL_PROVIDER } from '../constants'
+import type { LLMModelCapabilities, Message, LLMResponse } from '../types'
+import { DEFAULT_MODEL_PROVIDER, LLM_PROVIDERS } from '../constants'
 import { getDB } from '../db'
 import { callGroqAPI, transcribeAudio as transcribeGroq, detectEmotion as detectEmotionGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI, detectEmotion as detectEmotionOpenAI } from './openai'
@@ -287,6 +287,73 @@ export async function resolveEmotionDetector(providerID: string): Promise<Emotio
   const native = getNativeEmotion(providerID)
   if (native) return native
   return resolveEmotionFallback()
+}
+
+/**
+ * Resolve the model identifier to actually use for a request, given the
+ * user's chosen model and a set of capabilities the request requires.
+ *
+ * Behaviour:
+ *   1. If `required` is empty → return `chosenModel` unchanged.
+ *   2. If the chosen model satisfies all required capabilities → return it.
+ *   3. Otherwise pick the first model in the same provider whose
+ *      `capabilities` cover everything in `required`, regardless of
+ *      `visible` (the user didn't pick the fallback explicitly — visibility
+ *      only affects the model picker UI, not auto-substitution).
+ *   4. If no model in the provider qualifies → return `chosenModel`
+ *      unchanged. Caller decides whether to error, warn, or proceed with
+ *      degraded behaviour. We never throw here.
+ *
+ * Providers without an `LLM_PROVIDERS` registry entry (notably `custom`)
+ * always pass through unchanged — we have no capability metadata for them.
+ *
+ * Replaces the per-adapter `DEFAULT_GROQ_VISION_MODEL` / `_URL_CAPABLE_MODEL`
+ * substitution pattern with a single registry-driven lookup. Adapters can
+ * call this once at the top of their request builder instead of carrying
+ * their own substitution logic.
+ *
+ * @param providerId    Provider id matching `LLM_PROVIDERS[].id`.
+ * @param chosenModel   The full model identifier the user picked (e.g.
+ *                      `'llama-3.1-8b-instant'`, `'openai/gpt-5.4'`).
+ * @param required      Capabilities the incoming request demands. An empty
+ *                      array short-circuits to `chosenModel`.
+ * @returns             The model identifier to send to the provider's API.
+ */
+export function resolveModelForCapabilities(
+  providerId: string,
+  chosenModel: string,
+  required: (keyof LLMModelCapabilities)[],
+): string {
+  if (required.length === 0) return chosenModel
+
+  const provider = LLM_PROVIDERS.find(p => p.id === providerId)
+  if (!provider) return chosenModel
+
+  const satisfies = (caps: LLMModelCapabilities) =>
+    required.every(cap => caps[cap] === true)
+
+  // Already good? Pass through.
+  const chosen = provider.models.find(m => m.model === chosenModel)
+  if (chosen && satisfies(chosen.capabilities)) {
+    return chosenModel
+  }
+
+  // Find any model in the same provider that satisfies. We don't filter
+  // on `visible` — substitution targets aren't user-picked, and some
+  // capability-bearing models (e.g. Groq compound) are intentionally
+  // hidden from the picker.
+  const fallback = provider.models.find(m => satisfies(m.capabilities))
+  if (fallback) {
+    console.log(
+      `[Router] resolveModelForCapabilities: '${chosenModel}' lacks [${required.join(', ')}] — substituting '${fallback.model}'`,
+    )
+    return fallback.model
+  }
+
+  console.warn(
+    `[Router] resolveModelForCapabilities: no model in '${providerId}' satisfies [${required.join(', ')}] — keeping '${chosenModel}'`,
+  )
+  return chosenModel
 }
 
 /**

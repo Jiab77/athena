@@ -122,6 +122,58 @@ export interface EmotionDetectionResult {
   emotion: EmotionState | null
 }
 
+/**
+ * Boolean capability flags describing what an LLM model can natively handle.
+ *
+ * All fields are optional — `undefined` is interpreted as `false`. The
+ * registry stays terse for simple text-only models (`capabilities: {}`)
+ * while still being type-checked: typos in capability names fail at compile
+ * time, unlike a string-array approach.
+ *
+ * Used by `resolveModelForCapabilities()` in `lib/llm/router.ts` to pick
+ * the right model when a request requires capabilities the chosen model
+ * lacks (e.g. a vision-required request on a text-only model auto-falls
+ * back to the first model in the same provider that satisfies all required
+ * capabilities). Also used by the model picker UI to surface capability
+ * badges and by `lib/llm/tools.ts` to find a tool-capable model for tool
+ * detection.
+ *
+ * Adding a new capability: extend this interface, then fill in the flag
+ * for every model in `LLM_PROVIDERS` (TypeScript won't force this since
+ * fields are optional, but reviewers should). No other code changes needed.
+ */
+export interface LLMModelCapabilities {
+  // ─── Input capabilities (what the model can ingest) ────────────────────────
+  /** Accepts image inputs via `image_url` / multimodal content blocks. */
+  vision?: boolean
+  /** Can fetch and parse URLs natively (e.g. Groq compound's built-in browser). */
+  urls?: boolean
+  /** Accepts file/document uploads (PDF, etc.) for in-context parsing. */
+  documents?: boolean
+  /** Supports OpenAI-style function calling / tool use. */
+  tools?: boolean
+  /** Accepts audio inputs via `input_audio` content blocks. */
+  audio?: boolean
+  /** Has built-in web search (no separate tool wiring required). */
+  webSearch?: boolean
+
+  // ─── Output capabilities (what the model can produce) ──────────────────────
+  /**
+   * Can generate images inline in chat-completion responses (e.g. Nano Banana
+   * / `gemini-3.1-flash-image-preview`). Distinct from `vision`, which is
+   * input-side. Only applies to chat models that interleave images in the
+   * response payload — standalone image-generation APIs belong in their own
+   * registry, not here.
+   */
+  images?: boolean
+  /**
+   * Can generate videos inline in chat-completion responses. Symmetrical to
+   * `images` — same scope, different modality. Kept separate because some
+   * models do one but not the other.
+   */
+  videos?: boolean
+}
+
 export interface LLMModel {
   id: string
   name: string
@@ -129,6 +181,7 @@ export interface LLMModel {
   url?: string
   model: string  // Full model identifier (e.g., 'groq/compound', 'mixtral-8x7b-32768')
   visible: boolean // Whether show the given model in the settings panel or not
+  capabilities: LLMModelCapabilities  // What the model can natively handle. Empty `{}` for text-only.
 }
 
 export interface LLMProvider {
