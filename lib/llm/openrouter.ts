@@ -127,7 +127,11 @@ export async function callOpenRouterAPI(
       temperature: 1,
       max_tokens: 2048,
       top_p: 1,
-      response_format: { type: 'json_object' },
+      tools: [
+        { type: 'openrouter:web_search' },
+        { type: 'openrouter:web_fetch' },
+        { type: 'openrouter:image_generation' }
+      ]
     }
 
     console.log('[Athena] callOpenRouterAPI: request body', {
