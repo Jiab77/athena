@@ -291,6 +291,8 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Experimental 4B biological neural network model. Inference runs through a living cortical culture on Cortical Labs CL1 hardware.',
         url: 'https://biollm.com/about',
         visible: true,
+        // Experimental research model — text in / text out only.
+        capabilities: {},
       },
       {
         id: 'v2',
@@ -299,6 +301,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Experimental 4B biological neural network model. Inference runs through a living cortical culture on Cortical Labs CL1 hardware.',
         url: 'https://biollm.com/about',
         visible: false,
+        capabilities: {},
       },
     ],
   },
@@ -313,6 +316,10 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Integrates GPT-OSS 120B and Llama 4 with web search and browser automation. Up to 10 tools per request.',
         url: 'https://console.groq.com/docs/compound/systems/compound',
         visible: false,
+        // Compound is the only model in the Groq catalogue with native URL
+        // fetching and built-in web search — that's the whole point of the
+        // system. Currently the auto-fallback target for URL-bearing requests.
+        capabilities: { tools: true, urls: true, webSearch: true },
       },
       {
         id: 'compound-mini',
@@ -321,6 +328,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Faster variant with unified tool access. Single tool per request with 3x lower latency.',
         url: 'https://console.groq.com/docs/compound/systems/compound-mini',
         visible: false,
+        capabilities: { tools: true, urls: true, webSearch: true },
       },
       {
         id: 'llama-3-instant',
@@ -329,6 +337,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Fast, cost-effective 8B model with 128K context window.',
         url: 'https://console.groq.com/docs/model/llama-3.1-8b-instant',
         visible: false,
+        capabilities: { tools: true },
       },
       {
         id: 'llama-4-scout',
@@ -337,6 +346,9 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Multimodal model supporting text and images with vision capabilities and 128K context.',
         url: 'https://console.groq.com/docs/model/meta-llama/llama-4-scout-17b-16e-instruct',
         visible: true,
+        // Currently the auto-fallback target for image-bearing requests on
+        // Groq (see DEFAULT_GROQ_VISION_MODEL).
+        capabilities: { vision: true, tools: true },
       },
       {
         id: 'gpt-oss-120b',
@@ -345,6 +357,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Frontier-grade agentic MoE model with 120B parameters. Advanced reasoning, and 131K context.',
         url: 'https://console.groq.com/docs/model/openai/gpt-oss-120b',
         visible: true,
+        capabilities: { tools: true },
       },
     ],
   },
@@ -359,6 +372,9 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Lightweight and fast model optimized for quick responses with reduced latency.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4-nano',
         visible: false,
+        // The whole GPT-5.4 family supports vision, function calling, and
+        // document parsing. Audio I/O is reserved for the larger variants.
+        capabilities: { vision: true, tools: true, documents: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -367,6 +383,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Balanced model offering good performance and efficiency for general-purpose tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini',
         visible: true,
+        capabilities: { vision: true, tools: true, documents: true, audio: true },
       },
       {
         id: 'gpt-5.4',
@@ -375,6 +392,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Advanced model with enhanced capabilities for complex reasoning and nuanced tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4',
         visible: true,
+        capabilities: { vision: true, tools: true, documents: true, audio: true },
       },
     ],
   },
@@ -389,6 +407,9 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "OpenAI's frontier model unifying Codex and GPT. Multimodal with 1M+ context window.",
         url: 'https://openrouter.ai/openai/gpt-5.4',
         visible: true,
+        // OpenRouter passes through OpenAI's full feature set for the
+        // GPT-5.4 family — vision, tools, documents, audio.
+        capabilities: { vision: true, tools: true, documents: true, audio: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -397,6 +418,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Faster, cheaper variant of GPT-5.4 for high-throughput workloads. Multimodal with strong tool use.',
         url: 'https://openrouter.ai/openai/gpt-5.4-mini',
         visible: true,
+        capabilities: { vision: true, tools: true, documents: true, audio: true },
       },
       {
         id: 'gemini-3.1-flash-lite-preview',
@@ -405,6 +427,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Google's high-efficiency model for high-volume use. Configurable thinking levels at half the cost of Gemini 3 Flash.",
         url: 'https://openrouter.ai/google/gemini-3.1-flash-lite-preview',
         visible: true,
+        capabilities: { vision: true, tools: true, audio: true },
       },
       {
         id: 'gemma-4-26b-a4b-it:free',
@@ -413,6 +436,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Instruction-tuned MoE model from Google DeepMind with 3.8B active params. Multimodal, 256K context, free tier.',
         url: 'https://openrouter.ai/google/gemma-4-26b-a4b-it:free',
         visible: true,
+        capabilities: { vision: true, tools: true },
       },
       {
         id: 'grok-4.3',
@@ -421,6 +445,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'xAI reasoning model with always-on reasoning. Multimodal, 1M context, no output limit.',
         url: 'https://openrouter.ai/x-ai/grok-4.3',
         visible: true,
+        capabilities: { vision: true, tools: true },
       },
       {
         id: 'claude-opus-4.7',
@@ -429,6 +454,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Anthropic's flagship model built for long-running async agents and complex multi-step orchestration.",
         url: 'https://openrouter.ai/anthropic/claude-opus-4.7',
         visible: true,
+        capabilities: { vision: true, tools: true, documents: true },
       },
       {
         id: 'qwen3.6-flash',
@@ -437,6 +463,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Fast, efficient model from Alibaba's Qwen 3.6 series. Text, image, and video input with 1M context.",
         url: 'https://openrouter.ai/qwen/qwen3.6-flash',
         visible: true,
+        capabilities: { vision: true, tools: true },
       },
       {
         id: 'llama-4-scout',
@@ -445,6 +472,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Meta MoE with 17B active params (109B total). Multilingual, multimodal, 10M context window.",
         url: 'https://openrouter.ai/meta-llama/llama-4-scout',
         visible: true,
+        capabilities: { vision: true, tools: true },
       },
       {
         id: 'llama-4-maverick',
@@ -453,6 +481,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Meta MoE with 128 experts, 17B active params (400B total). Multilingual, multimodal, 1M context.',
         url: 'https://openrouter.ai/meta-llama/llama-4-maverick',
         visible: true,
+        capabilities: { vision: true, tools: true },
       },
       {
         id: 'llama-3.3-70b-instruct:free',
@@ -461,6 +490,9 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Meta's instruction-tuned 70B multilingual model optimized for dialogue. Free tier, text-only.",
         url: 'https://openrouter.ai/meta-llama/llama-3.3-70b-instruct:free',
         visible: true,
+        // Free-tier text-only — function calling / vision not exposed on
+        // OpenRouter's free endpoint for this model.
+        capabilities: {},
       },
     ],
   },
