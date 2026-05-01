@@ -7,7 +7,7 @@ import { callGroqAPI, transcribeAudio as transcribeGroq, detectEmotion as detect
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI, detectEmotion as detectEmotionOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
 import { callBioLLMAPI } from './biollm'
-import { callOpenRouterAPI, transcribeAudio as transcribeOpenRouter } from './openrouter'
+import { callOpenRouterAPI, transcribeAudio as transcribeOpenRouter, detectEmotion as detectEmotionOpenRouter } from './openrouter'
 // Per-capability adapters (`transcribe*`, `detectEmotion*`) are still imported
 // for their registration in the `providers` map below — the fallback chains
 // read them from that registry rather than referencing the imports directly.
@@ -62,7 +62,10 @@ const providers: Record<string, LLMProvider> = {
     // (OpenRouter has no dedicated Whisper endpoint). Lets users get STT with
     // the same OpenRouter key already used for chat — see lib/llm/openrouter.ts.
     transcribeAudio: transcribeOpenRouter,
-    // No native emotion detection yet — handled via `EMOTION_FALLBACK_CHAIN`.
+    // Emotion detection routed through the same chat-completions endpoint
+    // with JSON mode — model resolved from `EMOTION_PROVIDERS` via
+    // `getEmotionModel('openrouter')`. Same single-key reasoning as STT.
+    detectEmotion: detectEmotionOpenRouter,
   },
 }
 

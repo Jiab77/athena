@@ -6,15 +6,14 @@ import {
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
+  DEFAULT_AUDIO_FILE,
+  EMOTION_PROVIDERS,
   STT_PROVIDERS,
 } from '../constants'
 import { getDB } from '../db'
 import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey } from '../utils'
 
 const CHAT_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
-
-/** Fallback STT model if the constants entry is somehow missing. Kept aligned with the registry's first model. */
-const DEFAULT_OPENROUTER_STT_MODEL = 'google/gemini-2.5-flash'
 
 /** Strict transcription instruction used as the user-facing text part alongside the audio block. */
 const TRANSCRIPTION_PROMPT = 'Transcribe the attached audio verbatim. Output only the transcription text. Do not add commentary, summaries, language labels, timestamps, or any other text.'
@@ -262,7 +261,10 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     // Resolve STT model from registry, mirroring the openai/groq adapters
     const provider = STT_PROVIDERS.find(p => p.id === 'openrouter')
-    const sttModel = provider?.models[0]?.model || DEFAULT_OPENROUTER_STT_MODEL
+    const sttModel = provider?.models[0]?.model
+    if (!sttModel) {
+      throw new Error('No STT model registered for provider \'openrouter\'')
+    }
 
     const audioBase64 = await blobToBase64(audioBlob)
     const audioFormat = deriveAudioFormat(audioBlob.type)
@@ -324,4 +326,72 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     console.log('[Athena] transcribeAudio (OpenRouter): caught error', error)
     throw error
   }
+}
+
+/**
+ * Run emotion classification on a piece of model-generated text via
+ * OpenRouter's chat-completions endpoint in JSON mode.
+ *
+ * Mirrors the OpenAI/Groq adapters — same narrow contract: take
+ * `(systemPrompt, userText)`, return the raw JSON string from the model.
+ * The OpenRouter wire format is OpenAI-compatible, so this is essentially
+ * the OpenAI implementation with a different host, key, and model namespace
+ * (e.g. `openai/gpt-5.4-nano` rather than `gpt-5.4-nano`).
+ *
+ * Single-key motivation: lets users get emotion detection with the same
+ * OpenRouter key already used for chat — no separate OpenAI/Groq key needed.
+ *
+ * Throws on HTTP failures so the caller can decide whether to retry, fall
+ * back, or downgrade gracefully.
+ */
+export async function detectEmotion(systemPrompt: string, userText: string): Promise<string> {
+  const apiKey = await getAPIKey('openrouter')
+
+  // Resolve model from the EMOTION_PROVIDERS registry — single source of
+  // truth for which model each provider runs emotion detection on.
+  const emotionModel = EMOTION_PROVIDERS.find(p => p.id === 'openrouter')?.models[0]?.model
+  if (!emotionModel) {
+    throw new Error('No emotion-detection model registered for provider \'openrouter\'')
+  }
+
+  const reqBody = {
+    model: emotionModel,
+    messages: [
+      { role: 'system' as const, content: systemPrompt },
+      { role: 'user' as const, content: userText },
+    ],
+    temperature: 0.3,
+    max_tokens: 64,
+    response_format: { type: 'json_object' as const },
+  }
+
+  console.log('[Athena] detectEmotion (OpenRouter): request', reqBody)
+
+  const response = await fetch(CHAT_API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      ...buildAttributionHeaders(),
+    },
+    body: JSON.stringify(reqBody),
+  })
+
+  console.log('[Athena] detectEmotion (OpenRouter): HTTP response', { status: response.status, ok: response.ok })
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    console.error('[Athena] detectEmotion (OpenRouter): API error', error)
+    throw new Error(error?.error?.message || `OpenRouter emotion detection failed: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+  console.log('[Athena] detectEmotion (OpenRouter): raw response', data)
+
+  const content = data.choices?.[0]?.message?.content
+  if (!content) {
+    throw new Error('No content in OpenRouter emotion detection response')
+  }
+
+  return content
 }

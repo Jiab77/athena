@@ -7,8 +7,8 @@ import {
   DEFAULT_PERSONALITY,
   DEFAULT_MEMORY_SIZE,
   DEFAULT_AUDIO_FILE,
-  DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
-  STT_PROVIDERS
+  EMOTION_PROVIDERS,
+  STT_PROVIDERS,
 } from '../constants'
 import { getDB } from '../db'
 import { buildSystemPrompt, getAPIKey } from '../utils'
@@ -289,7 +289,10 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     // Get STT model from constants (OpenAI provider's first model)
     const providers = STT_PROVIDERS.find(p => p.id === 'openai')
-    const sttModel = providers?.models[0]?.model || 'whisper-1'
+    const sttModel = providers?.models[0]?.model
+    if (!sttModel) {
+      throw new Error('No STT model registered for provider \'openai\'')
+    }
     formData.append('model', sttModel)
     // formData.append('language', 'fr')
 
@@ -342,8 +345,15 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 export async function detectEmotion(systemPrompt: string, userText: string): Promise<string> {
   const apiKey = await getAPIKey('openai')
 
+  // Resolve model from the EMOTION_PROVIDERS registry — single source of
+  // truth for which model each provider runs emotion detection on.
+  const emotionModel = EMOTION_PROVIDERS.find(p => p.id === 'openai')?.models[0]?.model
+  if (!emotionModel) {
+    throw new Error('No emotion-detection model registered for provider \'openai\'')
+  }
+
   const reqBody = {
-    model: DEFAULT_OPENAI_EMOTION_DETECTION_MODEL,
+    model: emotionModel,
     messages: [
       { role: 'system' as const, content: systemPrompt },
       { role: 'user' as const, content: userText },

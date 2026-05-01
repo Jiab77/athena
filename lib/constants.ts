@@ -3,7 +3,9 @@
  * Single source of truth for all configuration options and selectable values
  */
 
-import type { Avatar, EmotionConfig, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider } from './types'
+import type {
+  Avatar, EmotionConfig, EmotionProvider, ExpressionState, LLMProvider, Locale, PersonalityType, VisualFormat, STTProvider, TTSProvider
+} from './types'
 
 /**
  * i18n
@@ -58,9 +60,6 @@ export const MAX_DISPLAY_MESSAGES = 30
  * Single source of truth for LLM services
  */
 export const DEFAULT_EMOTION_DETECTION_PROVIDER = 'openai'
-export const DEFAULT_GROQ_EMOTION_DETECTION_MODEL = 'llama-3.1-8b-instant'
-export const DEFAULT_OPENAI_EMOTION_DETECTION_MODEL = 'gpt-5.4-nano'
-export const DEFAULT_GROQ_STT_MODEL = 'whisper-large-v3-turbo'
 export const DEFAULT_GROQ_TOOL_DETECTION_MODEL = 'groq/compound-mini'
 export const DEFAULT_GROQ_URL_CAPABLE_MODEL = 'groq/compound'
 export const DEFAULT_GROQ_VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
@@ -78,15 +77,6 @@ export const SECONDARY_AUDIO_TYPE = 'audio/mp3'
 export const SECONDARY_AUDIO_FILE = 'audio.mp3'
 export const ENABLE_VOICE_OUTPUT = false
 
-/** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
-export const ENABLE_BIOLLM_PERSONALITY = true
-
-/** Milliseconds of inactivity before Decart live avatar disconnects to stop consuming credits */
-export const LIVE_AVATAR_IDLE_TIMEOUT = 10000
-
-/** Milliseconds to wait for Decart to connect before aborting and falling back to local audio */
-export const LIVE_AVATAR_CONNECTION_TIMEOUT = 5000
-
 /**
  * Default AI Companion
  * Single source of truth for supported AI companion
@@ -100,6 +90,18 @@ export const DEFAULT_COMPANION = {
   imageUrl: '/avatars/cyberpunk/f-03-vibrant.jpg',
   createdAt: new Date().toISOString()
 }
+
+/** Mobile swipping threshold */
+export const MOBILE_SWIPE_THRESHOLD = 50 // px
+
+/** Set to true once confirmed that BioLLM accepts a system prompt in the request body */
+export const ENABLE_BIOLLM_PERSONALITY = true
+
+/** Milliseconds of inactivity before Decart live avatar disconnects to stop consuming credits */
+export const LIVE_AVATAR_IDLE_TIMEOUT = 10000
+
+/** Milliseconds to wait for Decart to connect before aborting and falling back to local audio */
+export const LIVE_AVATAR_CONNECTION_TIMEOUT = 5000
 
 /**
  * Avatar configurations
@@ -433,6 +435,60 @@ export const LLM_PROVIDERS: LLMProvider[] = [
 ]
 
 /**
+ * Emotion Detection Provider configurations.
+ *
+ * Each provider exposes the smallest/fastest model it offers — emotion
+ * detection runs on every assistant response, so latency and cost matter
+ * more than flagship accuracy on a single-token classification task.
+ *
+ * Adapters in `lib/llm/{provider}.ts` resolve their model from this registry
+ * via `getEmotionModel()` in `lib/llm/router.ts`. Order here is informational
+ * only — runtime resolution order is controlled by `EMOTION_FALLBACK_CHAIN`
+ * inside the router.
+ */
+export const EMOTION_PROVIDERS: EmotionProvider[] = [
+  {
+    id: 'groq',
+    name: 'Groq',
+    models: [
+      {
+        id: 'llama-3.1-8b-instant',
+        name: 'Llama 3.1 8B Instant',
+        model: 'llama-3.1-8b-instant',
+        description: 'Fast 8B model. Used post-response for sentiment classification.',
+        url: 'https://console.groq.com/docs/models',
+      },
+    ],
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI',
+    models: [
+      {
+        id: 'gpt-5.4-nano',
+        name: 'GPT-5.4 Nano',
+        model: 'gpt-5.4-nano',
+        description: 'Smallest GPT-5.4 model. Reliable JSON-mode output for emotion classification.',
+        url: 'https://platform.openai.com/docs/models',
+      },
+    ],
+  },
+  {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    models: [
+      {
+        id: 'gpt-5.4-nano',
+        name: 'GPT-5.4 Nano',
+        model: 'openai/gpt-5.4-nano',
+        description: 'OpenAI GPT-5.4 Nano via OpenRouter. Lets users get emotion detection with the same OpenRouter key already used for chat.',
+        url: 'https://openrouter.ai/openai/gpt-5.4-nano',
+      },
+    ],
+  },
+]
+
+/**
  * Speech-to-Text (STT) Provider configurations
  * Supports multiple STT providers for audio transcription
  */
@@ -468,11 +524,11 @@ export const STT_PROVIDERS: STTProvider[] = [
     name: 'OpenRouter',
     models: [
       {
-        id: 'gemini-2.5-flash',
-        name: 'Gemini 2.5 Flash',
-        model: 'google/gemini-2.5-flash',
-        description: 'Multimodal Gemini model used for transcription via chat completions with audio input. Single OpenRouter key covers chat + STT.',
-        url: 'https://openrouter.ai/google/gemini-2.5-flash',
+        id: 'whisper-1',
+        name: 'Whisper V1',
+        model: 'openai/whisper-1',
+        description: 'General-purpose speech recognition trained on diverse multilingual audio. Supports 99+ languages.',
+        url: 'https://openrouter.ai/openai/whisper-1',
       }
     ],
   },
@@ -516,9 +572,9 @@ export const TTS_PROVIDERS: TTSProvider[] = [
       {
         id: 'gpt-4o-mini-tts',
         name: 'GPT-4o Mini TTS',
-        model: 'gpt-4o-mini-tts',
+        model: 'openai/gpt-4o-mini-tts-2025-12-15',
         description: "OpenAI's TTS model proxied via OpenRouter. Same voices as OpenAI's direct API, with a single key shared across chat, STT and TTS.",
-        url: 'https://openrouter.ai/openai/gpt-4o-mini-tts',
+        url: 'https://openrouter.ai/openai/gpt-4o-mini-tts-2025-12-15',
       },
     ],
   },
@@ -703,8 +759,3 @@ export const EMOTION_CONFIG: Record<ExpressionState, EmotionConfig> = {
     shakeAmp: 0.0, shakeSpeed: 0.0,
   },
 }
-
-/**
- * Mobile swipping threshold
- */
-export const MOBILE_SWIPE_THRESHOLD = 50 // px
