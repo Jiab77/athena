@@ -11,7 +11,7 @@ import {
   STT_PROVIDERS,
 } from '../constants'
 import { getDB } from '../db'
-import { parseCompanionJSON, buildSystemPrompt, escapeDocumentContent, getAPIKey } from '../utils'
+import { buildSystemPrompt, escapeDocumentContent, getAPIKey } from '../utils'
 
 const CHAT_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
@@ -39,10 +39,15 @@ function buildAttributionHeaders(): Record<string, string> {
  * Call OpenRouter API with conversation history using fetch.
  *
  * OpenRouter is a thin OpenAI-compatible Chat Completions gateway in front of
- * many model providers (OpenAI, Anthropic, Google, Meta, etc.). The wire
- * format mirrors the Groq adapter — same JSON mode, same vision content
- * shape, same document injection — so we can reuse the existing companion
- * JSON contract without any transport-level surprises.
+ * many model providers (OpenAI, Anthropic, Google, Meta, etc.). Vision content
+ * shape and document injection mirror the Groq adapter.
+ *
+ * Response handling: returns the assistant message text verbatim — no JSON
+ * envelope parsing. The server tools array (`openrouter:web_search`,
+ * `openrouter:web_fetch`, `openrouter:image_generation`) is fulfilled
+ * server-side by OpenRouter, so any tool-driven content (search results,
+ * fetched URL bodies, generated images) is already woven into the model's
+ * final message by the time it reaches us.
  *
  * Automatically retrieves API key, model, personality, and companion from database.
  */
@@ -173,28 +178,22 @@ export async function callOpenRouterAPI(
 
     const usage = data.usage || null
 
-    let parsedResponse: { response: string; reasoning?: string }
-    try {
-      const content = data.choices?.[0]?.message?.content
+    // OpenRouter follows the standard Chat Completions wire format — assistant
+    // text is at `choices[0].message.content`. Server-tool output (web search
+    // results, fetched URLs, generated images) has already been woven into
+    // this string by the time we receive it, so no special-case extraction is
+    // required for the text path.
+    const content = data.choices?.[0]?.message?.content
 
-      if (!content) {
-        throw new Error('No response content from OpenRouter API')
-      }
-      console.log('[Athena] callOpenRouterAPI: raw content before parse --', content.slice(0, 200))
-      parsedResponse = parseCompanionJSON(content)
-      console.log('[Athena] callOpenRouterAPI: parsedResponse keys', Object.keys(parsedResponse))
-    } catch {
-      throw new Error('Invalid JSON response from OpenRouter API')
+    if (!content) {
+      console.log('[Athena] callOpenRouterAPI: no content in response')
+      throw new Error('No response content from OpenRouter API')
     }
 
-    if (!parsedResponse.response) {
-      throw new Error('No response field in parsed JSON')
-    }
-
-    console.log('[Athena] callOpenRouterAPI: success', { responseLength: parsedResponse.response.length, usage })
+    console.log('[Athena] callOpenRouterAPI: success', { responseLength: content.length, usage })
 
     return {
-      response: parsedResponse.response,
+      response: content,
       usage: usage as { prompt_tokens: number; completion_tokens: number; total_tokens: number } | null,
     }
   } catch (error) {
