@@ -383,7 +383,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Balanced model offering good performance and efficiency for general-purpose tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini',
         visible: true,
-        capabilities: { vision: true, tools: true, documents: true, audio: true },
+        capabilities: { vision: true, tools: true, documents: true },
       },
       {
         id: 'gpt-5.4',
@@ -392,7 +392,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Advanced model with enhanced capabilities for complex reasoning and nuanced tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4',
         visible: true,
-        capabilities: { vision: true, tools: true, documents: true, audio: true },
+        capabilities: { vision: true, tools: true, documents: true },
       },
     ],
   },
@@ -409,7 +409,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: true,
         // OpenRouter passes through OpenAI's full feature set for the
         // GPT-5.4 family — vision, tools, documents, audio.
-        capabilities: { vision: true, tools: true, documents: true, audio: true },
+        capabilities: { vision: true, tools: true, documents: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -418,7 +418,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Faster, cheaper variant of GPT-5.4 for high-throughput workloads. Multimodal with strong tool use.',
         url: 'https://openrouter.ai/openai/gpt-5.4-mini',
         visible: true,
-        capabilities: { vision: true, tools: true, documents: true, audio: true },
+        capabilities: { vision: true, tools: true, documents: true },
       },
       {
         id: 'gemini-3.1-flash-lite-preview',
@@ -427,7 +427,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: "Google's high-efficiency model for high-volume use. Configurable thinking levels at half the cost of Gemini 3 Flash.",
         url: 'https://openrouter.ai/google/gemini-3.1-flash-lite-preview',
         visible: true,
-        capabilities: { vision: true, tools: true, audio: true },
+        capabilities: { vision: true, tools: true },
       },
       {
         id: 'gemma-4-26b-a4b-it:free',
