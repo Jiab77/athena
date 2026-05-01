@@ -13,6 +13,13 @@ const ContentSecurityPolicy = [
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
+  // Required for TTS playback: providers return audio as Blob, which we wrap in
+  // a `blob:` object URL via `URL.createObjectURL` and feed to `<audio>`. Some
+  // providers (Decart streaming, certain inline-return TTS) deliver `data:`
+  // URIs instead. Without this, browsers fall back to `default-src 'self'` and
+  // `<audio src="blob:...">` is rejected as a CSP violation. Same-origin scope
+  // by definition — no exfiltration risk.
+  "media-src 'self' blob: data:",
   "font-src 'self' data:",
   "connect-src 'self' https:",
   "worker-src 'self' blob:",
