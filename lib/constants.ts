@@ -383,7 +383,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: false,
         // The whole GPT-5.4 family supports vision, function calling, and
         // document parsing. Audio I/O is reserved for the larger variants.
-        capabilities: { tools: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -392,7 +392,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Balanced model offering good performance and efficiency for general-purpose tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini',
         visible: true,
-        capabilities: { tools: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
       },
       {
         id: 'gpt-5.4',
@@ -401,7 +401,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Advanced model with enhanced capabilities for complex reasoning and nuanced tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4',
         visible: true,
-        capabilities: { tools: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
       },
     ],
   },
