@@ -292,7 +292,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         url: 'https://biollm.com/about',
         visible: true,
         // Experimental research model — text in / text out only.
-        capabilities: {},
+        capabilities: { documents: true },
       },
       {
         id: 'v2',
@@ -301,7 +301,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Experimental 4B biological neural network model. Inference runs through a living cortical culture on Cortical Labs CL1 hardware.',
         url: 'https://biollm.com/about',
         visible: false,
-        capabilities: {},
+        capabilities: { documents: true },
       },
     ],
   },
@@ -348,7 +348,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: true,
         // Currently the auto-fallback target for image-bearing requests on
         // Groq (see DEFAULT_GROQ_VISION_MODEL).
-        capabilities: { vision: true },
+        capabilities: { vision: true, documents: true },
       },
       {
         id: 'gpt-oss-120b',
@@ -357,7 +357,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Frontier-grade agentic MoE model with 120B parameters. Advanced reasoning, and 131K context.',
         url: 'https://console.groq.com/docs/model/openai/gpt-oss-120b',
         visible: true,
-        capabilities: { tools: true },
+        capabilities: { documents: true },
       },
     ],
   },
@@ -516,11 +516,11 @@ export const EMOTION_PROVIDERS: EmotionProvider[] = [
     name: 'Groq',
     models: [
       {
-        id: 'llama-3.1-8b-instant',
-        name: 'Llama 3.1 8B Instant',
+        id: 'llama-3-instant',
+        name: 'Llama 3.1 8B',
         model: 'llama-3.1-8b-instant',
-        description: 'Fast 8B model. Used post-response for sentiment classification.',
-        url: 'https://console.groq.com/docs/models',
+        description: 'Fast, cost-effective 8B model with 128K context window.',
+        url: 'https://console.groq.com/docs/model/llama-3.1-8b-instant',
       },
     ],
   },
@@ -532,8 +532,8 @@ export const EMOTION_PROVIDERS: EmotionProvider[] = [
         id: 'gpt-5.4-nano',
         name: 'GPT-5.4 Nano',
         model: 'gpt-5.4-nano',
-        description: 'Smallest GPT-5.4 model. Reliable JSON-mode output for emotion classification.',
-        url: 'https://platform.openai.com/docs/models',
+        description: 'Lightweight and fast model optimized for quick responses with reduced latency.',
+        url: 'https://developers.openai.com/api/docs/models/gpt-5.4-nano',
       },
     ],
   },
