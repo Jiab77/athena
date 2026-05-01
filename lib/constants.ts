@@ -418,7 +418,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: true,
         // OpenRouter passes through OpenAI's full feature set for the
         // GPT-5.4 family — vision, tools, documents, audio.
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -427,7 +427,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Faster, cheaper variant of GPT-5.4 for high-throughput workloads. Multimodal with strong tool use.',
         url: 'https://openrouter.ai/openai/gpt-5.4-mini',
         visible: true,
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
       },
       {
         id: 'gpt-5.4-nano',
@@ -436,7 +436,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'The most lightweight and cost-efficient variant of the GPT-5.4 family, optimized for speed-critical and high-volume tasks.',
         url: 'https://openrouter.ai/openai/gpt-5.4-nano',
         visible: true,
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
       },
       {
         id: 'gemini-3.1-flash-lite-preview',
