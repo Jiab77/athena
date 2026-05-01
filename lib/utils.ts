@@ -250,6 +250,18 @@ export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: ()
   let audioContext: AudioContext | null = null
   let analyser: AnalyserNode | null = null
 
+  // Idempotent close: `playAudio` has 5 disposal paths (`ended`, `error`,
+  // `stop()`, the catch block, plus any combination if events overlap) and
+  // any second call to `AudioContext.close()` throws `InvalidStateError:
+  // Cannot close a closed AudioContext`. Optional chaining only guards
+  // against `null`, not against the "already closed" state — hence this
+  // helper checks `state` first and swallows any residual rejection.
+  const closeAudioContextSafely = () => {
+    if (audioContext && audioContext.state !== 'closed') {
+      audioContext.close().catch(() => {})
+    }
+  }
+
   try {
     const audioUrl = URL.createObjectURL(audioBlob)
     const audio = new Audio(audioUrl)
@@ -271,12 +283,12 @@ export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: ()
     audio.addEventListener('ended', () => {
       onEnd?.()
       URL.revokeObjectURL(audioUrl)
-      audioContext?.close()
+      closeAudioContextSafely()
     })
 
     audio.addEventListener('error', () => {
       URL.revokeObjectURL(audioUrl)
-      audioContext?.close()
+      closeAudioContextSafely()
       onEnd?.()
     })
 
@@ -289,7 +301,7 @@ export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: ()
         audio.currentTime = 0
         onEnd?.()
         URL.revokeObjectURL(audioUrl)
-        audioContext?.close()
+        closeAudioContextSafely()
       },
       pause: () => {
         audio.pause()
@@ -302,7 +314,7 @@ export async function playAudio(audioBlob: Blob, onPlay?: () => void, onEnd?: ()
       getAnalyser: () => analyser,
     }
   } catch (error) {
-    audioContext?.close()
+    closeAudioContextSafely()
     onEnd?.()
     throw error
   }
