@@ -383,7 +383,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: false,
         // The whole GPT-5.4 family supports vision, function calling, and
         // document parsing. Audio I/O is reserved for the larger variants.
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -392,7 +392,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Balanced model offering good performance and efficiency for general-purpose tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4-mini',
         visible: true,
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
       },
       {
         id: 'gpt-5.4',
@@ -401,7 +401,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Advanced model with enhanced capabilities for complex reasoning and nuanced tasks.',
         url: 'https://developers.openai.com/api/docs/models/gpt-5.4',
         visible: true,
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
       },
     ],
   },
@@ -418,7 +418,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         visible: true,
         // OpenRouter passes through OpenAI's full feature set for the
         // GPT-5.4 family — vision, tools, documents, audio.
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
       },
       {
         id: 'gpt-5.4-mini',
@@ -427,7 +427,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'Faster, cheaper variant of GPT-5.4 for high-throughput workloads. Multimodal with strong tool use.',
         url: 'https://openrouter.ai/openai/gpt-5.4-mini',
         visible: true,
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
       },
       {
         id: 'gpt-5.4-nano',
@@ -436,7 +436,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         description: 'The most lightweight and cost-efficient variant of the GPT-5.4 family, optimized for speed-critical and high-volume tasks.',
         url: 'https://openrouter.ai/openai/gpt-5.4-nano',
         visible: true,
-        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true, images: true },
       },
       {
         id: 'gemini-3.1-flash-lite-preview',
