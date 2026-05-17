@@ -1,7 +1,7 @@
 'use client'
 
 import type { LLMModelCapabilities, Message, LLMResponse } from '../types'
-import { ATHENA_FREE_PROVIDER_ID, DEFAULT_MODEL_PROVIDER, LLM_PROVIDERS } from '../constants'
+import { DEFAULT_MODEL_PROVIDER, LLM_PROVIDERS } from '../constants'
 import { getDB } from '../db'
 import { callGroqAPI, transcribeAudio as transcribeGroq, detectEmotion as detectEmotionGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI, detectEmotion as detectEmotionOpenAI } from './openai'
@@ -73,7 +73,7 @@ const providers: Record<string, LLMProvider> = {
   // for chat-completions audio transcription); emotion detection is wired so
   // free-tier users get expression-driven avatars without a paid key. See
   // lib/llm/free.ts for the public-key tradeoff rationale.
-  [ATHENA_FREE_PROVIDER_ID]: {
+  free: {
     callAPI: callAthenaFreeAPI,
     detectEmotion: detectEmotionFree,
   },
@@ -174,7 +174,7 @@ export async function callLLMWithFreeFallback(
   try {
     return await callLLM(messages, providerID)
   } catch (error) {
-    if (providerID === ATHENA_FREE_PROVIDER_ID) {
+    if (providerID === 'free') {
       console.log('[Router] callLLMWithFreeFallback: active provider IS free tier — no fallback path', error)
       throw error
     }
@@ -183,7 +183,7 @@ export async function callLLMWithFreeFallback(
       throw error
     }
     console.log(`[Router] callLLMWithFreeFallback: '${providerID}' failed — retrying through Free Tier`, error)
-    return callLLM(messages, ATHENA_FREE_PROVIDER_ID)
+    return callLLM(messages, 'free')
   }
 }
 
@@ -302,7 +302,7 @@ export async function supportsSTT(): Promise<boolean> {
  * configuring any paid provider — accuracy is good enough on a single-token
  * classification, and the bundled key carries the cost.
  */
-const EMOTION_FALLBACK_CHAIN = ['openai', 'groq', ATHENA_FREE_PROVIDER_ID] as const
+const EMOTION_FALLBACK_CHAIN = ['openai', 'groq', 'free'] as const
 
 /** Return type shared by `getNativeEmotion` and the public resolver — pairs the
  * resolved provider id with the actual detector function so callers don't have
@@ -337,7 +337,7 @@ async function resolveEmotionFallback(): Promise<EmotionDetector | null> {
   for (const providerID of EMOTION_FALLBACK_CHAIN) {
     const provider = providers[providerID]
     if (!provider?.detectEmotion) continue
-    const hasKey = providerID === ATHENA_FREE_PROVIDER_ID
+    const hasKey = providerID === 'free'
       ? isAthenaFreeAvailable()
       : await db.checkAPIKey(providerID)
     if (hasKey) {

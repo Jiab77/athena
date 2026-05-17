@@ -32,7 +32,6 @@ import {
   MIN_MEMORY_SIZE,
   MAX_MEMORY_SIZE,
   LLM_PROVIDERS,
-  ATHENA_FREE_PROVIDER_ID,
   TTS_PROVIDERS,
   TTS_VOICES,
   AVATARS,
@@ -97,7 +96,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
   // Reserved for future "Free Tier" badge / messaging in the picker. Wire-up
   // is intentionally minimal in this change — visual treatment to follow.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isFreeTier = provider === ATHENA_FREE_PROVIDER_ID
+  const isFreeTier = provider === 'free'
   const selectedProvider = LLM_PROVIDERS.find((p) => p.id === provider)
   const availableModels = selectedProvider?.models.filter(m => m.visible) || []
   // Free Tier (and any future provider with `requiresApiKey: false`) hides
@@ -109,7 +108,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
   // `process.env` because Next.js inlines `NEXT_PUBLIC_*` into client code.
   const isAthenaFreeAvailable = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
   const visibleProviders = LLM_PROVIDERS.filter(
-    (p) => p.id !== ATHENA_FREE_PROVIDER_ID || isAthenaFreeAvailable,
+    (p) => p.id !== 'free' || isAthenaFreeAvailable,
   )
 
   // Voice settings logic

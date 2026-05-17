@@ -20,8 +20,8 @@
  * Architecture: structured to mirror `lib/llm/openrouter.ts` line-for-line so
  * the diff is obvious in review. Differences are limited to:
  *   1. `getAthenaFreeKey()` instead of `getAPIKey('openrouter')`
- *   2. Provider id `ATHENA_FREE_PROVIDER_ID` when looking up STT / emotion
- *      models in the shared registries
+ *   2. Provider id `'free'` when looking up STT / emotion models in the
+ *      shared registries
  *   3. Attribution title is bumped to `Athena Free Tier` so OpenRouter's
  *      leaderboard can distinguish bundled-tier traffic from user-keyed
  *      OpenRouter traffic
@@ -29,7 +29,6 @@
 
 import type { Message, PersonalityType, GenderType, LLMResponse } from '../types'
 import {
-  ATHENA_FREE_PROVIDER_ID,
   DEFAULT_GENDER,
   DEFAULT_COMPANION_NAME,
   DEFAULT_PERSONALITY,
@@ -219,8 +218,8 @@ export async function callAthenaFreeAPI(messages: Message[]): Promise<LLMRespons
  * Run emotion classification through the bundled Free Tier account.
  *
  * Same wire format as `detectEmotion` in `lib/llm/openrouter.ts`. Model is
- * resolved from `EMOTION_PROVIDERS` keyed on `ATHENA_FREE_PROVIDER_ID`, so
- * swapping the model later is a registry edit only — no code change here.
+ * resolved from `EMOTION_PROVIDERS` keyed on `'free'`, so swapping the model
+ * later is a registry edit only — no code change here.
  *
  * Throws on HTTP failures so the router can fall back to another provider's
  * emotion detector via `EMOTION_FALLBACK_CHAIN`.
@@ -228,9 +227,9 @@ export async function callAthenaFreeAPI(messages: Message[]): Promise<LLMRespons
 export async function detectEmotion(systemPrompt: string, userText: string): Promise<string> {
   const apiKey = getAthenaFreeKey()
 
-  const emotionModel = EMOTION_PROVIDERS.find(p => p.id === ATHENA_FREE_PROVIDER_ID)?.models[0]?.model
+  const emotionModel = EMOTION_PROVIDERS.find(p => p.id === 'free')?.models[0]?.model
   if (!emotionModel) {
-    throw new Error(`No emotion-detection model registered for provider '${ATHENA_FREE_PROVIDER_ID}'`)
+    throw new Error("No emotion-detection model registered for provider 'free'")
   }
 
   const reqBody = {

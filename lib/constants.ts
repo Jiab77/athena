@@ -43,22 +43,6 @@ export const DEFAULT_MODEL_ID = 'gpt-5.4-mini'
 export const DEFAULT_MODEL_NAME = 'gpt-5.4-mini'
 
 /**
- * Bundled "Free Tier" provider — a curated pair of OpenRouter free-tier
- * models accessed through a dedicated OpenRouter account whose key is shipped
- * in the public bundle via `NEXT_PUBLIC_ATHENA_FREE_KEY`.
- *
- * Treat this key as publicly extractable by design: it is read in client
- * code, baked into the JS bundle at build time, and bound to a dedicated
- * OpenRouter account that holds nothing else. If it leaks or is abused
- * beyond rate limits, rotate the key on that dedicated account — no other
- * Athena features or user accounts are affected.
- *
- * The provider is hidden from the model picker when the env var is unset
- * so a self-hosted Athena without the variable degrades silently.
- */
-export const ATHENA_FREE_PROVIDER_ID = 'free'
-
-/**
  * Default Memory Config
  */
 export const DEFAULT_MEMORY_SIZE = 10
@@ -297,7 +281,19 @@ export const PERSONALITY_VOICES: Record<PersonalityType, string> = {
  */
 export const LLM_PROVIDERS: LLMProvider[] = [
   {
-    id: ATHENA_FREE_PROVIDER_ID,
+    // Bundled "Free Tier" provider — a curated pair of OpenRouter free-tier
+    // models accessed through a dedicated OpenRouter account whose key is
+    // shipped in the public bundle via `NEXT_PUBLIC_ATHENA_FREE_KEY`.
+    //
+    // Treat this key as publicly extractable by design: it is read in client
+    // code, baked into the JS bundle at build time, and bound to a dedicated
+    // OpenRouter account that holds nothing else. If it leaks or is abused
+    // beyond rate limits, rotate the key on that dedicated account — no
+    // other Athena features or user accounts are affected.
+    //
+    // Hidden from the model picker when the env var is unset so a
+    // self-hosted Athena without the variable degrades silently.
+    id: 'free',
     name: 'Athena Free Tier',
     // No `keysUrl` — this provider intentionally hides the API key input in
     // the settings panel. The key is supplied via `NEXT_PUBLIC_ATHENA_FREE_KEY`
@@ -586,7 +582,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
  */
 export const EMOTION_PROVIDERS: EmotionProvider[] = [
   {
-    id: ATHENA_FREE_PROVIDER_ID,
+    id: 'free',
     name: 'Athena Free Tier',
     models: [
       {
