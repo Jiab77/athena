@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Lock, Info, Eye, EyeOff } from 'lucide-react'
+import { Lock, Info, Eye, EyeOff, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -46,6 +46,7 @@ import {
 } from '@/lib/constants'
 import type { PersonalityType, VisualFormat, GenderType, TTSProvider, Locale } from '@/lib/types'
 import { useDB } from '@/lib/db-context'
+import { isAthenaFreeAvailable } from '@/lib/utils'
 import { encryptData, decryptData } from '@/lib/crypto'
 import { useToast } from '@/hooks/use-toast'
 import { useTranslation } from '@/hooks/use-translation'
@@ -93,8 +94,28 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
   const isLiveAvatar = visualFormat === 'live-avatar'
   const isCustomProvider = provider === 'custom'
   const isBioLLM = provider === 'biollm'
+  // Reserved for future "Free Tier" badge / messaging in the picker. Wire-up
+  // is intentionally minimal in this change — visual treatment to follow.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const isFreeTier = provider === 'free'
   const selectedProvider = LLM_PROVIDERS.find((p) => p.id === provider)
   const availableModels = selectedProvider?.models.filter(m => m.visible) || []
+  // Free Tier (and any future provider with `requiresApiKey: false`) hides
+  // the API key input — its credentials come from the bundled env var.
+  const requiresApiKey = selectedProvider?.requiresApiKey !== false
+  // Hide Free Tier from the picker when `NEXT_PUBLIC_ATHENA_FREE_KEY` isn't
+  // set at build time. Self-hosters without the env var see no Free Tier
+  // option at all rather than a broken entry.
+  const freeTierAvailable = isAthenaFreeAvailable()
+  const visibleProviders = LLM_PROVIDERS.filter(
+    (p) => p.id !== 'free' || freeTierAvailable,
+  )
+  console.log('[Settings] providers: free-tier visibility', {
+    freeTierAvailable,
+    totalProviders: LLM_PROVIDERS.length,
+    visibleProviders: visibleProviders.map((p) => p.id),
+    activeProvider: provider,
+  })
 
   // Voice settings logic
   const selectedTTSProvider = TTS_PROVIDERS.find((p) => p.id === voiceProvider)
@@ -627,7 +648,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                       </span>
                     </SelectTrigger>
                     <SelectContent>
-                      {LLM_PROVIDERS.map((p) => (
+                      {visibleProviders.map((p) => (
                         <SelectItem key={p.id} value={p.id} className="focus:bg-secondary/50">
                           <div className="flex flex-col">
                             <span>{p.name}</span>
@@ -761,7 +782,10 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                   </div>
                 )}
 
-                {/* API Key */}
+                {/* API Key — hidden for providers with `requiresApiKey: false`
+                    (Free Tier today). Those providers source credentials from
+                    a bundled env var instead of per-user IndexedDB storage. */}
+                {requiresApiKey && (
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
                     {t('settings.model.apiKey')}
@@ -787,7 +811,28 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                     <Lock className="inline h-3 w-3 mr-1" />
                     {t('settings.model.encryptionNotice')}
                   </p>
+                  {/* Help line linking out to the provider's API-key page.
+                      Only shown for built-in providers that have a `keysUrl`
+                      defined in `lib/constants.ts`. The Custom provider has
+                      no canonical URL — its endpoint depends on whatever the
+                      user pointed it at — so we hide the line entirely there
+                      rather than showing a generic "check your docs" message
+                      that would add noise without value. */}
+                  {!isCustomProvider && selectedProvider?.keysUrl && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <ExternalLink className="inline h-3 w-3 mr-1 text-accent" />
+                      <a
+                        href={selectedProvider.keysUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent underline hover:text-primary transition-colors"
+                      >
+                        {t('settings.model.getApiKey', { provider: selectedProvider.name })}
+                      </a>
+                    </p>
+                  )}
                 </div>
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>

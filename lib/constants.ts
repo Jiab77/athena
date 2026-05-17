@@ -38,9 +38,9 @@ export const DEFAULT_VISUAL_FORMAT: VisualFormat = 'static-2d'
 export const DEFAULT_GENDER = 'F'
 export const DEFAULT_COLOR_SCHEME = 'vibrant'
 export const DEFAULT_AVATAR_CATEGORY = 'cyberpunk'
-export const DEFAULT_MODEL_PROVIDER = 'openai'
-export const DEFAULT_MODEL_ID = 'gpt-5.4-mini'
-export const DEFAULT_MODEL_NAME = 'gpt-5.4-mini'
+export const DEFAULT_MODEL_PROVIDER = 'free'
+export const DEFAULT_MODEL_ID = 'dense'
+export const DEFAULT_MODEL_NAME = 'Dense'
 
 /**
  * Default Memory Config
@@ -281,8 +281,57 @@ export const PERSONALITY_VOICES: Record<PersonalityType, string> = {
  */
 export const LLM_PROVIDERS: LLMProvider[] = [
   {
+    // Bundled "Free Tier" provider — a curated pair of OpenRouter free-tier
+    // models accessed through a dedicated OpenRouter account whose key is
+    // shipped in the public bundle via `NEXT_PUBLIC_ATHENA_FREE_KEY`.
+    //
+    // Treat this key as publicly extractable by design: it is read in client
+    // code, baked into the JS bundle at build time, and bound to a dedicated
+    // OpenRouter account that holds nothing else. If it leaks or is abused
+    // beyond rate limits, rotate the key on that dedicated account — no
+    // other Athena features or user accounts are affected.
+    //
+    // Hidden from the model picker when the env var is unset so a
+    // self-hosted Athena without the variable degrades silently.
+    id: 'free',
+    name: 'Athena Free Tier',
+    // No `keysUrl` — this provider intentionally hides the API key input in
+    // the settings panel. The key is supplied via `NEXT_PUBLIC_ATHENA_FREE_KEY`
+    // and bundled with the app, not entered per-user.
+    requiresApiKey: false,
+    models: [
+      {
+        id: 'light',
+        name: 'Light',
+        // Tracks `meta-llama/llama-3.3-70b-instruct:free` — same model as the
+        // OpenRouter free entry, but reached via the bundled Athena account.
+        // Optimised for fast, cheap turn-taking on simple chats.
+        model: 'meta-llama/llama-3.3-70b-instruct:free',
+        description: 'Fast, lightweight free model for everyday chat. Text-only, runs through the bundled Athena Free Tier account on OpenRouter.',
+        url: 'https://openrouter.ai/meta-llama/llama-3.3-70b-instruct:free',
+        visible: true,
+        // Free-tier text-only — function calling / vision not exposed by
+        // OpenRouter for this model on the free endpoint.
+        capabilities: { tools: true, urls: true, webSearch: true, documents: true },
+      },
+      {
+        id: 'dense',
+        name: 'Dense',
+        // Tracks `google/gemma-4-26b-a4b-it:free` — multimodal MoE that can
+        // ingest images and documents on the free tier. Heavier but more
+        // capable than `Light`.
+        model: 'google/gemma-4-26b-a4b-it:free',
+        description: 'More capable free multimodal model with vision and document support. Runs through the bundled Athena Free Tier account on OpenRouter.',
+        url: 'https://openrouter.ai/google/gemma-4-26b-a4b-it:free',
+        visible: true,
+        capabilities: { tools: true, urls: true, webSearch: true, vision: true, documents: true },
+      },
+    ],
+  },
+  {
     id: 'biollm',
     name: 'BioLLM',
+    keysUrl: 'https://biollm.com/dashboard',
     models: [
       {
         id: 'shadow',
@@ -308,6 +357,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
   {
     id: 'groq',
     name: 'Groq',
+    keysUrl: 'https://console.groq.com/keys',
     models: [
       {
         id: 'compound',
@@ -373,6 +423,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
   {
     id: 'openai',
     name: 'OpenAI',
+    keysUrl: 'https://platform.openai.com/api-keys',
     models: [
       {
         id: 'gpt-5.4-nano',
@@ -408,6 +459,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
   {
     id: 'openrouter',
     name: 'OpenRouter',
+    keysUrl: 'https://openrouter.ai/settings/keys',
     models: [
       {
         id: 'gpt-5.4',
@@ -529,6 +581,22 @@ export const LLM_PROVIDERS: LLMProvider[] = [
  * inside the router.
  */
 export const EMOTION_PROVIDERS: EmotionProvider[] = [
+  {
+    id: 'free',
+    name: 'Athena Free Tier',
+    models: [
+      {
+        id: 'light',
+        name: 'Light',
+        // Same model the Free Tier `Light` chat entry uses — lets the free
+        // adapter classify emotion through the bundled OpenRouter account
+        // without needing a user-supplied key.
+        model: 'meta-llama/llama-3.3-70b-instruct:free',
+        description: 'Free-tier emotion classifier routed through the bundled Athena account.',
+        url: 'https://openrouter.ai/meta-llama/llama-3.3-70b-instruct:free',
+      },
+    ],
+  },
   {
     id: 'groq',
     name: 'Groq',

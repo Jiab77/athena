@@ -279,6 +279,7 @@
       "apiKeyPlaceholder": "Geben Sie Ihren {provider}-Schlüssel ein",
       "apiKeyFallback": "API",
       "encryptionNotice": "Lokal verschlüsselt, nur zur Authentifizierung an API-Anbieter gesendet",
+      "getApiKey": "{provider} API-Schlüssel abrufen",
       "modelsCount": "{count} Modelle"
     },
 

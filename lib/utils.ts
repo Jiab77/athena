@@ -20,6 +20,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Whether the bundled Athena Free Tier provider is currently usable.
+ *
+ * Reads `NEXT_PUBLIC_ATHENA_FREE_KEY` directly from `process.env` — Next.js
+ * inlines `NEXT_PUBLIC_*` at build time, so this is safe in client and
+ * server code alike. Lives here (alongside `getAPIKey`) so anything that
+ * needs to gate on Free Tier availability — picker, connection-status hook,
+ * onboarding, the Free Tier adapter itself — pulls from a single source.
+ */
+export function isAthenaFreeAvailable(): boolean {
+  const available = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
+  console.log('[Utils] isAthenaFreeAvailable:', { available })
+  return available
+}
+
+/**
  * Map MIME type to DocumentFormat
  */
 export function getDocumentFormat(mimeType: string): DocumentFormat {

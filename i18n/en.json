@@ -267,6 +267,7 @@
       "apiKeyPlaceholder": "Enter your {provider} key",
       "apiKeyFallback": "API",
       "encryptionNotice": "Encrypted locally, sent only to API providers for authentication",
+      "getApiKey": "Get your {provider} API key",
       "modelsCount": "{count} models"
     },
 
