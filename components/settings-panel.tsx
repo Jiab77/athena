@@ -110,6 +110,13 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
   const visibleProviders = LLM_PROVIDERS.filter(
     (p) => p.id !== 'free' || isAthenaFreeAvailable,
   )
+  console.log('[v0] SettingsPanel.providers: free-tier visibility', {
+    envVarLength: (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length,
+    isAthenaFreeAvailable,
+    totalProviders: LLM_PROVIDERS.length,
+    visibleProviders: visibleProviders.map((p) => p.id),
+    activeProvider: provider,
+  })
 
   // Voice settings logic
   const selectedTTSProvider = TTS_PROVIDERS.find((p) => p.id === voiceProvider)

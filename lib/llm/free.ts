@@ -53,7 +53,15 @@ const ATTRIBUTION_TITLE = `${DEFAULT_COMPANION_NAME} Free Tier`
  * silently downgrade.
  */
 export function getAthenaFreeKey(): string {
-  const key = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim()
+  const raw = process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? ''
+  const key = raw.trim()
+  console.log('[v0] free.getAthenaFreeKey: env var present?', {
+    rawLength: raw.length,
+    trimmedLength: key.length,
+    // Never log the full key — only confirm shape so we can tell whether
+    // the bundle actually received the env var at build time.
+    looksLikeOpenRouterKey: key.startsWith('sk-or-'),
+  })
   if (!key) {
     throw new Error('Athena Free Tier is not configured (NEXT_PUBLIC_ATHENA_FREE_KEY missing)')
   }
@@ -67,7 +75,9 @@ export function getAthenaFreeKey(): string {
  * to hide the Free Tier entry from the picker when the env var is unset.
  */
 export function isAthenaFreeAvailable(): boolean {
-  return (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
+  const available = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
+  console.log('[v0] free.isAthenaFreeAvailable:', { available })
+  return available
 }
 
 /**
