@@ -148,11 +148,6 @@ export async function callAthenaFreeAPI(messages: Message[]): Promise<LLMRespons
       temperature: 1,
       max_tokens: 2048,
       top_p: 1,
-      tools: [
-        { type: 'openrouter:web_search' },
-        { type: 'openrouter:web_fetch' },
-        { type: 'openrouter:image_generation' },
-      ],
     }
 
     console.log('[Free] callAthenaFreeAPI: request body', {
