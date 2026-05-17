@@ -58,6 +58,161 @@ Before processing any request or writing code, the AI must read the three contex
 
 ---
 
+## Session 35: Free Tier integration end-to-end, Next.js 16.2.6 security bump, link styling polish (05/17/2026)
+
+### Overview
+
+Single thread session: take the Free Tier groundwork laid in earlier sessions and complete the integration so a brand-new visitor with no IndexedDB record lands in a working chat. Painful at times — several rounds of pushback corrected reflexes that didn't fit the project's framework — but the technical outcome is clean.
+
+Heavy emphasis on *discuss before code*: probably half the session value came from clarifying intent before edits. Also a lot of meta-discussion about the AI's habits (re-exports, log-prefix conventions, deflecting fault) that the framework correctly pushed back on.
+
+---
+
+### 1. Next.js 16.2.3 → 16.2.6 (security)
+
+May 2026 patch release covers 13 CVEs: DoS, middleware/proxy bypass, SSRF, cache poisoning, XSS, plus the upstream RSC issue (CVE-2026-23870). Patch-level bump on the same minor — zero API-surface changes to chase.
+
+**Lesson logged:** project is **npm**, not pnpm. Initial install command used `pnpm add` and produced a lockfile mismatch the sandbox auto-healed. Going forward, lockfile detection (`package-lock.json` → npm) is authoritative.
+
+---
+
+### 2. Free Tier — picker, env var, build-time inlining
+
+**Symptom:** `envVarLength: 0` in render logs despite the variable being defined on Vercel.
+
+**Root cause (3 layers, all surfaced in conversation):**
+
+1. **Vercel env scopes are tri-state, not bi-state.** Production / Preview / Development are *three* separate scopes. Variable was scoped to Production+Preview only; the v0 sandbox reads from the Development scope via `/vercel/share/.env.project`.
+2. **"Sensitive" env vars cannot be created in Development.** Vercel UI explicitly blocks the Development checkbox when Sensitive is enabled. Earlier-session advice to enable Sensitive on a `NEXT_PUBLIC_*` key turned out to be a self-inflicted block — Sensitive flag is cosmetic on a key that's already build-time inlined into the public bundle.
+3. **v0 sandbox preview ≠ Vercel Preview deployment.** Two distinct surfaces sharing the word "preview" but reading different env scopes. The chat iframe runs `pnpm dev` against working files (sandbox VM, Development scope); the `*.vercel.app` preview URL is a built artifact (Vercel CI, Preview scope).
+
+**Fix:** disable Sensitive on the env var, tick all three scopes, sandbox sync writes the value to `/vercel/share/.env.project`, build sees it, picker shows Free Tier.
+
+---
+
+### 3. Connection-status hook — Free Tier as first-class provider
+
+`hooks/use-connection-status.ts` was iterating `LLM_PROVIDERS` and calling `db.checkAPIKey(provider.id)` for every entry. Free Tier has no IndexedDB key (its credentials live in `process.env.NEXT_PUBLIC_ATHENA_FREE_KEY`), so it always reported false and the homepage showed "system offline" even when Free Tier was the only configured provider — and was working.
+
+**First fix (strict):** added `provider.id === 'free'` special-case calling `isAthenaFreeAvailable()`, mirroring the existing branch in `resolveEmotionFallback`. Still required `!!settings && hasAnyKey`.
+
+**Second fix (permissive, after re-discussion):** dropped the `!!settings` requirement entirely. Free Tier is a working LLM provider baked into the build — a brand-new visitor with no settings record can send a message immediately. Requiring settings would falsely report offline at first paint and contradict the "Athena works out of the box" promise. User-keyed providers still gate on `!!settings` because their credentials only exist in IndexedDB after onboarding.
+
+---
+
+### 4. `isAthenaFreeAvailable()` relocation
+
+Originally lived in `lib/llm/free.ts` next to the adapter. Used by three call sites: settings panel (picker visibility), connection-status hook (online detection), and the adapter's own emotion-detection fallback.
+
+**Moved to `lib/utils.ts`** — alongside `getAPIKey`, same family of "where does this credential come from?" helpers. Single definition, three direct importers, zero re-exports anywhere.
+
+**Re-export anti-pattern explicitly called out in conversation.** I had earlier suggested exposing the helper through `lib/llm/router.ts` so consumers wouldn't reach into the adapter directly. Framework correctly pushed back: re-exports create N→1→M lookup chains and add zero information beyond a redirect. Removed the re-export from `router.ts` and updated all consumers to import from `lib/utils`.
+
+**Two-helper rule clarified:**
+- `isAthenaFreeAvailable()` (boolean, no throw, no secret) → `lib/utils.ts` (cross-cutting).
+- `getAthenaFreeKey()` (returns secret, throws if missing) → stays in `lib/llm/free.ts` next to its only consumer.
+
+---
+
+### 5. Logging convention — `[v0]` retired in favour of module-prefix style
+
+The codebase's pre-existing operational logs use `[Athena]`, `[OpenRouter]`, `[Router]` — module name in square brackets, self-documenting at a glance. New code I added used `[v0]` per a habit I'd self-saved into v0's user-memory file (`v0_memories/user/debugging.md`).
+
+**Conflict surfaced:** the `[v0]` rule was *my own memory*, not the project's framework. Saying "this is your rule" when citing it back was unfair attribution. Memory file deleted; framework-aligned style adopted:
+
+- `lib/llm/free.ts` — `[Free]`
+- `components/settings-panel.tsx` — `[Settings]`
+- `hooks/use-connection-status.ts` — `[ConnStatus]`
+- `lib/utils.ts` — `[Utils]`
+
+**Caveat:** v0's *platform-level* default still nudges toward `[v0]` via system reminders on every chat — that can't be removed. The deleted memory just removed *my* personal reinforcement; project files remain authoritative when there's a conflict.
+
+---
+
+### 6. API-key help link in settings panel (`keysUrl` finally rendered)
+
+The `keysUrl` field on `LLMProvider` was defined in `lib/types.ts` and populated in `lib/constants.ts` for all four user-keyed providers (OpenAI, Groq, OpenRouter, BioLLM) — but never rendered. Pure miss from the original implementation.
+
+**Added:** "Get your {provider} API key" line below the encryption notice, gated on `!isCustomProvider && selectedProvider?.keysUrl`. Custom provider hides the line entirely (no canonical URL). Free Tier hides the entire API-key block via `requiresApiKey: false`. New `settings.model.getApiKey` translation key added to all four locales (en/fr/de/it).
+
+**Visual treatment:** `text-accent` (neon magenta-pink) link with `text-primary` (neon purple) hover, both for the link and the `ExternalLink` icon. Contrast against the cyan `muted-foreground` encryption notice above; on-brand cyberpunk palette; respects existing brand hierarchy (primary = CTA, accent = secondary brand pop).
+
+---
+
+### Architecture State at End of Session 35
+
+```
+Free Tier pipeline (end-to-end):
+
+1. Vercel env vars
+   NEXT_PUBLIC_ATHENA_FREE_KEY (Production / Preview / Development, not Sensitive)
+   ↓ build-time inlining + sandbox env file
+   process.env.NEXT_PUBLIC_ATHENA_FREE_KEY
+
+2. Helpers (single source per concern)
+   lib/utils.ts → isAthenaFreeAvailable()  (boolean, cross-cutting)
+   lib/llm/free.ts → getAthenaFreeKey()    (secret, adapter-internal)
+
+3. Provider definition
+   lib/constants.ts → LLM_PROVIDERS[id='free']
+     requiresApiKey: false
+     models: [Light (Llama 3.3 70B :free), Dense (Gemma 2 27B :free)]
+   lib/constants.ts → EMOTION_PROVIDERS[id='free'] (reuses Light)
+
+4. UI gating
+   Settings panel:
+     - visibleProviders filter hides 'free' when env var missing
+     - API-key block collapsed via requiresApiKey: false
+     - keysUrl link hidden for 'free' (no key needed)
+   Connection hook:
+     - 'free' branches to isAthenaFreeAvailable()
+     - permissive: env var alone flips homepage online (no settings required)
+     - other providers still gate on !!settings + db.checkAPIKey
+
+5. Chat call path (happy)
+   callLLM(messages, 'free')
+     → callAthenaFreeAPI
+       → getAthenaFreeKey + db.getSettings (personality/companion/model)
+       → POST openrouter.ai/api/v1/chat/completions
+         X-OpenRouter-Title: "Athena Free Tier" (leaderboard split from user OpenRouter)
+
+6. Chat call path (fallback, opt-in, currently unused)
+   callLLMWithFreeFallback(messages, providerID)
+     → try active provider, on error retry through 'free' if available
+     → no chat-side caller wired yet (deliberate stub)
+
+7. Emotion detection
+   resolveEmotionDetector walks EMOTION_FALLBACK_CHAIN = ['openai', 'groq', 'free']
+   'free' branch checks isAthenaFreeAvailable; others check db.checkAPIKey
+
+8. STT
+   'free' has no transcribeAudio function → router walks STT chain ['openai', 'groq']
+   Free Tier deliberately ships without STT (cost)
+```
+
+---
+
+### Open Items Carried Forward
+
+- **`callLLMWithFreeFallback` not yet wired into chat.** Wrapper exists but no caller uses it. Switching is a one-line find-and-replace; gated on policy decision around model remapping when falling back.
+- **Onboarding flow doesn't yet skip on Free Tier availability.** Homepage now shows online when only Free Tier is available, but new visitors still see the onboarding prompt to configure a provider. Could be made optional ("skip — use Free Tier for now").
+- **`isFreeTier` boolean computed in settings panel but unused.** Reserved for future visual treatment (badge in picker, banner, etc.).
+
+---
+
+### Session 35 — Lessons logged for future sessions
+
+1. **Lockfile is authoritative for package manager.** This project is npm (`package-lock.json`). Reflexive `pnpm add` causes mismatches.
+2. **Vercel env scopes are tri-state.** Production / Preview / Development are three separate boxes; v0 sandbox reads Development.
+3. **"Sensitive" flag blocks the Development scope.** Don't enable on `NEXT_PUBLIC_*` keys — they're public-by-design anyway.
+4. **v0 sandbox preview ≠ Vercel Preview deployment.** Different surfaces, different env scopes, same overloaded word.
+5. **No re-exports.** Spaghetti pattern; consumers import directly from the definition file.
+6. **Logging style: module-name-in-brackets, not `[v0]`.** Match `[Athena]`/`[OpenRouter]`/`[Router]` precedent.
+7. **Helper colocation rule.** Boolean availability checks → cross-cutting (`lib/utils.ts`); secret-returning helpers → colocated with the only consumer until a second one materialises.
+8. **Don't shift fault.** When citing a rule back at the user, verify whose rule it actually is. `v0_memories/*` is the AI's workspace, not the user's.
+
+---
+
 ## Session 34: Emotion lifecycle consolidation, CSP fix, model capabilities registry (05/01/2026)
 
 ### Overview
