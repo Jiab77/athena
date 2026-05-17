@@ -46,6 +46,7 @@ import {
 } from '@/lib/constants'
 import type { PersonalityType, VisualFormat, GenderType, TTSProvider, Locale } from '@/lib/types'
 import { useDB } from '@/lib/db-context'
+import { isAthenaFreeAvailable } from '@/lib/utils'
 import { encryptData, decryptData } from '@/lib/crypto'
 import { useToast } from '@/hooks/use-toast'
 import { useTranslation } from '@/hooks/use-translation'
@@ -104,15 +105,13 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
   const requiresApiKey = selectedProvider?.requiresApiKey !== false
   // Hide Free Tier from the picker when `NEXT_PUBLIC_ATHENA_FREE_KEY` isn't
   // set at build time. Self-hosters without the env var see no Free Tier
-  // option at all rather than a broken entry. Read directly from
-  // `process.env` because Next.js inlines `NEXT_PUBLIC_*` into client code.
-  const isAthenaFreeAvailable = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
+  // option at all rather than a broken entry.
+  const freeTierAvailable = isAthenaFreeAvailable()
   const visibleProviders = LLM_PROVIDERS.filter(
-    (p) => p.id !== 'free' || isAthenaFreeAvailable,
+    (p) => p.id !== 'free' || freeTierAvailable,
   )
   console.log('[v0] SettingsPanel.providers: free-tier visibility', {
-    envVarLength: (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length,
-    isAthenaFreeAvailable,
+    freeTierAvailable,
     totalProviders: LLM_PROVIDERS.length,
     visibleProviders: visibleProviders.map((p) => p.id),
     activeProvider: provider,

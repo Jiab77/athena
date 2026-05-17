@@ -69,18 +69,6 @@ export function getAthenaFreeKey(): string {
 }
 
 /**
- * Whether the Free Tier provider is currently usable. Safe to call from
- * client components — `process.env.NEXT_PUBLIC_*` is available in browser
- * code because Next.js inlines it at build time. Used by the settings panel
- * to hide the Free Tier entry from the picker when the env var is unset.
- */
-export function isAthenaFreeAvailable(): boolean {
-  const available = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
-  console.log('[v0] free.isAthenaFreeAvailable:', { available })
-  return available
-}
-
-/**
  * Build the optional attribution headers OpenRouter consumes for their public
  * leaderboard. Same shape as the OpenRouter adapter — only the title differs.
  */

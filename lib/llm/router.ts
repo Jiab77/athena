@@ -8,7 +8,8 @@ import { callOpenAIAPI, transcribeAudio as transcribeOpenAI, detectEmotion as de
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
 import { callBioLLMAPI } from './biollm'
 import { callOpenRouterAPI, transcribeAudio as transcribeOpenRouter, detectEmotion as detectEmotionOpenRouter } from './openrouter'
-import { callAthenaFreeAPI, detectEmotion as detectEmotionFree, isAthenaFreeAvailable } from './free'
+import { callAthenaFreeAPI, detectEmotion as detectEmotionFree } from './free'
+import { isAthenaFreeAvailable } from '../utils'
 // Per-capability adapters (`transcribe*`, `detectEmotion*`) are still imported
 // for their registration in the `providers` map below — the fallback chains
 // read them from that registry rather than referencing the imports directly.
@@ -134,13 +135,6 @@ export async function callLLM(messages: Message[], selectedProvider?: string): P
   console.log('[Router] callLLM - response received', { responseLength: result.response.length, usage: result.usage, hasImage: !!result.imageBase64 })
   return result
 }
-
-/**
- * Re-export of `isAthenaFreeAvailable` so consumers (settings panel, picker,
- * onboarding) can gate UI on Free Tier availability without importing the
- * adapter directly. Keeps the router as the single integration surface.
- */
-export { isAthenaFreeAvailable } from './free'
 
 /**
  * Try the active provider first; on failure, retry once through the bundled
