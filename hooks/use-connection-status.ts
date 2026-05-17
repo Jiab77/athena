@@ -17,9 +17,9 @@ export function useConnectionStatus() {
       try {
         const settings = await db.getSettings()
 
-        // Online if settings exist AND at least one configured provider has an
-        // API key. Derive the list from `LLM_PROVIDERS` so future providers are
-        // picked up automatically — see lib/constants.ts.
+        // Online when at least one provider has a usable credential. Derived
+        // from `LLM_PROVIDERS` so future providers are picked up automatically
+        // — see lib/constants.ts.
         //
         // Free Tier is a special case: it has no IndexedDB key (its credentials
         // come from `NEXT_PUBLIC_ATHENA_FREE_KEY`), so `db.checkAPIKey('free')`
@@ -27,20 +27,27 @@ export function useConnectionStatus() {
         // would appear offline. Mirror the special-case from
         // `resolveEmotionFallback` in `lib/llm/router.ts` to keep one rule
         // across the codebase.
+        //
+        // Free Tier availability alone is sufficient to mark the system as
+        // online — it's a fully working LLM provider baked into the build, so
+        // a brand-new visitor with no settings record can still send a message
+        // out of the box. Requiring `!!settings` here would falsely report
+        // "system offline" on first paint and contradict the Free Tier
+        // feature's "Athena works out of the box" promise. User-keyed
+        // providers still need a settings record because their credentials
+        // live in IndexedDB, which is only populated after onboarding.
         const keyChecks = await Promise.all(
           LLM_PROVIDERS.map(provider =>
             provider.id === 'free'
               ? Promise.resolve(isAthenaFreeAvailable())
-              : db.checkAPIKey(provider.id)
+              : Promise.resolve(!!settings).then(ok => ok && db.checkAPIKey(provider.id))
           )
         )
-        const hasAnyKey = keyChecks.some(Boolean)
-        const online = !!settings && hasAnyKey
+        const online = keyChecks.some(Boolean)
 
         console.log('[v0] useConnectionStatus.checkStatus:', {
           hasSettings: !!settings,
           providers: LLM_PROVIDERS.map((p, i) => ({ id: p.id, hasKey: keyChecks[i] })),
-          hasAnyKey,
           isOnline: online,
         })
 
