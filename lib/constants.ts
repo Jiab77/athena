@@ -38,9 +38,9 @@ export const DEFAULT_VISUAL_FORMAT: VisualFormat = 'static-2d'
 export const DEFAULT_GENDER = 'F'
 export const DEFAULT_COLOR_SCHEME = 'vibrant'
 export const DEFAULT_AVATAR_CATEGORY = 'cyberpunk'
-export const DEFAULT_MODEL_PROVIDER = 'openai'
-export const DEFAULT_MODEL_ID = 'gpt-5.4-mini'
-export const DEFAULT_MODEL_NAME = 'gpt-5.4-mini'
+export const DEFAULT_MODEL_PROVIDER = 'free'
+export const DEFAULT_MODEL_ID = 'dense'
+export const DEFAULT_MODEL_NAME = 'Dense'
 
 /**
  * Default Memory Config
