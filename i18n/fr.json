@@ -285,6 +285,7 @@
       "apiKeyPlaceholder": "Entrez votre clé {provider}",
       "apiKeyFallback": "API",
       "encryptionNotice": "Chiffrée localement, envoyée uniquement aux fournisseurs d'API pour l'authentification",
+      "getApiKey": "Obtenir votre clé API {provider}",
       "modelsCount": "{count} modèles"
     },
 

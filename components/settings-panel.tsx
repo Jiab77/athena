@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Lock, Info, Eye, EyeOff } from 'lucide-react'
+import { Lock, Info, Eye, EyeOff, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -811,6 +811,26 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                     <Lock className="inline h-3 w-3 mr-1" />
                     {t('settings.model.encryptionNotice')}
                   </p>
+                  {/* Help line linking out to the provider's API-key page.
+                      Only shown for built-in providers that have a `keysUrl`
+                      defined in `lib/constants.ts`. The Custom provider has
+                      no canonical URL — its endpoint depends on whatever the
+                      user pointed it at — so we hide the line entirely there
+                      rather than showing a generic "check your docs" message
+                      that would add noise without value. */}
+                  {!isCustomProvider && selectedProvider?.keysUrl && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      <ExternalLink className="inline h-3 w-3 mr-1" />
+                      <a
+                        href={selectedProvider.keysUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-foreground transition-colors"
+                      >
+                        {t('settings.model.getApiKey', { provider: selectedProvider.name })}
+                      </a>
+                    </p>
+                  )}
                 </div>
                 )}
               </div>

@@ -279,6 +279,7 @@
       "apiKeyPlaceholder": "Inserisci la tua chiave {provider}",
       "apiKeyFallback": "API",
       "encryptionNotice": "Crittografata localmente, inviata solo ai fornitori API per l'autenticazione",
+      "getApiKey": "Ottieni la tua chiave API {provider}",
       "modelsCount": "{count} modelli"
     },
 
