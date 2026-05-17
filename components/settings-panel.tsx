@@ -820,12 +820,12 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                       that would add noise without value. */}
                   {!isCustomProvider && selectedProvider?.keysUrl && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      <ExternalLink className="inline h-3 w-3 mr-1" />
+                      <ExternalLink className="inline h-3 w-3 mr-1 text-accent" />
                       <a
                         href={selectedProvider.keysUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="underline hover:text-foreground transition-colors"
+                        className="text-accent underline hover:text-primary transition-colors"
                       >
                         {t('settings.model.getApiKey', { provider: selectedProvider.name })}
                       </a>
