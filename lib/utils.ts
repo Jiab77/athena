@@ -30,7 +30,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function isAthenaFreeAvailable(): boolean {
   const available = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
-  console.log('[v0] utils.isAthenaFreeAvailable:', { available })
+  console.log('[Utils] isAthenaFreeAvailable:', { available })
   return available
 }
 

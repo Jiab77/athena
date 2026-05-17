@@ -110,7 +110,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
   const visibleProviders = LLM_PROVIDERS.filter(
     (p) => p.id !== 'free' || freeTierAvailable,
   )
-  console.log('[v0] SettingsPanel.providers: free-tier visibility', {
+  console.log('[Settings] providers: free-tier visibility', {
     freeTierAvailable,
     totalProviders: LLM_PROVIDERS.length,
     visibleProviders: visibleProviders.map((p) => p.id),

@@ -45,7 +45,7 @@ export function useConnectionStatus() {
         )
         const online = keyChecks.some(Boolean)
 
-        console.log('[v0] useConnectionStatus.checkStatus:', {
+        console.log('[ConnStatus] checkStatus:', {
           hasSettings: !!settings,
           providers: LLM_PROVIDERS.map((p, i) => ({ id: p.id, hasKey: keyChecks[i] })),
           isOnline: online,
@@ -53,7 +53,7 @@ export function useConnectionStatus() {
 
         setIsOnline(online)
       } catch (error) {
-        console.log('[v0] useConnectionStatus.checkStatus: error, marking offline', error)
+        console.log('[ConnStatus] checkStatus: error, marking offline', error)
         setIsOnline(false)
       }
     }

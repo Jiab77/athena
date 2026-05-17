@@ -55,7 +55,7 @@ const ATTRIBUTION_TITLE = `${DEFAULT_COMPANION_NAME} Free Tier`
 export function getAthenaFreeKey(): string {
   const raw = process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? ''
   const key = raw.trim()
-  console.log('[v0] free.getAthenaFreeKey: env var present?', {
+  console.log('[Free] free.getAthenaFreeKey: env var present?', {
     rawLength: raw.length,
     trimmedLength: key.length,
     // Never log the full key — only confirm shape so we can tell whether
@@ -107,7 +107,7 @@ export async function callAthenaFreeAPI(messages: Message[]): Promise<LLMRespons
     const avatarGender = (settings.avatarGender as GenderType) || DEFAULT_GENDER
     const customPersonalityTraits = settings.customPersonalityTraits
 
-    console.log('[v0] callAthenaFreeAPI: settings resolved', { model, personality, companion, memoryWindowSize, avatarGender })
+    console.log('[Free] callAthenaFreeAPI: settings resolved', { model, personality, companion, memoryWindowSize, avatarGender })
 
     const systemPrompt = buildSystemPrompt(companion, personality, avatarGender, customPersonalityTraits)
     const windowedMessages = messages.slice(-memoryWindowSize)
@@ -155,7 +155,7 @@ export async function callAthenaFreeAPI(messages: Message[]): Promise<LLMRespons
       ],
     }
 
-    console.log('[v0] callAthenaFreeAPI: request body', {
+    console.log('[Free] callAthenaFreeAPI: request body', {
       ...reqBody,
       messages: reqBody.messages.map((msg) => ({
         ...msg,
@@ -175,13 +175,13 @@ export async function callAthenaFreeAPI(messages: Message[]): Promise<LLMRespons
       body: JSON.stringify(reqBody),
     })
 
-    console.log('[v0] callAthenaFreeAPI: HTTP response status', response.status, response.ok)
+    console.log('[Free] callAthenaFreeAPI: HTTP response status', response.status, response.ok)
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
       const status = response.status
       const errorMessage = error.error?.message || error.message || 'Unknown error'
-      console.log('[v0] callAthenaFreeAPI: API error response', error)
+      console.log('[Free] callAthenaFreeAPI: API error response', error)
       throw {
         status,
         message: errorMessage,
@@ -190,24 +190,24 @@ export async function callAthenaFreeAPI(messages: Message[]): Promise<LLMRespons
     }
 
     const data = await response.json()
-    console.log('[v0] callAthenaFreeAPI: response data', data)
+    console.log('[Free] callAthenaFreeAPI: response data', data)
 
     const usage = data.usage || null
     const content = data.choices?.[0]?.message?.content
 
     if (!content) {
-      console.log('[v0] callAthenaFreeAPI: no content in response')
+      console.log('[Free] callAthenaFreeAPI: no content in response')
       throw new Error('No response content from Athena Free Tier')
     }
 
-    console.log('[v0] callAthenaFreeAPI: success', { responseLength: content.length, usage })
+    console.log('[Free] callAthenaFreeAPI: success', { responseLength: content.length, usage })
 
     return {
       response: content,
       usage: usage as { prompt_tokens: number; completion_tokens: number; total_tokens: number } | null,
     }
   } catch (error) {
-    console.log('[v0] callAthenaFreeAPI: caught error', error)
+    console.log('[Free] callAthenaFreeAPI: caught error', error)
     throw error
   }
 }
@@ -241,7 +241,7 @@ export async function detectEmotion(systemPrompt: string, userText: string): Pro
     response_format: { type: 'json_object' as const },
   }
 
-  console.log('[v0] detectEmotion (Free): request', reqBody)
+  console.log('[Free] detectEmotion (Free): request', reqBody)
 
   const response = await fetch(CHAT_API_URL, {
     method: 'POST',
@@ -253,16 +253,16 @@ export async function detectEmotion(systemPrompt: string, userText: string): Pro
     body: JSON.stringify(reqBody),
   })
 
-  console.log('[v0] detectEmotion (Free): HTTP response', { status: response.status, ok: response.ok })
+  console.log('[Free] detectEmotion (Free): HTTP response', { status: response.status, ok: response.ok })
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}))
-    console.error('[v0] detectEmotion (Free): API error', error)
+    console.error('[Free] detectEmotion (Free): API error', error)
     throw new Error(error?.error?.message || `Athena Free Tier emotion detection failed: ${response.statusText}`)
   }
 
   const data = await response.json()
-  console.log('[v0] detectEmotion (Free): raw response', data)
+  console.log('[Free] detectEmotion (Free): raw response', data)
 
   const content = data.choices?.[0]?.message?.content
   if (!content) {
