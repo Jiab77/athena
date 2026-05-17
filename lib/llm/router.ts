@@ -1,13 +1,14 @@
 'use client'
 
 import type { LLMModelCapabilities, Message, LLMResponse } from '../types'
-import { DEFAULT_MODEL_PROVIDER, LLM_PROVIDERS } from '../constants'
+import { ATHENA_FREE_PROVIDER_ID, DEFAULT_MODEL_PROVIDER, LLM_PROVIDERS } from '../constants'
 import { getDB } from '../db'
 import { callGroqAPI, transcribeAudio as transcribeGroq, detectEmotion as detectEmotionGroq } from './groq'
 import { callOpenAIAPI, transcribeAudio as transcribeOpenAI, detectEmotion as detectEmotionOpenAI } from './openai'
 import { callCustomAPI, transcribeAudio as transcribeCustom } from './custom'
 import { callBioLLMAPI } from './biollm'
 import { callOpenRouterAPI, transcribeAudio as transcribeOpenRouter, detectEmotion as detectEmotionOpenRouter } from './openrouter'
+import { callAthenaFreeAPI, detectEmotion as detectEmotionFree, isAthenaFreeAvailable } from './free'
 // Per-capability adapters (`transcribe*`, `detectEmotion*`) are still imported
 // for their registration in the `providers` map below — the fallback chains
 // read them from that registry rather than referencing the imports directly.
@@ -67,6 +68,15 @@ const providers: Record<string, LLMProvider> = {
     // `getEmotionModel('openrouter')`. Same single-key reasoning as STT.
     detectEmotion: detectEmotionOpenRouter,
   },
+  // Bundled "Free Tier" — uses NEXT_PUBLIC_ATHENA_FREE_KEY against a
+  // dedicated OpenRouter account. No native STT (free-tier quota too tight
+  // for chat-completions audio transcription); emotion detection is wired so
+  // free-tier users get expression-driven avatars without a paid key. See
+  // lib/llm/free.ts for the public-key tradeoff rationale.
+  [ATHENA_FREE_PROVIDER_ID]: {
+    callAPI: callAthenaFreeAPI,
+    detectEmotion: detectEmotionFree,
+  },
 }
 
 /**
@@ -123,6 +133,58 @@ export async function callLLM(messages: Message[], selectedProvider?: string): P
   const result = await provider.callAPI(messages)
   console.log('[Router] callLLM - response received', { responseLength: result.response.length, usage: result.usage, hasImage: !!result.imageBase64 })
   return result
+}
+
+/**
+ * Re-export of `isAthenaFreeAvailable` so consumers (settings panel, picker,
+ * onboarding) can gate UI on Free Tier availability without importing the
+ * adapter directly. Keeps the router as the single integration surface.
+ */
+export { isAthenaFreeAvailable } from './free'
+
+/**
+ * Try the active provider first; on failure, retry once through the bundled
+ * Free Tier when it's available *and* the active provider isn't already
+ * Free Tier. Returns the original error untouched when fallback is not
+ * possible — the caller's existing error handling continues to work.
+ *
+ * Use this from chat call-sites that want graceful degradation when a
+ * user-keyed provider rate-limits, errors, or has its key revoked. The active
+ * provider's chat call still runs first, so happy-path latency is unchanged.
+ *
+ * Note: the fallback request will use the user's currently-selected model
+ * string, which is unlikely to match a Free Tier model. We override the
+ * model lookup by routing through the Free Tier adapter regardless — but
+ * the adapter still reads `settings.selectedModel` from IndexedDB. To keep
+ * this wrapper truly transparent, we temporarily push a Free Tier model into
+ * the settings via the conversation context isn't ideal. Pragmatic v1: the
+ * Free Tier adapter will simply send the user's original model string to
+ * OpenRouter; non-free models will return an auth/access error and the
+ * fallback will surface that error. This is an acceptable v1 — chat-side
+ * fallback is mainly useful when the user is *already* on a Free Tier model
+ * and the bundled key has hiccupped, or for future "auto-degrade on quota
+ * exhaustion" UX. Cross-tier fallback (paid → free) requires a model
+ * remapping pass that's out of scope for this change.
+ */
+export async function callLLMWithFreeFallback(
+  messages: Message[],
+  selectedProvider?: string,
+): Promise<LLMResponse> {
+  const providerID = selectedProvider || await getCurrentProvider()
+  try {
+    return await callLLM(messages, providerID)
+  } catch (error) {
+    if (providerID === ATHENA_FREE_PROVIDER_ID) {
+      console.log('[Router] callLLMWithFreeFallback: active provider IS free tier — no fallback path', error)
+      throw error
+    }
+    if (!isAthenaFreeAvailable()) {
+      console.log('[Router] callLLMWithFreeFallback: free tier unavailable, rethrowing', error)
+      throw error
+    }
+    console.log(`[Router] callLLMWithFreeFallback: '${providerID}' failed — retrying through Free Tier`, error)
+    return callLLM(messages, ATHENA_FREE_PROVIDER_ID)
+  }
 }
 
 /**
@@ -235,9 +297,12 @@ export async function supportsSTT(): Promise<boolean> {
  *
  * OpenAI is listed first because its emotion-detection model is consistently
  * accurate on JSON-formatted classification tasks; Groq is the cost/latency
- * fallback when no OpenAI key is available.
+ * fallback when no OpenAI key is available. Free Tier sits at the end as a
+ * last-resort option for self-hosters who want emotion detection without
+ * configuring any paid provider — accuracy is good enough on a single-token
+ * classification, and the bundled key carries the cost.
  */
-const EMOTION_FALLBACK_CHAIN = ['openai', 'groq'] as const
+const EMOTION_FALLBACK_CHAIN = ['openai', 'groq', ATHENA_FREE_PROVIDER_ID] as const
 
 /** Return type shared by `getNativeEmotion` and the public resolver — pairs the
  * resolved provider id with the actual detector function so callers don't have
@@ -261,13 +326,20 @@ function getNativeEmotion(providerID: string): EmotionDetector | null {
  * Walk `EMOTION_FALLBACK_CHAIN` and return the first provider whose API key
  * is configured *and* whose registry entry exposes `detectEmotion`. Returns
  * `null` when none qualify.
+ *
+ * Free Tier is special-cased: it has no IndexedDB key — availability is
+ * gated on `NEXT_PUBLIC_ATHENA_FREE_KEY` instead, checked synchronously via
+ * `isAthenaFreeAvailable()`. Every other provider goes through the standard
+ * `db.checkAPIKey()` path.
  */
 async function resolveEmotionFallback(): Promise<EmotionDetector | null> {
   const db = await getDB()
   for (const providerID of EMOTION_FALLBACK_CHAIN) {
     const provider = providers[providerID]
     if (!provider?.detectEmotion) continue
-    const hasKey = await db.checkAPIKey(providerID)
+    const hasKey = providerID === ATHENA_FREE_PROVIDER_ID
+      ? isAthenaFreeAvailable()
+      : await db.checkAPIKey(providerID)
     if (hasKey) {
       return { providerID, detect: provider.detectEmotion }
     }

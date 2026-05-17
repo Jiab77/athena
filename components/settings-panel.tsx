@@ -32,6 +32,7 @@ import {
   MIN_MEMORY_SIZE,
   MAX_MEMORY_SIZE,
   LLM_PROVIDERS,
+  ATHENA_FREE_PROVIDER_ID,
   TTS_PROVIDERS,
   TTS_VOICES,
   AVATARS,
@@ -93,8 +94,23 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
   const isLiveAvatar = visualFormat === 'live-avatar'
   const isCustomProvider = provider === 'custom'
   const isBioLLM = provider === 'biollm'
+  // Reserved for future "Free Tier" badge / messaging in the picker. Wire-up
+  // is intentionally minimal in this change — visual treatment to follow.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const isFreeTier = provider === ATHENA_FREE_PROVIDER_ID
   const selectedProvider = LLM_PROVIDERS.find((p) => p.id === provider)
   const availableModels = selectedProvider?.models.filter(m => m.visible) || []
+  // Free Tier (and any future provider with `requiresApiKey: false`) hides
+  // the API key input — its credentials come from the bundled env var.
+  const requiresApiKey = selectedProvider?.requiresApiKey !== false
+  // Hide Free Tier from the picker when `NEXT_PUBLIC_ATHENA_FREE_KEY` isn't
+  // set at build time. Self-hosters without the env var see no Free Tier
+  // option at all rather than a broken entry. Read directly from
+  // `process.env` because Next.js inlines `NEXT_PUBLIC_*` into client code.
+  const isAthenaFreeAvailable = (process.env.NEXT_PUBLIC_ATHENA_FREE_KEY ?? '').trim().length > 0
+  const visibleProviders = LLM_PROVIDERS.filter(
+    (p) => p.id !== ATHENA_FREE_PROVIDER_ID || isAthenaFreeAvailable,
+  )
 
   // Voice settings logic
   const selectedTTSProvider = TTS_PROVIDERS.find((p) => p.id === voiceProvider)
@@ -627,7 +643,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                       </span>
                     </SelectTrigger>
                     <SelectContent>
-                      {LLM_PROVIDERS.map((p) => (
+                      {visibleProviders.map((p) => (
                         <SelectItem key={p.id} value={p.id} className="focus:bg-secondary/50">
                           <div className="flex flex-col">
                             <span>{p.name}</span>
@@ -761,7 +777,10 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                   </div>
                 )}
 
-                {/* API Key */}
+                {/* API Key — hidden for providers with `requiresApiKey: false`
+                    (Free Tier today). Those providers source credentials from
+                    a bundled env var instead of per-user IndexedDB storage. */}
+                {requiresApiKey && (
                 <div>
                   <label className="block text-xs font-semibold text-foreground mb-2">
                     {t('settings.model.apiKey')}
@@ -788,6 +807,7 @@ export function SettingsPanel({ onClose, onSettingsSaved, initialSection }: Sett
                     {t('settings.model.encryptionNotice')}
                   </p>
                 </div>
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>

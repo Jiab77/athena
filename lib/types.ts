@@ -188,6 +188,20 @@ export interface LLMProvider {
   id: string
   name: string
   models: LLMModel[]
+  /**
+   * Public landing page where users can obtain or manage an API key for this
+   * provider. Optional — used by the settings panel to render a "Get an API
+   * key" link next to the key input. Omit for providers that don't expose a
+   * self-service key page (e.g. Custom, BioLLM, the bundled Free Tier).
+   */
+  keysUrl?: string
+  /**
+   * Whether this provider needs a user-supplied API key. Defaults to `true`
+   * when omitted — every existing provider stores a per-user key in IndexedDB.
+   * The bundled Free Tier sets this to `false` so the settings panel can hide
+   * the API key input and the router can skip the IndexedDB lookup.
+   */
+  requiresApiKey?: boolean
 }
 
 /**
